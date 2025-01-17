@@ -46,7 +46,7 @@ function read($dir)
                 <div class="col-md-3">
                     <div class="panel panel-success">
                         <div class="panel-heading">
-                            <h3 class="panel-title">Featuers</h3>
+                            <h3 class="panel-title">Features</h3>
                         </div>
                         <ul class="list-group">
                             <?php read($featuresDir) ?>
@@ -69,7 +69,7 @@ function read($dir)
                             <h3 class="panel-title">Pages</h3>
                         </div>
                         <ul class="list-group">
-                            <?php read($pages) ?>
+                            <?php read($pagesDir) ?>
                         </ul>
                     </div>
                 </div>
@@ -79,7 +79,7 @@ function read($dir)
                             <h3 class="panel-title">Templates</h3>
                         </div>
                         <ul class="list-group">
-                            <?php read($templates) ?>
+                            <?php read($templatesDir) ?>
                         </ul>
                     </div>
                 </div>
