@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot-Installed Repositories</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .status-success { color: #28a745; }  /* Green for success */
+        .status-failed { color: #dc3545; }   /* Red for failure */
+        .status-pending { color: #ffc107; }  /* Yellow for pending */
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Installed Repositories</h1>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addRepoModal">
+                Add New Repository
+            </button>
+        </div>
+
+        <!-- Repositories List Table -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Repositories</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">Organization</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Stars</th>
+                            <th scope="col">Forks</th>
+                            <th scope="col">Open Issues</th>
+                            <th scope="col">Open PRs</th>
+                            <th scope="col">Languages</th>
+                            <th scope="col">Main Branch Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Example Row -->
+                        <tr>
+                            <td>octocat</td>
+                            <td>hello-world</td>
+                            <td><i class="fas fa-star"></i> 1.5k</td>
+                            <td><i class="fas fa-code-branch"></i> 350</td>
+                            <td><i class="fas fa-circle-exclamation"></i> 25</td>
+                            <td><i class="fas fa-code-pull-request"></i> 10</td>
+                            <td>
+                                <span class="badge bg-primary">JavaScript</span>
+                                <span class="badge bg-secondary">HTML</span>
+                            </td>
+                            <td><i class="fas fa-circle-check status-success"></i> Passing</td>
+                        </tr>
+                        <tr>
+                            <td>microsoft</td>
+                            <td>vscode</td>
+                            <td><i class="fas fa-star"></i> 123k</td>
+                            <td><i class="fas fa-code-branch"></i> 10.2k</td>
+                            <td><i class="fas fa-circle-exclamation"></i> 500</td>
+                            <td><i class="fas fa-code-pull-request"></i> 75</td>
+                            <td>
+                                <span class="badge bg-primary">TypeScript</span>
+                                <span class="badge bg-info">CSS</span>
+                                <span class="badge bg-warning">C++</span>
+                            </td>
+                            <td><i class="fas fa-circle-xmark status-failed"></i> Failing</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Add Repository Modal -->
+        <div class="modal fade" id="addRepoModal" tabindex="-1" aria-labelledby="addRepoModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addRepoModalLabel">Add New Repository</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="mb-3">
+                                <label for="githubIntegration" class="form-label">GitHub Integration</label>
+                                <select class="form-select" id="githubIntegration">
+                                    <option selected>Choose integration...</option>
+                                    <option value="1">Organization 1</option>
+                                    <option value="2">Organization 2</option>
+                                    <option value="3">Organization 3</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="repoName" class="form-label">Repository Name</label>
+                                <input type="text" class="form-control" id="repoName" placeholder="e.g. hello-world">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Add Repository</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS & FontAwesome -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

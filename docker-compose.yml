@@ -1,0 +1,10 @@
+services:
+  www:
+    container_name: www
+    build: .
+    ports:
+      - "8000:80"
+    volumes:
+      - ./src:/var/www/html/
+    networks:
+      - default

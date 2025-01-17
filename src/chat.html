@@ -1,0 +1,549 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>GStraccini-bot | Dashboard</title>
+        <link rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <link rel="stylesheet"
+            href="https://bot.straccini.com//static/user.css">
+        <link rel="stylesheet" href="style-chat.css">
+    </head>
+
+    <body>
+        <header class="navbar navbar-dark bg-primary">
+            <div class="container-fluid">
+                <a href="https://bot.straccini.com/dashboard.php"><img
+                        src="/images/logo-white.png" alt="Bot Logo"
+                        class="me-2"></a>
+
+                <nav class="navbar-nav flex-row me-auto">
+                    <a href="dashboard.php" class="nav-link text-white me-3">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                    <a href="repositories.php" class="nav-link text-white me-3">
+                        <i class="fas fa-folder-open"></i> Repositories
+                    </a>
+                    <a href="issues.php" class="nav-link text-white me-3">
+                        <i class="fas fa-exclamation-circle"></i> Issues
+                    </a>
+                    <a href="pull-requests.php"
+                        class="nav-link text-white me-3">
+                        <i class="fas fa-code-branch"></i> Pull Requests
+                    </a>
+                </nav>
+
+                <div class="d-flex align-items-center">
+                    <span id="themeSwitcher"
+                        class="theme-switcher text-white me-3"
+                        style="font-size: 24px;">
+                        <i class="fas fa-sun"></i>
+                    </span>
+                    <div class="dropdown me-3">
+                        <a href="#" id="notificationsDropdown"
+                            class="position-relative" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            <i class="fas fa-bell text-white"
+                                style="font-size: 24px;"></i>
+                            <span id="notification-count"
+                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"></span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end"
+                            aria-labelledby="notificationsDropdown"
+                            id="notificationsMenu">
+                            <li class="dropdown-header">Notifications</li>
+                            <li class="dropdown-item">Loading...</li>
+                        </ul>
+                    </div>
+                    <a href="https://docs.bot.straccini.com" class="me-3"
+                        target="_blank">
+                        <i class="fas fa-question-circle text-white"
+                            style="font-size: 24px;"></i>
+                    </a>
+                    <div class="dropdown me-3">
+                        <a href="#"
+                            class="d-flex align-items-center text-decoration-none dropdown-toggle"
+                            id="dropdownMenuButton" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            <img
+                                src="https://avatars.githubusercontent.com/u/3362854?v=4"
+                                alt="guibranco avatar"
+                                class="rounded-circle" width="40" height="40">
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end"
+                            aria-labelledby="dropdownMenuButton">
+                            <li><a class="dropdown-item" href="dashboard.php"><i
+                                        class="fas fa-tachometer-alt me-2"></i>
+                                    Dashboard</a></li>
+                            <li><a class="dropdown-item" href="account.php"><i
+                                        class="fas fa-user me-2"></i>
+                                    Account</a></li>
+                            <li><a class="dropdown-item" href="settings.php"><i
+                                        class="fas fa-cog me-2"></i>
+                                    Settings</a></li>
+                            <li><a class="dropdown-item"
+                                    href="integrations.php"><i
+                                        class="fas fa-plug me-2"></i>
+                                    Integrations</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item logout"
+                                    href="logout.php"><i
+                                        class="fas fa-sign-out-alt me-2"></i>
+                                    Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="container mt-5">
+            <div class="user-info">
+                <img src="https://avatars.githubusercontent.com/u/3362854?v=4"
+                    alt="User Avatar" width="80" height="80">
+                <div>
+                    <h2>Welcome, <a href="https://github.com/guibranco"
+                            target="_blank">Guilherme</a></h2>
+                    <p class="welcome-message">We're glad to have you back.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="container mt-5 d-none" id="alert-container"></div>
+
+        <div class="container">
+            <div class="row">
+                <section class="col-12">
+                    <h2 class="mb-4">GStraccini-Bot Usage Statistics</h2>
+                    <div class="row">
+
+                        <div class="col-md-4">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title">Total Pull
+                                        Requests</h5>
+                                    <p class="card-text display-4"
+                                        data-target="120">0</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title">Pull Requests
+                                        Merged</h5>
+                                    <p class="card-text display-4"
+                                        data-target="85">0</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title">Commits Analyzed</h5>
+                                    <p class="card-text display-4"
+                                        data-target="320">0</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-4">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title">Issues Closed</h5>
+                                    <p class="card-text display-4"
+                                        data-target="42">0</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title">Average Time to Merge
+                                        (hrs)</h5>
+                                    <p class="card-text display-4"
+                                        data-target="12">0</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title">Active
+                                        Repositories</h5>
+                                    <p class="card-text display-4"
+                                        data-target="6">0</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="row mt-5">
+                <div class="col-md-6">
+                    <h3 class="mb-4">Recent Activities</h3>
+                    <ul class="list-group">
+                        <li class="list-group-item">Created PR #45 in repo1</li>
+                        <li class="list-group-item">Merged PR #44 in repo2</li>
+                        <li class="list-group-item">Closed issue #10 in
+                            repo1</li>
+                        <li class="list-group-item">Analyzed commits in
+                            repo3</li>
+                        <li class="list-group-item">Opened PR #12 in repo2</li>
+                    </ul>
+                </div>
+
+                <div class="col-md-6">
+                    <h3 class="mb-4">Pending Actions</h3>
+                    <ul class="list-group">
+                        <li class="list-group-item">Review PR #43 in repo3</li>
+                        <li class="list-group-item">Close issue #11 in
+                            repo2</li>
+                        <li class="list-group-item">Merge PR #42 in repo1</li>
+                        <li class="list-group-item">Update README in repo2</li>
+                        <li class="list-group-item">Respond to issue #9 in
+                            repo1</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container mt-5">
+            <div class="row mt-5">
+                <div class="col-md-6">
+                    <h3>Assigned Pull Requests <span
+                            class="badge text-bg-warning rounded-pill"
+                            id="openPullRequestsCount">0</span></h3>
+                    <ul class="list-group" id="openPullRequests">
+                        <li class="list-group-item">
+                            <i class="fas fa-spinner fa-spin"></i> Loading
+                            data...
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="col-md-6">
+                    <h3>Assigned Issues <span
+                            class="badge text-bg-warning rounded-pill"
+                            id="openIssuesCount">0</span></h3>
+                    <ul class="list-group" id="openIssues">
+                        <li class="list-group-item">
+                            <i class="fas fa-spinner fa-spin"></i> Loading
+                            data...
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="chatbot-container" id="chatbot">
+            <div class="chatbot-header">
+                <div class="bot-info">
+                    <img src="bot-avatar.png" alt="Bot Avatar"
+                        class="bot-avatar" />
+                    <span class="bot-name">GStraccini Bot</span>
+                </div>
+                <button class="close-btn">✖</button>
+            </div>
+            <div class="chatbot-body">
+                <div class="message bot-message">
+                    Hi! How can I assist you today?
+                </div>
+                <div class="message user-message">
+                    Show me the latest issues.
+                </div>
+                <div class="message bot-message">
+                    Here you go: <a href="#">Issue #123</a>, <a href="#">Issue
+                        #124</a>.
+                </div>
+            </div>
+            <div class="chatbot-footer">
+                <input type="text" class="chat-input"
+                    placeholder="Type a command or ask a question..." />
+                <button class="send-btn" id="sendBtn">➤</button>
+            </div>
+        </div>
+
+        <footer>
+            <p>© 2024 GStraccini-bot. All rights reserved.</p>
+            <nav>
+                <ul>
+                    <li><a href="privacy-policy.php">Privacy Policy</a></li>
+                    <li><a href="terms-of-service.php">Terms of Service</a></li>
+                    <li><a href="service-status.php">Service Status</a></li>
+                    <li><a href="https://docs.bot.straccini.com"
+                            target="_blank">Documentation</a></li>
+                    <li><a href="https://github.com/marketplace/gstraccini-bot"
+                            target="_blank">GitHub Marketplace</a></li>
+                    <li><a
+                            href="https://github.com/guibranco/gstraccini-bot-service"
+                            target="_blank">GitHub Repository</a></li>
+                </ul>
+            </nav>
+        </footer>
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script
+            src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js"></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+        <script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        // Select DOM elements
+const chatbot = document.getElementById("chatbot");
+const chatBody = document.getElementById("chatBody");
+const chatInput = document.getElementById("chatInput");
+const sendBtn = document.getElementById("sendBtn");
+const closeChat = document.getElementById("closeChat");
+
+// Add event listener to send button
+sendBtn.addEventListener("click", () => {
+  sendMessage();
+});
+
+// Handle the Enter key for sending messages
+chatInput.addEventListener("keypress", (event) => {
+  if (event.key === "Enter") {
+    sendMessage();
+  }
+});
+
+// Function to send the message
+function sendMessage() {
+  const userMessage = chatInput.value.trim();
+
+  // Check if the input is empty
+  if (!userMessage) return;
+
+  // Add user message to chat
+  addMessage(userMessage, "user");
+
+  // Simulate bot response (replace with actual backend/API call later)
+  setTimeout(() => {
+    const botResponse = generateBotResponse(userMessage);
+    addMessage(botResponse, "bot");
+  }, 1000); // Simulate response delay
+
+  // Clear the input field
+  chatInput.value = "";
+}
+
+// Function to add a message to the chat
+function addMessage(message, type) {
+  const messageBubble = document.createElement("div");
+  messageBubble.classList.add("message");
+  messageBubble.classList.add(`${type}-message`);
+  messageBubble.textContent = message;
+
+  chatBody.appendChild(messageBubble);
+
+  // Auto-scroll to the latest message
+  chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+// Simulate bot response logic (replace this with real API interaction)
+function generateBotResponse(userMessage) {
+  if (userMessage.toLowerCase().includes("issues")) {
+    return "Here are the latest issues: <a href='#'>Issue #123</a>, <a href='#'>Issue #124</a>.";
+  } else if (userMessage.toLowerCase().includes("hello")) {
+    return "Hello! How can I help you today?";
+  } else {
+    return "I'm not sure how to respond to that. Try asking about issues or commands.";
+  }
+}
+
+// Add event listener to close button
+closeChat.addEventListener("click", () => {
+  chatbot.style.display = "none";
+});
+
+        function fetchNotifications() {
+            fetch('notifications_inline.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error('Error fetching notifications:', data.error);
+                        document.getElementById('notificationsMenu').innerHTML = `<li class="dropdown-item text-bg-danger">${data.error}</li>`;
+                    } else {
+                        processNotifications(data);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('notificationsMenu').innerHTML = '<li class="dropdown-item text-bg-danger">Failed to load notifications.</li>';
+                })
+                .finally(() => { createViewAll(); });
+        }
+
+        function processNotifications(notifications) {
+            const notificationsMenu = document.getElementById('notificationsMenu');
+            const notificationCount = document.getElementById('notification-count');
+
+            notificationsMenu.innerHTML = '';
+
+            if (notifications.length === 0) {
+                notificationsMenu.innerHTML = '<li class="dropdown-item">No new notifications.</li>';
+                notificationCount.textContent = '';
+                return;
+            }
+
+            notifications.forEach(notification => {
+                const title = notification.subject.title;
+                const repo = notification.repository.full_name;
+                const url = notification.subject.url.replace('api.github.com/repos', 'github.com').replace('/issues', '/issues/');
+
+                const listItem = document.createElement('li');
+                listItem.classList.add('dropdown-item');
+
+                const safeUrl = encodeURI(url);
+                const safeTitle = escapeHtml(title);
+                const safeRepo = escapeHtml(repo);
+                listItem.innerHTML = `<a href="${safeUrl}" target="_blank" aria-label="Notification: ${safeTitle}">${safeTitle} - ${safeRepo}</a>`;
+                notificationsMenu.appendChild(listItem);
+            });
+            notificationCount.textContent = notifications.length > 9 ? '9+' : notifications.length;
+        }
+
+        function createViewAll() {
+            const notificationsMenu = document.getElementById('notificationsMenu');
+
+            const listDivider = document.createElement('li');
+            listDivider.innerHTML = '<hr class="dropdown-divider">';
+            notificationsMenu.appendChild(listDivider);
+
+            const listViewAll = document.createElement('li');
+            listViewAll.classList.add('dropdown-item');
+            listViewAll.innerHTML = '<a href="notifications.php">View all notifications</a>';
+            notificationsMenu.appendChild(listViewAll);
+        }
+
+        const notificationsDropdown = document.getElementById('notificationsDropdown');
+        notificationsDropdown.addEventListener('click', function () {
+            fetchNotifications();
+        });
+        fetchNotifications();
+    });
+
+        function showErrorAlert(message) {
+            var alertHtml = `
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>Error!</strong> ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>`;
+
+            $("#alert-container").toggleClass("d-none").toggleClass("d-block").html(alertHtml);
+
+            setTimeout(function () {
+                var alertElement = document.querySelector('.alert');
+                if (alertElement) {
+                    var alertInstance = new bootstrap.Alert(alertElement);
+                    alertInstance.close();
+                }
+            }, 15000);
+        }
+
+        function populateIssues(items, id) {
+            $(`#${id}Count`).text(items.length);
+            const list = document.getElementById(id);
+            list.innerHTML = '';
+
+            if (items.length === 0) {
+                const itemLi = document.createElement('li');
+                itemLi.className = 'list-group-item list-group-item-warning';
+                itemLi.innerHTML = `<strong>No items found!</strong>`;
+                list.appendChild(itemLi);
+                return;
+            }
+
+            items.forEach(item => {
+                let state = "";
+                if (id === "openPullRequests") {
+                    state = getStateBadge(item.state);
+                }
+                const itemLi = document.createElement('li');
+                itemLi.className = 'list-group-item';
+                let content = '';
+                content += `<strong><a href='${item.url}' target='_blank'>${item.title}</a></strong><br />`;
+                content += `<span class="text-muted"><a href='https://github.com/${item.full_name}' target='_blank'>${item.repository}</a></span> - `;
+                content += `<span class="text-muted">(🕐 ${item.created_at})</span> ${state}`;
+                itemLi.innerHTML = content;
+                list.appendChild(itemLi);
+            });
+        }
+
+        function getStateBadge(state) {
+            switch (state) {
+                case 'success':
+                    return '<span class="badge bg-success"><i class="fas fa-check-circle"></i> Success</span>';
+                case 'failure':
+                    return '<span class="badge bg-danger"><i class="fas fa-times-circle"></i> Failure</span>';
+                case 'pending':
+                    return '<span class="badge bg-warning text-dark"><i class="fas fa-hourglass-half"></i> Pending</span>';
+                case 'error':
+                    return '<span class="badge bg-danger"><i class="fas fa-exclamation-triangle"></i> Error</span>';
+                default:
+                    return '<span class="badge bg-secondary"><i class="fas fa-question-circle"></i> Empty</span>';
+            }
+        }
+
+        function loadData() {
+            fetch('api.php?dashboard=true')
+                .then(response => response.json())
+                .then(data => {
+                    populateIssues(data.openPullRequestsDashboard, "openPullRequests");
+                    populateIssues(data.openIssuesDashboard, "openIssues");
+                    setTimeout(loadData, 1000 * 60);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showErrorAlert('Failed to complete the request. Please try again later.');;
+                });
+        }
+
+        window.addEventListener('DOMContentLoaded', loadData);
+        document.addEventListener('DOMContentLoaded', () => {
+            const counters = document.querySelectorAll('.card-text');
+
+            counters.forEach(counter => {
+                const target = +counter.getAttribute('data-target');
+                const duration = 2000;
+                const interval = 10;
+                const increment = target / (duration / interval);
+
+                let current = 0;
+
+                const updateCounter = () => {
+                    current += increment;
+                    if (current >= target) {
+                        counter.textContent = target;
+                    } else {
+                        counter.textContent = Math.ceil(current);
+                        setTimeout(updateCounter, interval);
+                    }
+                };
+
+                updateCounter();
+            });
+        });
+    </script>
+    </body>
+
+</html>

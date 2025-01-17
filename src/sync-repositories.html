@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Repositories</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container mt-5">
+    <h2 class="mb-4">GitHub Repositories</h2>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="select-all"></th>
+                <th>Repository Name</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Example row (dynamically repeat this block for each repository) -->
+            <tr>
+                <td><input type="checkbox" class="repo-checkbox" data-repo-id="1" disabled checked></td>
+                <td>Repository-1</td>
+                <td><button class="btn btn-secondary" disabled>Connected</button></td>
+                <td><button class="btn btn-danger">Disconnect</button></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" class="repo-checkbox" data-repo-id="2"></td>
+                <td>Repository-2</td>
+                <td><button class="btn btn-warning" disabled>Not Connected</button></td>
+                <td><button class="btn btn-success">Connect</button></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" class="repo-checkbox" data-repo-id="3" disabled checked></td>
+                <td>Repository-3</td>
+                <td><button class="btn btn-secondary" disabled>Connected</button></td>
+                <td><button class="btn btn-danger">Disconnect</button></td>
+            </tr>
+            <!-- End of example row -->
+        </tbody>
+    </table>
+
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <input type="checkbox" id="select-all-bottom"> Select All
+        </div>
+        <button id="connect-selected-btn" class="btn btn-primary" disabled>Connect Selected Repositories</button>
+    </div>
+</div>
+
+<script>
+    const checkboxes = document.querySelectorAll('.repo-checkbox:not([disabled])');
+    const connectButton = document.getElementById('connect-selected-btn');
+    const selectAll = document.getElementById('select-all');
+    const selectAllBottom = document.getElementById('select-all-bottom');
+
+    // Enable/Disable Connect button based on selection
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+            const anyChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
+            connectButton.disabled = !anyChecked;
+        });
+    });
+
+    // Select/Deselect All functionality (only for not connected repositories)
+    function toggleSelectAll(status) {
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = status;
+        });
+        connectButton.disabled = !status;
+    }
+
+    selectAll.addEventListener('change', () => {
+        toggleSelectAll(selectAll.checked);
+        selectAllBottom.checked = selectAll.checked;
+    });
+
+    selectAllBottom.addEventListener('change', () => {
+        toggleSelectAll(selectAllBottom.checked);
+        selectAll.checked = selectAllBottom.checked;
+    });
+
+    // Handle Connect Selected button click
+    connectButton.addEventListener('click', () => {
+        const selectedRepos = Array.from(checkboxes)
+            .filter(checkbox => checkbox.checked)
+            .map(checkbox => checkbox.dataset.repoId);
+
+        // Implement logic to connect selected repositories
+        console.log('Connecting repositories:', selectedRepos);
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

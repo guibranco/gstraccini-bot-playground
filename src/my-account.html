@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account Security</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .alert-dismissible .btn-close {
+      position: relative;
+      top: -2px;
+      right: -5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container mt-4">
+    <h2>Security Settings</h2>
+
+    <!-- Alert Container -->
+    <div id="alertContainer"></div>
+
+    <!-- Change Password Section -->
+    <div class="card mt-3">
+      <div class="card-body">
+        <h5 class="card-title">Change Password</h5>
+        <p>If you leave these fields empty, no password will be changed.</p>
+        <form id="changePasswordForm">
+          <div class="mb-3">
+            <label for="newPassword" class="form-label">New Password</label>
+            <input type="password" class="form-control" id="newPassword" placeholder="Enter new password">
+          </div>
+          <div class="mb-3">
+            <label for="confirmPassword" class="form-label">Confirm New Password</label>
+            <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm new password">
+          </div>
+          <button type="submit" class="btn btn-primary">Update Password</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Two-Factor Authentication Section -->
+    <div class="card mt-3">
+      <div class="card-body">
+        <h5 class="card-title">Two-Factor Authentication (2FA)</h5>
+        <button class="btn btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2FA" aria-expanded="false" aria-controls="collapse2FA">
+          Enable/Disable 2FA
+        </button>
+        <div class="collapse mt-3" id="collapse2FA">
+          <p>Use Google Authenticator or another compatible app to scan the QR code or enter the code to enable 2FA.</p>
+          <img src="https://via.placeholder.com/150x150" alt="QR Code">
+          <p><small>Scan this QR code to link your Google Authenticator app.</small></p>
+          <button class="btn btn-primary" id="toggle2FA">Toggle 2FA</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FIDO Section -->
+    <div class="card mt-3">
+      <div class="card-body">
+        <h5 class="card-title">FIDO Devices</h5>
+        <p>Manage your registered FIDO devices below.</p>
+        <!-- List of FIDO Devices -->
+        <ul class="list-group mb-3" id="fidoDeviceList">
+          <li class="list-group-item">Device 1: USB Security Key</li>
+          <li class="list-group-item">Device 2: Built-in Laptop Sensor</li>
+        </ul>
+        <button class="btn btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFIDO" aria-expanded="false" aria-controls="collapseFIDO">
+          Add New FIDO Device
+        </button>
+        <div class="collapse mt-3" id="collapseFIDO">
+          <p>Click the button below to register a new FIDO device.</p>
+          <button class="btn btn-success" id="registerFidoDevice">Register New Device</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- JavaScript for Asynchronous Operations -->
+  <script>
+    // Function to show alerts
+    function showAlert(message, type) {
+      const alertContainer = document.getElementById('alertContainer');
+      const alert = `
+        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+          ${message}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>`;
+      alertContainer.innerHTML = alert;
+
+      // Automatically close the alert after 3 seconds
+      setTimeout(() => {
+        const alertNode = alertContainer.querySelector('.alert');
+        if (alertNode) {
+          const bsAlert = new bootstrap.Alert(alertNode);
+          bsAlert.close();
+        }
+      }, 3000);
+    }
+
+    // Handle Change Password Form Submission
+    document.getElementById('changePasswordForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      if (newPassword !== confirmPassword) {
+        showAlert('Passwords do not match!', 'danger');
+        return;
+      }
+
+      try {
+        // Simulating a server call with fetch
+        const response = await fetch('/api/change-password', {
+          method: 'POST',
+          body: JSON.stringify({ newPassword }),
+          headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (response.ok) {
+          showAlert('Password updated successfully!', 'success');
+        } else {
+          showAlert('Failed to update password!', 'danger');
+        }
+      } catch (error) {
+        showAlert('Error updating password!', 'danger');
+      }
+    });
+
+    // Handle Toggle 2FA
+    document.getElementById('toggle2FA').addEventListener('click', async () => {
+      try {
+        // Simulating a server call with fetch
+        const response = await fetch('/api/toggle-2fa', { method: 'POST' });
+
+        if (response.ok) {
+          showAlert('2FA status changed successfully!', 'success');
+        } else {
+          showAlert('Failed to change 2FA status!', 'danger');
+        }
+      } catch (error) {
+        showAlert('Error toggling 2FA!', 'danger');
+      }
+    });
+
+    // Handle Register New FIDO Device
+    document.getElementById('registerFidoDevice').addEventListener('click', async () => {
+      try {
+        // Simulating a server call with fetch
+        const response = await fetch('/api/register-fido-device', { method: 'POST' });
+
+        if (response.ok) {
+          showAlert('FIDO device registered successfully!', 'success');
+          // Add new device to the list (simulated)
+          const newDevice = document.createElement('li');
+          newDevice.classList.add('list-group-item');
+          newDevice.textContent = `Device 3: New FIDO Device`;
+          document.getElementById('fidoDeviceList').appendChild(newDevice);
+        } else {
+          showAlert('Failed to register FIDO device!', 'danger');
+        }
+      } catch (error) {
+        showAlert('Error registering FIDO device!', 'danger');
+      }
+    });
+  </script>
+</body>
+</html>
