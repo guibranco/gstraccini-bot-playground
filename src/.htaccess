@@ -16,3 +16,5 @@ Header set Strict-Transport-Security "max-age=31536000; includeSubDomains"
     Order allow,deny
     Deny from all
 </FilesMatch>
+
+-Indexes
