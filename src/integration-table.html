@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Provider Integration</title>
+
+    <!-- Bootstrap 5.3.3 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- FontAwesome 6.0.0-beta-3 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+    <style>
+        .input-container {
+            margin: 2rem auto;
+            width: 50%;
+        }
+
+        .badge-healthy {
+            background-color: #76ca61;
+            color: white;
+        }
+
+        .badge-unhealthy {
+            background-color: #ee3535;
+            color: white;
+        }
+
+        .badge-checking {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .icon-btn {
+            cursor: pointer;
+        }
+
+        .provider-logo {
+            height: 30px;
+            width: auto;
+            margin-right: 10px;
+        }
+
+        .integration-table img {
+            height: 30px;
+            width: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Provider Selection -->
+        <div class="input-container">
+            <label for="providerSelect" class="form-label">Select Provider</label>
+            <select id="providerSelect" class="form-select">
+                <option value="" disabled selected>Choose a provider...</option>
+                <option value="provider1" data-logo="https://via.placeholder.com/50?text=P1">Provider 1</option>
+                <option value="provider2" data-logo="https://via.placeholder.com/50?text=P2">Provider 2</option>
+                <option value="provider3" data-logo="https://via.placeholder.com/50?text=P3">Provider 3</option>
+            </select>
+        </div>
+
+        <!-- API Key Input -->
+        <div class="input-container">
+            <label for="apiKey" class="form-label">API Key</label>
+            <div class="input-group">
+                <input type="password" id="apiKey" class="form-control" placeholder="Enter API Key" aria-label="API Key">
+                <span class="input-group-text">
+                    <i id="toggleVisibility" class="fas fa-eye icon-btn"></i>
+                </span>
+            </div>
+            <div class="d-flex justify-content-between mt-2">
+                <span id="badgeStatus" class="badge" style="display:none;"></span>
+                <button class="btn btn-primary" id="saveBtn">Save API Key</button>
+            </div>
+        </div>
+
+        <!-- Integrations Table -->
+        <div class="mt-5">
+            <h5>Integrations</h5>
+            <table class="table table-bordered integration-table">
+                <thead>
+                    <tr>
+                        <th>Provider</th>
+                        <th>API Key</th>
+                        <th>Status</th>
+                        <th>Last Usage</th>
+                        <th>Last Error</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="integrationsTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Bootstrap 5.3.3 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        let isVisible = false;
+
+        $("#toggleVisibility").click(toggleVisibility);
+        $("#saveBtn").click(saveIntegration);
+
+        function toggleVisibility() {
+            const input = $('#apiKey');
+            const icon = $('#toggleVisibility');
+            
+            if (isVisible) {
+                input.attr('type', 'password');
+                icon.removeClass('fa-eye-slash').addClass('fa-eye');
+            } else {
+                input.attr('type', 'text');
+                icon.removeClass('fa-eye').addClass('fa-eye-slash');
+            }
+            isVisible = !isVisible;
+        }
+
+        function saveIntegration() {
+            const provider = $('#providerSelect').val();
+            const apiKey = $('#apiKey').val();
+            const badge = $('#badgeStatus');
+
+            if (!provider || apiKey.length < 8) {
+                alert('Please select a provider and enter a valid API Key (minimum 8 characters).');
+                return;
+            }
+
+            // Lock input and show spinner
+            $('#saveBtn').prop('disabled', true);
+            $('#apiKey').prop('disabled', true);
+            badge.show().html('<i class="fas fa-spinner fa-spin"></i> Checking...').addClass('badge-checking');
+
+            // Simulate API key validation
+            setTimeout(() => {
+                const isValid = Math.random() > 0.5; // Mock validation
+                updateBadge(isValid, badge);
+
+                if (isValid) {
+                    const logoUrl = $('#providerSelect option:selected').data('logo');
+                    const maskedKey = apiKey.substring(0, 5) + '****' + apiKey.substring(apiKey.length - 5);
+                    addIntegrationToTable(provider, logoUrl, maskedKey);
+                }
+
+                resetInput();
+            }, 2000);
+        }
+
+        function updateBadge(isValid, badge) {
+            if (isValid) {
+                badge.html('<i class="far fa-check-circle"></i> Healthy').addClass('badge-healthy').removeClass('badge-checking badge-unhealthy');
+            } else {
+                badge.html('<i class="fas fa-times-circle"></i> Unhealthy').addClass('badge-unhealthy').removeClass('badge-checking badge-healthy');
+            }
+        }
+
+        function resetInput() {
+            $('#apiKey').val('').prop('disabled', false);
+            $('#providerSelect').val('');
+            $('#badgeStatus').hide().removeClass('badge-healthy badge-unhealthy badge-checking');
+            $('#saveBtn').prop('disabled', false);
+        }
+
+        function addIntegrationToTable(provider, logoUrl, apiKey) {
+            const row = `
+                <tr>
+                    <td><img src="${logoUrl}" alt="${provider} Logo" /> ${provider}</td>
+                    <td>${apiKey}</td>
+                    <td>Healthy</td>
+                    <td>Never</td>
+                    <td>None</td>
+                    <td><button class="btn btn-danger btn-sm">Remove</button></td>
+                </tr>
+            `;
+            $('#integrationsTableBody').append(row);
+        }
+    </script>
+</body>
+</html>

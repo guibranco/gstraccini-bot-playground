@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>System Notifications</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+            rel="stylesheet">
+        <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+            rel="stylesheet">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    </head>
+    <body>
+
+        <div class="container mt-5">
+            <!-- Pending Actions Section -->
+            <h2>Pending Actions</h2>
+            <div class="list-group mb-5" id="pending-actions-list">
+                <!-- Example pending action (repeat this block dynamically) -->
+                <a href="#" class="list-group-item list-group-item-action">
+                    <i class="fas fa-exclamation-circle"></i> Complete Profile
+                    Setup
+                </a>
+                <a href="#" class="list-group-item list-group-item-action">
+                    <i class="fas fa-tasks"></i> Approve New User Requests
+                </a>
+            </div>
+
+            <!-- Notifications Section -->
+            <h2>Notifications</h2>
+
+            <!-- Tabs for notification filtering -->
+            <ul class="nav nav-tabs" id="notificationTabs" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active" id="unread-tab"
+                        data-bs-toggle="tab" data-bs-target="#unread"
+                        type="button" role="tab"><i class="fas fa-envelope"></i>
+                        Unread</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="read-tab" data-bs-toggle="tab"
+                        data-bs-target="#read" type="button" role="tab"><i
+                            class="fas fa-envelope-open"></i> Read</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="all-tab" data-bs-toggle="tab"
+                        data-bs-target="#all" type="button" role="tab"><i
+                            class="fas fa-list"></i> View All</button>
+                </li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content" id="notificationTabsContent">
+                <!-- Unread Tab -->
+                <div class="tab-pane fade show active" id="unread"
+                    role="tabpanel">
+                    <div class="list-group" id="unread-list"></div>
+                    <nav>
+                        <ul class="pagination" id="unread-pagination"></ul>
+                    </nav>
+                </div>
+                <!-- Read Tab -->
+                <div class="tab-pane fade" id="read" role="tabpanel">
+                    <div class="list-group" id="read-list"></div>
+                    <nav>
+                        <ul class="pagination" id="read-pagination"></ul>
+                    </nav>
+                </div>
+                <!-- View All Tab -->
+                <div class="tab-pane fade" id="all" role="tabpanel">
+                    <div class="list-group" id="all-list"></div>
+                    <nav>
+                        <ul class="pagination" id="all-pagination"></ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <script>
+// Simulated function to fetch paginated notifications from the backend (would use AJAX)
+function fetchNotifications(filter, page = 1) {
+    const itemsPerPage = 50;
+
+    // Simulated example data (replace this with actual AJAX calls)
+    const notifications = {
+        'unread': [
+            { sender: 'John', avatar: 'john-avatar.jpg', title: 'You have a new message.', type: 'issue', id: 1 },
+            // add more unread notifications...
+        ],
+        'read': [
+            { sender: 'System', avatar: 'system-avatar.png', title: 'System maintenance scheduled.', type: 'comms', id: 2 },
+            // add more read notifications...
+        ],
+        'all': [
+            // include both read and unread...
+        ]
+    };
+
+    return paginate(notifications[filter], itemsPerPage, page);
+}
+
+// Paginate function (divides notifications into pages)
+function paginate(items, itemsPerPage, page) {
+    const start = (page - 1) * itemsPerPage;
+    const paginatedItems = items.slice(start, start + itemsPerPage);
+    const totalPages = Math.ceil(items.length / itemsPerPage);
+    return { paginatedItems, totalPages };
+}
+
+// Update UI with paginated notifications
+function updateNotificationList(notifications, listElement, paginationElement, currentPage, filter) {
+    $(listElement).empty();
+    notifications.paginatedItems.forEach(notification => {
+        const iconClass = getIconClass(notification.type);
+        $(listElement).append(`
+            <a href="#" class="list-group-item list-group-item-action">
+                <img src="${notification.avatar}" alt="${notification.sender}" class="rounded-circle me-2" width="40" height="40">
+                <i class="fas ${iconClass} me-2"></i> ${notification.title}
+            </a>
+        `);
+    });
+
+    // Pagination
+    $(paginationElement).empty();
+    for (let i = 1; i <= notifications.totalPages; i++) {
+        $(paginationElement).append(`
+            <li class="page-item ${i === currentPage ? 'active' : ''}">
+                <a class="page-link" href="#" onclick="fetchAndDisplayNotifications('${filter}', ${i})">${i}</a>
+            </li>
+        `);
+    }
+}
+
+// Fetch and display notifications based on filter and page
+function fetchAndDisplayNotifications(filter, page = 1) {
+    const notifications = fetchNotifications(filter, page);
+    const listElement = `#${filter}-list`;
+    const paginationElement = `#${filter}-pagination`;
+    updateNotificationList(notifications, listElement, paginationElement, page, filter);
+}
+
+// Get FontAwesome icon class based on type
+function getIconClass(type) {
+    switch (type) {
+        case 'issue': return 'fa-bug';
+        case 'pull_request': return 'fa-code-branch';
+        case 'repository': return 'fa-folder';
+        case 'comms': return 'fa-comments';
+        case 'other': default: return 'fa-info-circle';
+    }
+}
+
+// Initial load with Unread notifications
+$(document).ready(function () {
+    fetchAndDisplayNotifications('unread');
+    
+    // Event listeners for tabs
+    $('#unread-tab').on('click', function () { fetchAndDisplayNotifications('unread'); });
+    $('#read-tab').on('click', function () { fetchAndDisplayNotifications('read'); });
+    $('#all-tab').on('click', function () { fetchAndDisplayNotifications('all'); });
+});
+
+</script>
+
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+</html>

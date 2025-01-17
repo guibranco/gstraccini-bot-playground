@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Fork Notification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #dddddd;
+            border-radius: 10px;
+            background-color: #ffffff;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+        }
+        .header h1 {
+            font-size: 24px;
+            color: #333333;
+            margin: 10px 0 5px;
+        }
+        .header p {
+            font-size: 14px;
+            color: #777777;
+        }
+        .content {
+            padding: 10px 0;
+        }
+        .repository-details,
+        .fork-details {
+            margin-bottom: 20px;
+        }
+        .details-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #555555;
+            margin-bottom: 10px;
+        }
+        .details-item {
+            margin-bottom: 5px;
+        }
+        .details-item span {
+            font-weight: bold;
+            color: #333333;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #aaaaaa;
+        }
+        a {
+            color: #1d72b8;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <img src="{{forkee_owner_avatar_url}}" alt="Avatar of {{forkee_owner_login}}">
+            <h1>New Fork Alert!</h1>
+            <p>The repository <strong>{{repository_full_name}}</strong> has been forked by <strong>{{forkee_owner_login}}</strong>.</p>
+        </div>
+        <div class="content">
+            <div class="repository-details">
+                <p class="details-title">Original Repository Details:</p>
+                <p class="details-item"><span>Repository Name:</span> {{repository_name}}</p>
+                <p class="details-item"><span>Owner:</span> {{repository_owner_login}}</p>
+                <p class="details-item"><span>Description:</span> {{repository_description}}</p>
+                <p class="details-item"><span>URL:</span> <a href="{{repository_html_url}}" target="_blank">{{repository_html_url}}</a></p>
+            </div>
+            <div class="fork-details">
+                <p class="details-title">Fork Details:</p>
+                <p class="details-item"><span>Forked Repository Name:</span> {{forkee_name}}</p>
+                <p class="details-item"><span>Forked By:</span> {{forkee_owner_login}}</p>
+                <p class="details-item"><span>Fork URL:</span> <a href="{{forkee_html_url}}" target="_blank">{{forkee_html_url}}</a></p>
+                <p class="details-item"><span>Fork Description:</span> {{forkee_description}}</p>
+                <p class="details-item"><span>Created At:</span> {{forkee_created_at}}</p>
+                <p class="details-item"><span>Last Pushed At:</span> {{forkee_pushed_at}}</p>
+                <p class="details-item"><span>Default Branch:</span> {{forkee_default_branch}}</p>
+            </div>
+        </div>
+        <div class="footer">
+            <p>This notification was generated automatically. If you have any questions, please contact us.</p>
+        </div>
+    </div>
+</body>
+</html>

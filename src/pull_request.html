@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pull Request Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
+    <style>
+        .status-success { color: #28a745; }  /* Green for success */
+        .status-failed { color: #dc3545; }   /* Red for failure */
+        .status-pending { color: #ffc107; }  /* Yellow for pending */
+        .label { margin-right: 5px; }        /* Spacing between labels */
+        .file-item, .commit-item { margin-bottom: 10px; }  /* File and Commit styling */
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Pull Request Details</h1>
+
+        <!-- Pull Request Summary -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="mb-0">#1234 - Fix the issue with X</h3>
+                <p class="text-muted mb-0">Opened by <strong>@johndoe</strong> on <strong>Oct 13, 2024</strong></p>
+            </div>
+            <div class="card-body">
+                <p><strong>Description:</strong> This PR fixes the issue with X, improves Y, and ensures Z.</p>
+
+                <!-- Labels -->
+                <h5>Labels:</h5>
+                <div class="mb-3">
+                    <span class="badge bg-primary label">bug</span>
+                    <span class="badge bg-warning label">needs-review</span>
+                </div>
+
+                <!-- Requested Reviewers -->
+                <h5>Requested Reviewers:</h5>
+                <ul class="list-unstyled mb-3">
+                    <li><i class="bi bi-person"></i> @alice</li>
+                    <li><i class="bi bi-person"></i> @bob</li>
+                </ul>
+
+                <!-- Reviewers -->
+                <h5>Reviewers:</h5>
+                <ul class="list-unstyled mb-3">
+                    <li><i class="bi bi-check-circle-fill text-success"></i> @alice (Approved)</li>
+                    <li><i class="bi bi-x-circle-fill text-danger"></i> @bob (Changes Requested)</li>
+                </ul>
+
+                <!-- Commands (Bot triggered) -->
+                <h5>Commands:</h5>
+                <ul class="list-group mb-3">
+                    <li class="list-group-item"><i class="bi bi-terminal"></i> /retest</li>
+                    <li class="list-group-item"><i class="bi bi-terminal"></i> /merge</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Files Changed -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Files Changed</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li class="file-item"><i class="bi bi-file-earmark-text"></i> file1.py</li>
+                    <li class="file-item"><i class="bi bi-file-earmark-text"></i> file2.py</li>
+                    <li class="file-item"><i class="bi bi-file-earmark-text"></i> README.md</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Commits -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Commits</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li class="commit-item"><i class="bi bi-git-commit"></i> abc123 - Initial commit fixing issue X (by @johndoe)</li>
+                    <li class="commit-item"><i class="bi bi-git-commit"></i> def456 - Refactored file Y (by @alice)</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Check Status Overview -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Check Status (General)</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            <li><i class="bi bi-check-circle-fill status-success"></i> CI/CD Passed</li>
+                            <li><i class="bi bi-check-circle-fill status-success"></i> Lint Passed</li>
+                            <li><i class="bi bi-x-circle-fill status-failed"></i> Unit Tests Failed</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Check Status (Bot)</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            <li><i class="bi bi-check-circle-fill status-success"></i> Check Commit</li>
+                            <li><i class="bi bi-check-circle-fill status-success"></i> Check Pull Request</li>
+                            <li><i class="bi bi-check-circle-fill status-success"></i> Check Pull Request Description</li>
+                            <li><i class="bi bi-x-circle-fill status-failed"></i> Check Pull Request Content</li>
+                            <li><i class="bi bi-exclamation-circle-fill status-pending"></i> Check Pull Request Size</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Return to Dashboard Button -->
+        <div class="text-center">
+            <a href="dashboard.php" class="btn btn-secondary">Back to Dashboard</a>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
