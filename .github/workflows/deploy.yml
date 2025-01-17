@@ -40,6 +40,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           localDir: "src"
           remoteDir: "/"
+          options: "--delete"
 
   create_release:
     name: Create release
