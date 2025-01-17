@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GitHub Workflow Notification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .email-header {
+            background-color: #24292f;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+        .email-body {
+            padding: 20px;
+        }
+        .email-footer {
+            background-color: #f1f1f1;
+            color: #666;
+            padding: 10px;
+            text-align: center;
+            font-size: 12px;
+        }
+        .button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .button:hover {
+            background-color: #218838;
+        }
+        .status {
+            font-weight: bold;
+            color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="email-header">
+            <h1>GitHub Workflow Run Update</h1>
+        </div>
+        <div class="email-body">
+            <p>Hi <strong>{owner_login}</strong>,</p>
+            <p>The workflow <strong>{workflow_name}</strong> in the repository <strong>{repository_full_name}</strong> has been updated.</p>
+            <ul>
+                <li><strong>Status:</strong> <span class="status">{workflow_status}</span></li>
+                <li><strong>Action:</strong> {action}</li>
+                <li><strong>Event:</strong> {workflow_event}</li>
+                <li><strong>Branch:</strong> {head_branch}</li>
+                <li><strong>Commit SHA:</strong> {head_sha}</li>
+            </ul>
+            <p>You can view more details using the following links:</p>
+            <ul>
+                <li><a href="{workflow_html_url}" target="_blank">View Workflow Run</a></li>
+                <li><a href="{repository_html_url}" target="_blank">View Repository</a></li>
+            </ul>
+            <a href="{workflow_html_url}" class="button" target="_blank">View Workflow</a>
+        </div>
+        <div class="email-footer">
+            <p>This email was generated automatically by the GitHub Webhooks system.</p>
+        </div>
+    </div>
+</body>
+</html>
