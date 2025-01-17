@@ -3,7 +3,7 @@ error_reporting(E_ALL);
 $featuresDir = "features";
 $fidoDir = "FIDO";
 $pagesDir = "pages";
-$templates = "templates";
+$templatesDir = "templates";
 
 function read($dir)
 {
@@ -12,7 +12,7 @@ function read($dir)
     while ($file = readdir($handle)) {
         if (is_dir($dir . "/" . $file) && !in_array($file, $ignorePaths)) {
             echo "<li class='list-group-item'><a href='" . $dir . "/" . $file . "'>" . preg_replace('/(?<!^)([A-Z])/', ' \\1', $file) . "</a></li>\r\n";
-        } else if (is_file($dir . "/" . $file) && !in_array($file, $ignorePaths)) {
+        } elseif (is_file($dir . "/" . $file) && !in_array($file, $ignorePaths)) {
             echo "<li class='list-group-item'><a href='" . $dir . "/" . $file . "'>" . $file . "</a></li>\r\n";
         }
     }
@@ -54,7 +54,7 @@ function read($dir)
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="panel panel-info">
+                    <div class="panel panel-danger">
                         <div class="panel-heading">
                             <h3 class="panel-title">FIDO</h3>
                         </div>
@@ -74,7 +74,7 @@ function read($dir)
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="panel panel-primary">
+                    <div class="panel panel-info">
                         <div class="panel-heading">
                             <h3 class="panel-title">Templates</h3>
                         </div>
