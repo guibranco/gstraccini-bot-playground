@@ -4,7 +4,7 @@ RewriteCond %{HTTPS} off
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
 RewriteCond %{HTTP_HOST} !^straccini\.com$ [NC]
-RewriteRule ^(.*)$ https://straccini.com/$1 [L,R=301]
+RewriteRule ^(.*)$ https://straccini.com/bot-playground/$1 [L,R=301]
 
 Header set X-Content-Type-Options "nosniff"
 Header set X-Frame-Options "SAMEORIGIN"
@@ -16,3 +16,5 @@ Header set Strict-Transport-Security "max-age=31536000; includeSubDomains"
     Order allow,deny
     Deny from all
 </FilesMatch>
+
+Options -Indexes
