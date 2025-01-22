@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepSource Webhook Notification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header {
+            background-color: #0d6efd;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+        .header img {
+            max-width: 150px;
+            margin-bottom: 10px;
+        }
+        .content {
+            padding: 20px;
+        }
+        .content h2 {
+            color: #0d6efd;
+        }
+        .content p {
+            line-height: 1.6;
+        }
+        .content .details {
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #f4f4f4;
+            border-left: 4px solid #0d6efd;
+        }
+        .content .details p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        .footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #f1f1f1;
+            font-size: 12px;
+            color: #666;
+        }
+        .footer a {
+            color: #0d6efd;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="header">
+            <img src="https://static.deepsource.io/avatars/avatar.png" alt="DeepSource Logo">
+            <h1>DeepSource Notification</h1>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <h2>Repository Analysis Activated</h2>
+            <p>Hello,</p>
+            <p>We are excited to let you know that the repository analysis has been successfully activated for your repository:</p>
+
+            <!-- Details Section -->
+            <div class="details">
+                <p><strong>Repository Name:</strong> {{ repository_name }}</p>
+                <p><strong>VCS Provider:</strong> {{ vcs_provider }}</p>
+                <p><strong>Repository URL:</strong> <a href="{{ vcs_url }}" target="_blank">{{ vcs_url }}</a></p>
+                <p><strong>Default Branch:</strong> {{ default_branch }}</p>
+                <p><strong>Latest Commit OID:</strong> {{ latest_commit_oid }}</p>
+                <p><strong>Private:</strong> {{ is_private }}</p>
+            </div>
+
+            <!-- Account Section -->
+            <h3>Account Details</h3>
+            <div class="details">
+                <p><strong>Account Name:</strong> {{ account_name }}</p>
+                <p><strong>Account Type:</strong> {{ account_type }}</p>
+                <p><strong>Account URL:</strong> <a href="{{ account_url }}" target="_blank">{{ account_url }}</a></p>
+            </div>
+
+            <p>If you have any questions, feel free to reach out to us at <a href="mailto:support@deepsource.io">support@deepsource.io</a>.</p>
+            <p>Thank you,<br>DeepSource Team</p>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>DeepSource Inc. | <a href="https://deepsource.io" target="_blank">Visit our website</a></p>
+        </div>
+    </div>
+</body>
+</html>
