@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML to JSX/TSX Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            margin-bottom: 10px;
+            font-family: monospace;
+        }
+        button {
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Paste your HTML here:</h2>
+    <textarea id="htmlInput"></textarea>
+    <button onclick="convertHTMLtoJSX()">Convert</button>
+
+    <h2>Converted JSX/TSX:</h2>
+    <textarea id="jsxOutput" readonly></textarea>
+
+    <script>
+        function convertHTMLtoJSX() {
+            const inputHTML = document.getElementById("htmlInput").value;
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(inputHTML, "text/html");
+            const expRows = doc.querySelectorAll(".exp-row");
+
+            let companies = {};
+
+            expRows.forEach(row => {
+                const nameElement = row.querySelector(".name");
+                const periodElement = row.querySelector(".year");
+                const jobElement = row.querySelector(".job");
+                const descriptionElement = row.querySelector("p");
+                const achievementsElements = row.querySelectorAll("ul li");
+
+                if (!nameElement || !jobElement || !periodElement) return;
+
+                // Extract company name, flag, and additional description
+                let companyText = nameElement.childNodes[0].nodeValue.trim();
+                let companyDescription = nameElement.querySelector("span")?.textContent.trim() || "";
+                let flagElement = nameElement.querySelector("img");
+                let flagURL = flagElement ? flagElement.src : "";
+
+                let companyKey = companyText.toLowerCase().replace(/\s+/g, "_");
+
+                // Define company entry if not exists
+                if (!companies[companyKey]) {
+                    companies[companyKey] = {
+                        company: companyText,
+                        logo: `https://guibranco.github.io/images/experience/${companyText.replace(/\s+/g, "")}.png`,
+                        location: flagElement ? flagElement.title : "",
+                        description: companyDescription,
+                        period: periodElement.textContent.trim(),
+                        flag: flagURL,
+                        roles: []
+                    };
+                } else {
+                    // Update the overall period if new role has an earlier start
+                    companies[companyKey].period = `${periodElement.textContent.trim()} - Present`;
+                }
+
+                // Extract role details
+                let role = {
+                    title: jobElement.textContent.trim(),
+                    period: periodElement.textContent.trim(),
+                    description: descriptionElement?.textContent.trim() || "",
+                    achievements: [...achievementsElements].map(li => li.textContent.trim())
+                };
+
+                // Add the role to the company
+                companies[companyKey].roles.push(role);
+            });
+
+            // Convert to JSX format
+            let outputJSX = Object.values(companies).map(company => JSON.stringify(company, null, 2)).join(",\n\n");
+
+            document.getElementById("jsxOutput").value = outputJSX;
+        }
+    </script>
+
+</body>
+</html>
