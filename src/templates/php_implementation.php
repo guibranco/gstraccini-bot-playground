@@ -43,7 +43,7 @@ class GitHubPRProcessingEmailGenerator
      */
     public function parseFromPlainText($plainText)
     {
-        $items = preg_split('/=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=/', $plainText);
+        $items = preg_split('/\r?\n={90,}\r?\n/', $plainText);
 
         foreach ($items as $item) {
             if (empty(trim($item)))
@@ -60,7 +60,6 @@ class GitHubPRProcessingEmailGenerator
             // Extract PR URL
             preg_match('/(https:\/\/github\.com\/[^\s:]+)/', $item, $urlMatches);
             $prUrl = isset($urlMatches[1]) ? $urlMatches[1] : '';
-
             // Extract result
             preg_match('/Item\s+(processed|updated[^!]*)!/', $item, $resultMatches);
             $result = isset($resultMatches[0]) ? $resultMatches[0] : '';
