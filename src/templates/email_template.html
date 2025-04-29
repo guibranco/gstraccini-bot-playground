@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>CRON Job Report</title>
+        <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f7fa;
+        }
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+            background-color: #007bff;
+            color: #ffffff;
+        }
+        .logo {
+            max-width: 150px;
+            height: auto;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px 0;
+            border-top: 1px solid #ddd;
+            margin-top: 20px;
+            font-size: 0.8em;
+            color: #666;
+        }
+        .pr-item {
+            background-color: #fff;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-left: 4px solid #0366d6;
+        }
+        .pr-item.processed {
+            border-left-color: #2cbe4e;
+        }
+        .pr-item.updated {
+            border-left-color: #f9c513;
+        }
+        .pr-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .pr-title {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        .pr-meta {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .pr-states {
+            margin-top: 10px;
+        }
+        .pr-state-item {
+            padding: 8px;
+            background-color: #f6f8fa;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+        .pr-result {
+            font-weight: bold;
+            margin-top: 10px;
+            padding: 8px;
+            background-color: #f0fff4;
+            border-radius: 4px;
+            color: #22863a;
+        }
+        .pr-result.updated {
+            background-color: #fff8c5;
+            color: #735c0f;
+        }
+        a {
+            color: #0366d6;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+    </head>
+    <body>
+        <div class="header">
+            <img src="https://bot.straccini.com/images/logo-white.png"
+                alt="Logo" class="logo">
+            <h1>CRON Job Report</h1>
+            <p>A detailed summary of processed items.</p>
+        </div>
+
+        <div class="content">
+            <div class="pr-item processed">
+                <div class="pr-header">
+                    <div class="pr-title">
+                        <a
+                            href="https://github.com/GuilhermeStracini/POC-GHActions-CI-PHPLaravel/pull/246">PR
+                            #246</a>
+                    </div>
+                    <div class="pr-meta">
+                        Sequence: 5233 | Delivery ID:
+                        7561D800-24C1-11F0-84F4-82823A891F09
+                    </div>
+                </div>
+
+                <div class="pr-states">
+                    <div class="pr-state-item">
+                        Triggering review of #245 - Sender: depfu[bot] 🔄
+                    </div>
+                    <div class="pr-state-item">
+                        PR State: closed ⛔
+                    </div>
+                </div>
+
+                <div class="pr-result">
+                    Item processed!
+                </div>
+            </div>
+
+            <div class="pr-item updated">
+                <div class="pr-header">
+                    <div class="pr-title">
+                        <a
+                            href="https://github.com/GuilhermeStracini/POC-GHActions-CI-PHPLaravel/pull/245">PR
+                            #245</a>
+                    </div>
+                    <div class="pr-meta">
+                        Sequence: 5102 | Delivery ID:
+                        5E1603C0-2475-11F0-945B-1C1AD0DAB291
+                    </div>
+                </div>
+
+                <div class="pr-states">
+                    <div class="pr-state-item">
+                        State: behind - Enable auto merge - Is NOT mergeable -
+                        Sender auto merge: ✅ - Sender: dependabot[bot] ⛔
+                    </div>
+                    <div class="pr-state-item">
+                        State: behind - Commits Behind: 1 - Updating branch: Yes
+                        - Sender: dependabot[bot] 👍🏻
+                    </div>
+                    <div class="pr-state-item">
+                        State: behind - Resolve conflicts - No conflicts -
+                        Sender: dependabot[bot] 🆒
+                    </div>
+                </div>
+
+                <div class="pr-result updated">
+                    Item updated by another process!
+                </div>
+            </div>
+
+            <div class="pr-item processed">
+                <div class="pr-header">
+                    <div class="pr-title">
+                        <a
+                            href="https://github.com/GuilhermeStracini/POC-GHActions-CI-PHPLaravel/pull/245">PR
+                            #245</a>
+                    </div>
+                    <div class="pr-meta">
+                        Sequence: 5102 | Delivery ID:
+                        5E1603C0-2475-11F0-945B-1C1AD0DAB291
+                    </div>
+                </div>
+
+                <div class="pr-states">
+                    <div class="pr-state-item">
+                        State: blocked - Enable auto merge - Is NOT mergeable -
+                        Sender auto merge: ✅ - Sender: dependabot[bot] ⛔
+                    </div>
+                    <div class="pr-state-item">
+                        State: blocked - Commits Behind: 0 - Updating branch: No
+                        - Sender: dependabot[bot] 👎🏻
+                    </div>
+                    <div class="pr-state-item">
+                        State: blocked - Resolve conflicts - No conflicts -
+                        Sender: dependabot[bot] 🆒
+                    </div>
+                </div>
+
+                <div class="pr-result">
+                    Item processed!
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Generated on <span id="currentDate">April 29, 2025</span></p>
+            <div class="footer_link">
+                <p>This email was generated automatically by <a
+                        href="https://github.com/guibranco/webhooks">Webhooks
+                        Handler v{{version}}</a>.</p>
+            </div>
+        </div>
+    </body>
+</html>

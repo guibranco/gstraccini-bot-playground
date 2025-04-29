@@ -1,0 +1,26 @@
+Sequence: 5233
+Delivery ID: 7561D800-24C1-11F0-84F4-82823A891F09
+https://github.com/GuilhermeStracini/POC-GHActions-CI-PHPLaravel/pull/246:
+
+Triggering review of #245 - Sender: depfu[bot] 🔄
+PR State: closed ⛔
+Item processed!
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+Sequence: 5102
+Delivery ID: 5E1603C0-2475-11F0-945B-1C1AD0DAB291
+https://github.com/GuilhermeStracini/POC-GHActions-CI-PHPLaravel/pull/245:
+
+State: behind - Enable auto merge - Is NOT mergeable - Sender auto merge: ✅ - Sender: dependabot[bot] ⛔
+State: behind - Commits Behind: 1 - Updating branch: Yes - Sender: dependabot[bot] 👍🏻
+State: behind - Resolve conflicts - No conflicts - Sender: dependabot[bot] 🆒
+Item updated by another process!
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+Sequence: 5102
+Delivery ID: 5E1603C0-2475-11F0-945B-1C1AD0DAB291
+https://github.com/GuilhermeStracini/POC-GHActions-CI-PHPLaravel/pull/245:
+
+State: blocked - Enable auto merge - Is NOT mergeable - Sender auto merge: ✅ - Sender: dependabot[bot] ⛔
+State: blocked - Commits Behind: 0 - Updating branch: No - Sender: dependabot[bot] 👎🏻
+State: blocked - Resolve conflicts - No conflicts - Sender: dependabot[bot] 🆒
+Item processed!
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
