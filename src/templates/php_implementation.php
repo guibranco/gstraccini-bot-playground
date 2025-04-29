@@ -19,13 +19,12 @@ class GitHubPRProcessingEmailGenerator
     public function addPRItem($sequence, $deliveryId, $prUrl, $states, $result)
     {
         // Extract PR number from URL
-        preg_match('/\/pull\/(\d+)$/', $prUrl, $matches);
+        preg_match('#/pull/(\d+)(?:/|$|\?)#', $prUrl, $matches);
         $prNumber = isset($matches[1]) ? $matches[1] : 'Unknown';
 
         // Extract repository name from URL
         preg_match('/github\.com\/([^\/]+\/[^\/]+)\/pull/', $prUrl, $repoMatches);
         $repository = isset($repoMatches[1]) ? $repoMatches[1] : 'Unknown Repository';
-
         $this->prItems[] = [
             'sequence' => $sequence,
             'deliveryId' => $deliveryId,
