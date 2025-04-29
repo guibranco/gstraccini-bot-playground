@@ -339,7 +339,7 @@ if (!in_array($method, ['plain_text', 'manual'])) {
 // Load the plain text email content
 if ($method === 'plain_text') {
     // Method 1: Parse from plain text
-    $plainTextEmail = file_get_contents('plain_text_email.txt');
+    $plainTextEmail = file_get_contents(__DIR__ . '/plain_text_email.txt');
     $emailGenerator->parseFromPlainText($plainTextEmail);
 } elseif ($method === 'manual') {
     // Method 2: Add items manually
