@@ -363,4 +363,10 @@ $emailGenerator
 
 // Generate and send
 $html = $emailGenerator->generateHtmlEmail();
-$emailGenerator->sendEmail('guilherme@guilhermebranco.com.br');
+$success = $emailGenerator->sendEmail('guilherme@guilhermebranco.com.br');
+
+if ($success) {
+    echo "Email sent successfully!";
+} else {
+    echo "Failed to send email. Please check your mail configuration.";
+}
