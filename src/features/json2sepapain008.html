@@ -106,6 +106,35 @@
             box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
         }
 
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #4facfe;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
         .convert-btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -207,27 +236,30 @@
                 <h2 class="section-title">JSON Input</h2>
                 <div class="textarea-container">
                     <textarea id="jsonInput" placeholder="Paste your JSON data here...">{
-    "BatchId": "94a6b2dc-206b-427b-ad45-539390c9666f",
+    "BatchId": "94a6b2dc-9999-427b-9999-539999c9666f",
     "Type": "DirectDebitCollect",
     "TransactionReference": "OUT00123456-1-2-HME-8",
-    "CustomerId": "OUT00OUT00123456104457",
+    "CustomerId": "OUT00123456",
     "AmountDue": 55.69,
     "Iban": "IE29AIBK93115212345678 ",
     "AccountHolderName": "John Doe",
     "MandateId": "OUT00123456-2",
     "MandateSignedDate": "2024-10-21",
     "IsFirstDirectDebit": false,
-    "id": "OUT00123456-1-2-HME-8",
-    "_etag": "\"9e00ac3f-0000-0c00-0000-683636110000\"",
-    "CreatedBy": "SYSTEM",
-    "CreatedDate": "2025-05-27T22:00:49.1021522+00:00",
-    "ModifiedBy": "SYSTEM",
-    "ModifiedDate": "2025-05-27T22:00:49.1021522+00:00",
-    "_rid": "2bhuAPHMHduSXAAAAAAAAA==",
-    "_self": "dbs/2bhuAA==/colls/2bhuAPHMHds=/docs/2bhuAPHMHduSXAAAAAAAAA==/",
-    "_attachments": "attachments/",
-    "_ts": 1748383249
+    "id": "OUT00123456-1-2-HME-8"
 }</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="oin" class="form-label">OIN:</label>
+                    <input type="text" id="oin" class="form-input" placeholder="Enter OIN (e.g., IE123456789)" value="OIN">
+                </div>
+                <div class="form-group">
+                    <label for="creditorName" class="form-label">Creditor Account Name:</label>
+                    <input type="text" id="creditorName" class="form-input" placeholder="Enter creditor account name" value="Creditor account name">
+                </div>
+                <div class="form-group">
+                    <label for="creditorIban" class="form-label">Creditor IBAN:</label>
+                    <input type="text" id="creditorIban" class="form-input" placeholder="Enter creditor IBAN" value="Credior IBAN">
                 </div>
                 <button class="convert-btn" onclick="convertToXML()">Convert to XML</button>
                 <div id="errorMessage"></div>
@@ -265,11 +297,11 @@
             }
         }
 
-        function generateMessageId() {
+        function generateMessageId(oin) {
             const now = new Date();
             const dateStr = now.toISOString().split('T')[0].replace(/-/g, '');
             const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '');
-            return `${dateStr}-${timeStr}-NORMAL-KB001-PAIN008`;
+            return `${dateStr}-${timeStr}-NORMAL-${oin}-PAIN008`;
         }
 
         function getSequenceType(isFirstDirectDebit) {
@@ -278,7 +310,7 @@
 
         function getCollectionDate() {
             const date = new Date();
-            date.setDate(date.getDate() + 4); // 4 days from now
+            date.setDate(date.getDate() + 4);
             return date.toISOString().split('T')[0];
         }
 
@@ -288,6 +320,9 @@
 
         function convertToXML() {
             const jsonInput = document.getElementById('jsonInput').value.trim();
+            const oin = document.getElementById('oin').value.trim();
+            const creditorName = document.getElementById('creditorName').value.trim();
+            const creditorIban = document.getElementById('creditorIban').value.trim();
             const errorDiv = document.getElementById('errorMessage');
             const successDiv = document.getElementById('successMessage');
             const xmlOutput = document.getElementById('xmlOutput');
@@ -299,26 +334,40 @@
 
             if (!jsonInput) {
                 errorDiv.innerHTML = '<div class="error-message">Please enter JSON data</div>';
-                xmlOutput.value = '';
-                copyBtn.style.display = 'none';
                 return;
             }
+
+            if (!oin) {
+                errorDiv.innerHTML = '<div class="error-message">Please enter an OIN</div>';
+                return;
+            }
+
+            if (!creditorName) {
+                errorDiv.innerHTML = '<div class="error-message">Please enter a creditor account name</div>';
+                return;
+            }
+
+            if (!creditorIban) {
+                errorDiv.innerHTML = '<div class="error-message">Please enter a creditor IBAN</div>';
+                return;
+            }
+
             try {
                 const data = JSON.parse(jsonInput);
                 
-// Validate required fields
-const requiredFields = ['AmountDue', 'Iban', 'AccountHolderName', 'MandateId', 'MandateSignedDate'];
-const missingFields = requiredFields.filter(field => data[field] == null);
+                const requiredFields = ['AmountDue', 'Iban', 'AccountHolderName', 'MandateId', 'MandateSignedDate'];
+                const missingFields = requiredFields.filter(field => !data[field]);
+                
+                if (missingFields.length > 0) {
+                    throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
+                }
 
-if (missingFields.length > 0) {
-    throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
-}
-
-                const msgId = generateMessageId();
+                const msgId = generateMessageId(oin);
                 const seqType = getSequenceType(data.IsFirstDirectDebit);
                 const collectionDate = getCollectionDate();
                 const createdDateTime = formatDateTime(new Date().toISOString());
                 const cleanedIban = cleanIban(data.Iban);
+                const cleanedCreditorIban = cleanIban(creditorIban);
                 const endToEndId = data.TransactionReference || data.id || 'NOTPROVIDED';
 
                 const xml = `<?xml version="1.0" encoding="utf-8" standalone="yes"?>
@@ -336,7 +385,7 @@ if (missingFields.length > 0) {
         <Id>
           <PrvtId>
             <Othr>
-              <Id>COMPANY-CODE</Id>
+              <Id>${oin}</Id>
             </Othr>
           </PrvtId>
         </Id>
@@ -358,11 +407,11 @@ if (missingFields.length > 0) {
       </PmtTpInf>
       <ReqdColltnDt>${collectionDate}</ReqdColltnDt>
       <Cdtr>
-        <Nm>COMPANY NAME</Nm>
+        <Nm>${creditorName}</Nm>
       </Cdtr>
       <CdtrAcct>
         <Id>
-          <IBAN>FIXED-IBAN-DO-NOT-CHANGE</IBAN>
+          <IBAN>${cleanedCreditorIban}</IBAN>
         </Id>
       </CdtrAcct>
       <CdtrAgt>
@@ -420,11 +469,7 @@ if (missingFields.length > 0) {
                 successDiv.innerHTML = '<div class="success-message">✅ JSON successfully converted to SEPA XML format!</div>';
 
             } catch (error) {
-+               const errBox = document.createElement('div');
-+               errBox.className = 'error-message';
-+               errBox.textContent = `Error: ${error.message}`;
-+               errorDiv.innerHTML = '';
-+               errorDiv.appendChild(errBox);
+                errorDiv.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
                 xmlOutput.value = '';
                 copyBtn.style.display = 'none';
             }
@@ -444,7 +489,6 @@ if (missingFields.length > 0) {
             }, 2000);
         }
 
-        // Auto-convert on page load if there's sample data
         window.addEventListener('load', function() {
             const jsonInput = document.getElementById('jsonInput');
             if (jsonInput.value.trim()) {
