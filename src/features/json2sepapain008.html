@@ -419,7 +419,11 @@ if (missingFields.length > 0) {
                 successDiv.innerHTML = '<div class="success-message">✅ JSON successfully converted to SEPA XML format!</div>';
 
             } catch (error) {
-                errorDiv.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
++               const errBox = document.createElement('div');
++               errBox.className = 'error-message';
++               errBox.textContent = `Error: ${error.message}`;
++               errorDiv.innerHTML = '';
++               errorDiv.appendChild(errBox);
                 xmlOutput.value = '';
                 copyBtn.style.display = 'none';
             }
