@@ -299,9 +299,10 @@
 
             if (!jsonInput) {
                 errorDiv.innerHTML = '<div class="error-message">Please enter JSON data</div>';
+                xmlOutput.value = '';
+                copyBtn.style.display = 'none';
                 return;
             }
-
             try {
                 const data = JSON.parse(jsonInput);
                 
