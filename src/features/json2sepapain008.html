@@ -305,13 +305,13 @@
             try {
                 const data = JSON.parse(jsonInput);
                 
-                // Validate required fields
-                const requiredFields = ['AmountDue', 'Iban', 'AccountHolderName', 'MandateId', 'MandateSignedDate'];
-                const missingFields = requiredFields.filter(field => !data[field]);
-                
-                if (missingFields.length > 0) {
-                    throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
-                }
+// Validate required fields
+const requiredFields = ['AmountDue', 'Iban', 'AccountHolderName', 'MandateId', 'MandateSignedDate'];
+const missingFields = requiredFields.filter(field => data[field] == null);
+
+if (missingFields.length > 0) {
+    throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
+}
 
                 const msgId = generateMessageId();
                 const seqType = getSequenceType(data.IsFirstDirectDebit);
