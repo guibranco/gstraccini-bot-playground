@@ -135,6 +135,12 @@
             box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
         }
 
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
         .convert-btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -221,6 +227,10 @@
             textarea {
                 height: 300px;
             }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -251,7 +261,7 @@
                 </div>
                 <div class="form-group">
                     <label for="oin" class="form-label">OIN:</label>
-                    <input type="text" id="oin" class="form-input" placeholder="Enter OIN (e.g., IE123456789)" value="OIN">
+                    <input type="text" id="oin" class="form-input" placeholder="Enter OIN (e.g., IE123456789)" value="KB001">
                 </div>
                 <div class="form-group">
                     <label for="creditorName" class="form-label">Creditor Account Name:</label>
@@ -259,7 +269,17 @@
                 </div>
                 <div class="form-group">
                     <label for="creditorIban" class="form-label">Creditor IBAN:</label>
-                    <input type="text" id="creditorIban" class="form-input" placeholder="Enter creditor IBAN" value="Credior IBAN">
+                    <input type="text" id="creditorIban" class="form-input" placeholder="Enter creditor IBAN" value="IE29AIBK93115212345678">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="transactionType" class="form-label">Transaction Type:</label>
+                        <select id="transactionType" class="form-input">
+                            <option value="NORMAL">NORMAL</option>
+                            <option value="RENEWAL">RENEWAL</option>
+                            <option value="RESUBM">RESUBM</option>
+                        </select>
+                    </div>
                 </div>
                 <button class="convert-btn" onclick="convertToXML()">Convert to XML</button>
                 <div id="errorMessage"></div>
@@ -287,21 +307,16 @@
             }
         }
 
-        function formatDateTime(dateString) {
-            if (!dateString) return '';
-            try {
-                const date = new Date(dateString);
-                return date.toISOString().replace(/\.\d{3}Z$/, '');
-            } catch (e) {
-                return dateString;
-            }
+        function formatDateTime(date = null) {
+            const now = date || new Date();
+            return now.toISOString().replace(/\.\d{3}Z$/, 'Z');
         }
 
-        function generateMessageId(oin) {
+        function generateMessageId(oin, transactionType = 'NORMAL') {
             const now = new Date();
             const dateStr = now.toISOString().split('T')[0].replace(/-/g, '');
             const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '');
-            return `${dateStr}-${timeStr}-NORMAL-${oin}-PAIN008`;
+            return `${dateStr}-${timeStr}-${transactionType}-PAIN008`;
         }
 
         function getSequenceType(isFirstDirectDebit) {
@@ -323,6 +338,7 @@
             const oin = document.getElementById('oin').value.trim();
             const creditorName = document.getElementById('creditorName').value.trim();
             const creditorIban = document.getElementById('creditorIban').value.trim();
+            const transactionType = document.getElementById('transactionType').value;
             const errorDiv = document.getElementById('errorMessage');
             const successDiv = document.getElementById('successMessage');
             const xmlOutput = document.getElementById('xmlOutput');
@@ -362,10 +378,10 @@
                     throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
                 }
 
-                const msgId = generateMessageId(oin);
+                const msgId = generateMessageId(oin, transactionType);
                 const seqType = getSequenceType(data.IsFirstDirectDebit);
                 const collectionDate = getCollectionDate();
-                const createdDateTime = formatDateTime(new Date().toISOString());
+                const createdDateTime = formatDateTime();
                 const cleanedIban = cleanIban(data.Iban);
                 const cleanedCreditorIban = cleanIban(creditorIban);
                 const endToEndId = data.TransactionReference || data.id || 'NOTPROVIDED';
