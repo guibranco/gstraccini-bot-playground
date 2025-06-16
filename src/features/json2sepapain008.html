@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON to SEPA XML Converter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            min-height: 600px;
+        }
+
+        .input-section, .output-section {
+            padding: 30px;
+        }
+
+        .input-section {
+            border-right: 1px solid #e0e0e0;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border-radius: 2px;
+        }
+
+        .textarea-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 400px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            resize: vertical;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #4facfe;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        .convert-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            width: 100%;
+        }
+
+        .convert-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .convert-btn:active {
+            transform: translateY(0);
+        }
+
+        .output-textarea {
+            background: #f8f9fa !important;
+            color: #2d3748;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(79, 172, 254, 0.9);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            opacity: 0.8;
+        }
+
+        .copy-btn:hover {
+            opacity: 1;
+            background: rgba(79, 172, 254, 1);
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #c53030;
+            font-family: monospace;
+            font-size: 13px;
+        }
+
+        .success-message {
+            background: #f0fff4;
+            color: #22543d;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #38a169;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .input-section {
+                border-right: none;
+                border-bottom: 1px solid #e0e0e0;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            textarea {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>JSON to SEPA XML Converter</h1>
+            <p>Convert Direct Debit JSON data to SEPA pain.008.001.08 XML format</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="input-section">
+                <h2 class="section-title">JSON Input</h2>
+                <div class="textarea-container">
+                    <textarea id="jsonInput" placeholder="Paste your JSON data here...">{
+    "BatchId": "94a6b2dc-206b-427b-ad45-539390c9666f",
+    "Type": "DirectDebitCollect",
+    "TransactionReference": "OUT00123456-1-2-HME-8",
+    "CustomerId": "OUT00OUT00123456104457",
+    "AmountDue": 55.69,
+    "Iban": "IE29AIBK93115212345678 ",
+    "AccountHolderName": "John Doe",
+    "MandateId": "OUT00123456-2",
+    "MandateSignedDate": "2024-10-21",
+    "IsFirstDirectDebit": false,
+    "id": "OUT00123456-1-2-HME-8",
+    "_etag": "\"9e00ac3f-0000-0c00-0000-683636110000\"",
+    "CreatedBy": "SYSTEM",
+    "CreatedDate": "2025-05-27T22:00:49.1021522+00:00",
+    "ModifiedBy": "SYSTEM",
+    "ModifiedDate": "2025-05-27T22:00:49.1021522+00:00",
+    "_rid": "2bhuAPHMHduSXAAAAAAAAA==",
+    "_self": "dbs/2bhuAA==/colls/2bhuAPHMHds=/docs/2bhuAPHMHduSXAAAAAAAAA==/",
+    "_attachments": "attachments/",
+    "_ts": 1748383249
+}</textarea>
+                </div>
+                <button class="convert-btn" onclick="convertToXML()">Convert to XML</button>
+                <div id="errorMessage"></div>
+            </div>
+            
+            <div class="output-section">
+                <h2 class="section-title">XML Output</h2>
+                <div class="textarea-container">
+                    <textarea id="xmlOutput" class="output-textarea" readonly placeholder="XML output will appear here..."></textarea>
+                    <button class="copy-btn" onclick="copyToClipboard()" id="copyBtn" style="display: none;">Copy</button>
+                </div>
+                <div id="successMessage"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            try {
+                const date = new Date(dateString);
+                return date.toISOString().split('T')[0];
+            } catch (e) {
+                return dateString;
+            }
+        }
+
+        function formatDateTime(dateString) {
+            if (!dateString) return '';
+            try {
+                const date = new Date(dateString);
+                return date.toISOString().replace(/\.\d{3}Z$/, '');
+            } catch (e) {
+                return dateString;
+            }
+        }
+
+        function generateMessageId() {
+            const now = new Date();
+            const dateStr = now.toISOString().split('T')[0].replace(/-/g, '');
+            const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '');
+            return `${dateStr}-${timeStr}-NORMAL-KB001-PAIN008`;
+        }
+
+        function getSequenceType(isFirstDirectDebit) {
+            return isFirstDirectDebit ? 'FRST' : 'RCUR';
+        }
+
+        function getCollectionDate() {
+            const date = new Date();
+            date.setDate(date.getDate() + 4); // 4 days from now
+            return date.toISOString().split('T')[0];
+        }
+
+        function cleanIban(iban) {
+            return iban ? iban.trim().replace(/\s+/g, '') : '';
+        }
+
+        function convertToXML() {
+            const jsonInput = document.getElementById('jsonInput').value.trim();
+            const errorDiv = document.getElementById('errorMessage');
+            const successDiv = document.getElementById('successMessage');
+            const xmlOutput = document.getElementById('xmlOutput');
+            const copyBtn = document.getElementById('copyBtn');
+
+            // Clear previous messages
+            errorDiv.innerHTML = '';
+            successDiv.innerHTML = '';
+
+            if (!jsonInput) {
+                errorDiv.innerHTML = '<div class="error-message">Please enter JSON data</div>';
+                return;
+            }
+
+            try {
+                const data = JSON.parse(jsonInput);
+                
+                // Validate required fields
+                const requiredFields = ['AmountDue', 'Iban', 'AccountHolderName', 'MandateId', 'MandateSignedDate'];
+                const missingFields = requiredFields.filter(field => !data[field]);
+                
+                if (missingFields.length > 0) {
+                    throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
+                }
+
+                const msgId = generateMessageId();
+                const seqType = getSequenceType(data.IsFirstDirectDebit);
+                const collectionDate = getCollectionDate();
+                const createdDateTime = formatDateTime(new Date().toISOString());
+                const cleanedIban = cleanIban(data.Iban);
+                const endToEndId = data.TransactionReference || data.id || 'NOTPROVIDED';
+
+                const xml = `<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Document
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="urn:iso:std:iso:20022:tech:xsd:pain.008.001.08"
+>
+  <CstmrDrctDbtInitn>
+    <GrpHdr>
+      <MsgId>${msgId}</MsgId>
+      <CreDtTm>${createdDateTime}</CreDtTm>
+      <NbOfTxs>1</NbOfTxs>
+      <CtrlSum>${data.AmountDue}</CtrlSum>
+      <InitgPty>
+        <Id>
+          <PrvtId>
+            <Othr>
+              <Id>COMPANY-CODE</Id>
+            </Othr>
+          </PrvtId>
+        </Id>
+      </InitgPty>
+    </GrpHdr>
+    <PmtInf>
+      <PmtInfId>${msgId}-${seqType}</PmtInfId>
+      <PmtMtd>DD</PmtMtd>
+      <NbOfTxs>1</NbOfTxs>
+      <CtrlSum>${data.AmountDue}</CtrlSum>
+      <PmtTpInf>
+        <SvcLvl>
+          <Cd>SEPA</Cd>
+        </SvcLvl>
+        <LclInstrm>
+          <Cd>CORE</Cd>
+        </LclInstrm>
+        <SeqTp>${seqType}</SeqTp>
+      </PmtTpInf>
+      <ReqdColltnDt>${collectionDate}</ReqdColltnDt>
+      <Cdtr>
+        <Nm>COMPANY NAME</Nm>
+      </Cdtr>
+      <CdtrAcct>
+        <Id>
+          <IBAN>FIXED-IBAN-DO-NOT-CHANGE</IBAN>
+        </Id>
+      </CdtrAcct>
+      <CdtrAgt>
+        <FinInstnId>
+          <Othr>
+            <Id>NOTPROVIDED</Id>
+          </Othr>
+        </FinInstnId>
+      </CdtrAgt>
+      <CdtrSchmeId>
+        <Id>
+          <PrvtId>
+            <Othr>
+              <Id>IE49ZZZ363191</Id>
+              <SchmeNm>
+                <Prtry>SEPA</Prtry>
+              </SchmeNm>
+            </Othr>
+          </PrvtId>
+        </Id>
+      </CdtrSchmeId>
+      <DrctDbtTxInf>
+        <PmtId>
+          <EndToEndId>${endToEndId}</EndToEndId>
+        </PmtId>
+        <InstdAmt Ccy="EUR">${data.AmountDue}</InstdAmt>
+        <DrctDbtTx>
+          <MndtRltdInf>
+            <MndtId>${data.MandateId}</MndtId>
+            <DtOfSgntr>${formatDate(data.MandateSignedDate)}</DtOfSgntr>
+          </MndtRltdInf>
+        </DrctDbtTx>
+        <DbtrAgt>
+          <FinInstnId>
+            <Othr>
+              <Id>NOTPROVIDED</Id>
+            </Othr>
+          </FinInstnId>
+        </DbtrAgt>
+        <Dbtr>
+          <Nm>${data.AccountHolderName}</Nm>
+        </Dbtr>
+        <DbtrAcct>
+          <Id>
+            <IBAN>${cleanedIban}</IBAN>
+          </Id>
+        </DbtrAcct>
+      </DrctDbtTxInf>
+    </PmtInf>
+  </CstmrDrctDbtInitn>
+</Document>`;
+
+                xmlOutput.value = xml;
+                copyBtn.style.display = 'block';
+                successDiv.innerHTML = '<div class="success-message">✅ JSON successfully converted to SEPA XML format!</div>';
+
+            } catch (error) {
+                errorDiv.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
+                xmlOutput.value = '';
+                copyBtn.style.display = 'none';
+            }
+        }
+
+        function copyToClipboard() {
+            const xmlOutput = document.getElementById('xmlOutput');
+            xmlOutput.select();
+            document.execCommand('copy');
+            
+            const copyBtn = document.getElementById('copyBtn');
+            const originalText = copyBtn.textContent;
+            copyBtn.textContent = 'Copied!';
+            
+            setTimeout(() => {
+                copyBtn.textContent = originalText;
+            }, 2000);
+        }
+
+        // Auto-convert on page load if there's sample data
+        window.addEventListener('load', function() {
+            const jsonInput = document.getElementById('jsonInput');
+            if (jsonInput.value.trim()) {
+                convertToXML();
+            }
+        });
+    </script>
+</body>
+</html>
