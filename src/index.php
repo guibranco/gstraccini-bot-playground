@@ -8,17 +8,31 @@ $templatesDir = "templates";
 function read($dir)
 {
     $ignorePaths = array(".", "..");
+    $ignoredExtensions = array("sql", "txt", "css", "js");
     $handle = opendir($dir);
+
     while ($file = readdir($handle)) {
-        if (is_dir($dir . "/" . $file) && !in_array($file, $ignorePaths)) {
-            echo "<li class='list-group-item'><a href='" . $dir . "/" . $file . "'>" . preg_replace('/(?<!^)([A-Z])/', ' \\1', $file) . "</a></li>\r\n";
-        } elseif (is_file($dir . "/" . $file) && !in_array($file, $ignorePaths)) {
-            echo "<li class='list-group-item'><a href='" . $dir . "/" . $file . "'>" . $file . "</a></li>\r\n";
+        $filePath = $dir . "/" . $file;
+
+        if (in_array($file, $ignorePaths)) {
+            continue;
+        }
+
+        if (is_dir($filePath)) {
+            echo "<li class='list-group-item'><a href='" . $filePath . "'>" . preg_replace('/(?<!^)([A-Z])/', ' \\1', $file) . "</a></li>\r\n";
+        } elseif (is_file($filePath)) {
+            $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+            if (in_array($ext, $ignoredExtensions)) {
+                continue;
+            }
+            echo "<li class='list-group-item'><a href='" . $filePath . "'>" . $file . "</a></li>\r\n";
         }
     }
+
     closedir($handle);
 }
 ?>
+
 <!DOCTYPE html>
 <html>
 
