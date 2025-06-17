@@ -53,7 +53,7 @@ function read($dir)
                     <img src="https://bot.straccini.com/images/logo-white.png" alt="GStraccini-bot | Playground" />
                 </div>
                 <div class="col-xs-12 col-md-6">
-                    <h1>GStraccini-bot | Playground</h1>
+                    <h1>Playground</h1>
                 </div>
             </div>
             <div class="row col-md-12" style="margin-top:50px;">
