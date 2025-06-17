@@ -1,62 +1,92 @@
-name: Deploy via ftp
+name: Deploy via FTP
 
 on:
   push:
-    branches: main
+    branches: [main]
   workflow_dispatch:
-
-concurrency:
-  group: build-deploy
 
 jobs:
   deploy:
-    name: Deploy to FTP
+    name: 📦 Deploy Application to FTP
     runs-on: ubuntu-latest
     outputs:
-      semVer: ${{ steps.gitversion.outputs.semVer }}
+      fullSemVer: ${{ steps.gitversion.outputs.fullSemVer }}
 
     steps:
-      - name: Checkout repository
+      - name: 📥 Checkout Repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v3
+      - name: 🔧 Install GitVersion
+        uses: gittools/actions/gitversion/setup@v3.2.1
         with:
           versionSpec: "5.x"
 
-      - name: Determine Version
+      - name: 🏷️ Determine Version Number
         id: gitversion
-        uses: gittools/actions/gitversion/execute@v3
+        uses: gittools/actions/gitversion/execute@v3.2.1
         with:
           useConfigFile: true
 
-      - name: Upload service
+      # - name: 💾 Cache Composer Dependencies
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: /tmp/composer-cache
+      #     key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+
+      # - name: 📚 Install PHP Dependencies
+      #   uses: "php-actions/composer@v6"
+      #   with:
+      #     php_extensions: sockets
+      #     dev: no
+      #     progress: yes
+      #     working_dir: "./src/"
+
+      - name: 📝 Create Version File for API
+        run: |
+          cd src       
+          echo ${{ env.fullSemVer }} > version.txt
+
+      - name: 📦 Package Files for Deployment
+        run: |
+          cd src
+          zip -r deploy.zip . -x install.php
+          cd ..
+          mkdir deploy
+          mv src/deploy.zip deploy
+          cp "src/install.php" deploy
+
+      - name: 📤 Upload Application via FTP
         uses: sebastianpopp/ftp-action@releases/v2
         with:
           host: ${{ secrets.FTP_SERVER }}
           user: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          localDir: "src"
+          localDir: "deploy/"
           remoteDir: "/"
-          options: "--delete"
+
+      - name: 🚀 Trigger Installation Process
+        run: curl --fail-with-body "${{ secrets.INSTALLATION_ENDPOINT }}install.php"
 
   create_release:
-    name: Create release
+    name: 📢 Create GitHub Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
     needs: deploy
     env:
-      SEMVER: ${{ needs.deploy.outputs.semVer }}
-    runs-on: ubuntu-latest
+      fullSemVer: ${{ needs.deploy.outputs.fullSemVer }}
+
     steps:
-      - name: Create Release
-        uses: ncipollo/release-action@v1.14.0
+      - name: 🏷️ Create and Publish Release
+        uses: ncipollo/release-action@v1.16.0
         with:
-          allowUpdates: false
           skipIfReleaseExists: true
+          allowUpdates: false
           draft: false
           makeLatest: true
-          tag: v${{ env.SEMVER }}
-          name: Release v${{ env.SEMVER }}
+          tag: v${{ env.fullSemVer }}
+          name: Release v${{ env.fullSemVer }}
           generateReleaseNotes: true
-          body: Release ${{ env.SEMVER }} of ${{ github.event.repository.name }}
+          body: Release ${{ env.fullSemVer }} of ${{ github.repository }}
