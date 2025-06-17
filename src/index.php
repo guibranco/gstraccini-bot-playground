@@ -108,7 +108,7 @@ echo "<li class='list-group-item'><a href='" . $filePath . "'>" .
             </div>
 
             <footer>
-                <div class="row col-md-12" style="background:#0dd682;">
+                <div class="row col-md-12 text-center" style="background:#0dd682;">
                     Developed by <a
                         href="https://guilherme.stracini.com.br/?utm_campaign=project&amp;utm_media=bot-playground&amp;utm_source=straccini.com"
                         target="_blank" rel="noopener noreferrer"><img
