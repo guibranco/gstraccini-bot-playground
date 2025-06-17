@@ -164,6 +164,39 @@
             transform: translateY(0);
         }
 
+        .storage-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .storage-btn {
+            background: linear-gradient(135deg, #38a169 0%, #48bb78 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(56, 161, 105, 0.3);
+        }
+
+        .storage-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(56, 161, 105, 0.4);
+        }
+
+        .clear-btn {
+            background: linear-gradient(135deg, #e53e3e 0%, #fc8181 100%);
+            box-shadow: 0 2px 8px rgba(229, 62, 62, 0.3);
+        }
+
+        .clear-btn:hover {
+            box-shadow: 0 4px 12px rgba(229, 62, 62, 0.4);
+        }
+
         .output-textarea {
             background: #f8f9fa !important;
             color: #2d3748;
@@ -189,6 +222,10 @@
             background: rgba(79, 172, 254, 1);
         }
 
+        .download-btn:hover {
+            background: rgba(56, 161, 105, 1) !important;
+        }
+
         .error-message {
             background: #fee;
             color: #c53030;
@@ -207,6 +244,16 @@
             border-radius: 8px;
             margin-top: 15px;
             border-left: 4px solid #38a169;
+            font-size: 14px;
+        }
+
+        .info-message {
+            background: #ebf8ff;
+            color: #2c5282;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #3182ce;
             font-size: 14px;
         }
 
@@ -230,6 +277,10 @@
 
             .form-row {
                 grid-template-columns: 1fr;
+            }
+
+            .storage-controls {
+                flex-direction: column;
             }
         }
     </style>
@@ -259,6 +310,12 @@
     "id": "OUT00123456-1-2-HME-8"
 }</textarea>
                 </div>
+                
+                <div class="storage-controls">
+                    <button class="storage-btn" onclick="saveFields()">💾 Save Fields</button>
+                    <button class="storage-btn clear-btn" onclick="clearSavedFields()">🗑️ Clear Saved</button>
+                </div>
+                
                 <div class="form-group">
                     <label for="oin" class="form-label">OIN:</label>
                     <input type="text" id="oin" class="form-input" placeholder="Enter OIN (e.g., IE99ZZZ999999)" value="IE99ZZZ999999">
@@ -290,6 +347,7 @@
                 <div class="textarea-container">
                     <textarea id="xmlOutput" class="output-textarea" readonly placeholder="XML output will appear here..."></textarea>
                     <button class="copy-btn" onclick="copyToClipboard()" id="copyBtn" style="display: none;">Copy</button>
+                    <button class="copy-btn" onclick="downloadXML()" id="downloadBtn" style="display: none; right: 70px; background: rgba(56, 161, 105, 0.9);">Download</button>
                 </div>
                 <div id="successMessage"></div>
             </div>
@@ -297,6 +355,96 @@
     </div>
 
     <script>
+        // Global variable to store the current message ID for download
+        let currentMessageId = '';
+
+        // In-memory storage for demo purposes
+        // Replace with localStorage in your own environment
+        let memoryStorage = {};
+
+        // Storage functions - replace with localStorage implementation
+        function setStorageItem(key, value) {
+            // For localStorage implementation, use:
+            // localStorage.setItem(key, value);
+            memoryStorage[key] = value;
+        }
+
+        function getStorageItem(key) {
+            // For localStorage implementation, use:
+            // return localStorage.getItem(key);
+            return memoryStorage[key] || null;
+        }
+
+        function removeStorageItem(key) {
+            // For localStorage implementation, use:
+            // localStorage.removeItem(key);
+            delete memoryStorage[key];
+        }
+
+        function saveFields() {
+            const oin = document.getElementById('oin').value.trim();
+            const creditorName = document.getElementById('creditorName').value.trim();
+            const creditorIban = document.getElementById('creditorIban').value.trim();
+            const transactionType = document.getElementById('transactionType').value;
+
+            const fieldsData = {
+                oin,
+                creditorName,
+                creditorIban,
+                transactionType
+            };
+
+            setStorageItem('sepaConverterFields', JSON.stringify(fieldsData));
+
+            const successDiv = document.getElementById('successMessage');
+            successDiv.innerHTML = '<div class="success-message">✅ Fields saved successfully! They will be restored next time you open the converter.</div>';
+            
+            setTimeout(() => {
+                successDiv.innerHTML = '';
+            }, 3000);
+        }
+
+        function loadSavedFields() {
+            const savedData = getStorageItem('sepaConverterFields');
+            
+            if (savedData) {
+                try {
+                    const fields = JSON.parse(savedData);
+                    
+                    if (fields.oin) document.getElementById('oin').value = fields.oin;
+                    if (fields.creditorName) document.getElementById('creditorName').value = fields.creditorName;
+                    if (fields.creditorIban) document.getElementById('creditorIban').value = fields.creditorIban;
+                    if (fields.transactionType) document.getElementById('transactionType').value = fields.transactionType;
+
+                    const successDiv = document.getElementById('successMessage');
+                    successDiv.innerHTML = '<div class="info-message">ℹ️ Previously saved fields have been restored.</div>';
+                    
+                    setTimeout(() => {
+                        successDiv.innerHTML = '';
+                    }, 3000);
+                } catch (error) {
+                    console.error('Error loading saved fields:', error);
+                }
+            }
+        }
+
+        function clearSavedFields() {
+            removeStorageItem('sepaConverterFields');
+            
+            // Clear the form fields
+            document.getElementById('oin').value = '';
+            document.getElementById('creditorName').value = '';
+            document.getElementById('creditorIban').value = '';
+            document.getElementById('transactionType').value = 'NORMAL';
+
+            const successDiv = document.getElementById('successMessage');
+            successDiv.innerHTML = '<div class="info-message">🗑️ Saved fields cleared and form reset.</div>';
+            
+            setTimeout(() => {
+                successDiv.innerHTML = '';
+            }, 3000);
+        }
+
         function formatDate(dateString) {
             if (!dateString) return '';
             try {
@@ -378,6 +526,7 @@
                 }
 
                 const msgId = generateMessageId(transactionType);
+                currentMessageId = msgId; // Store for download filename
                 const seqType = getSequenceType(data.IsFirstDirectDebit);
                 const collectionDate = getCollectionDate();
                 const createdDateTime = formatDateTime();
@@ -481,12 +630,14 @@
 
                 xmlOutput.value = xml;
                 copyBtn.style.display = 'block';
+                document.getElementById('downloadBtn').style.display = 'block';
                 successDiv.innerHTML = '<div class="success-message">✅ JSON successfully converted to SEPA XML format!</div>';
 
             } catch (error) {
                 errorDiv.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
                 xmlOutput.value = '';
                 copyBtn.style.display = 'none';
+                document.getElementById('downloadBtn').style.display = 'none';
             }
         }
 
@@ -504,7 +655,66 @@
             }, 2000);
         }
 
+        function downloadXML() {
+            const xmlOutput = document.getElementById('xmlOutput');
+            const xmlContent = xmlOutput.value;
+            
+            if (!xmlContent) {
+                alert('No XML content to download');
+                return;
+            }
+            
+            // Use the stored message ID or generate a fallback filename
+            const filename = currentMessageId ? `${currentMessageId}.xml` : 'sepa-payment.xml';
+            
+            // Create blob and download
+            const blob = new Blob([xmlContent], { type: 'application/xml' });
+            const url = window.URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+            // Show feedback
+            const downloadBtn = document.getElementById('downloadBtn');
+            const originalText = downloadBtn.textContent;
+            downloadBtn.textContent = 'Downloaded!';
+            
+            setTimeout(() => {
+                downloadBtn.textContent = originalText;
+            }, 2000);
+        }
+
+        // Auto-save fields when they change
+        function setupAutoSave() {
+            const fields = ['oin', 'creditorName', 'creditorIban', 'transactionType'];
+            
+            fields.forEach(fieldId => {
+                const element = document.getElementById(fieldId);
+                element.addEventListener('change', () => {
+                    // Auto-save after a delay to avoid excessive saves
+                    clearTimeout(element.autoSaveTimeout);
+                    element.autoSaveTimeout = setTimeout(() => {
+                        if (element.value.trim()) {
+                            saveFields();
+                        }
+                    }, 1000);
+                });
+            });
+        }
+
         window.addEventListener('load', function() {
+            // Load saved fields first
+            loadSavedFields();
+            
+            // Setup auto-save functionality
+            setupAutoSave();
+            
+            // Convert if JSON is already present
             const jsonInput = document.getElementById('jsonInput');
             if (jsonInput.value.trim()) {
                 convertToXML();
