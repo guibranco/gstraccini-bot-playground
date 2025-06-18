@@ -99,18 +99,13 @@ function formatDate(dateString) {
 
 function formatDateTime(dateString) {
     if (!dateString) return null;
-    
-    // If it's already in ISO format, return as is
-    if (dateString.includes('T') && dateString.includes('Z')) {
-        return dateString;
+
+    // Parse and always return UTC ISO 8601
+    const d = new Date(dateString);
+    if (isNaN(d.getTime())) {
+        throw new Error(`Invalid date: ${dateString}`);
     }
-    
-    // If it's a date only, convert to ISO datetime
-    if (!dateString.includes('T')) {
-        return `${dateString}T00:00:00.000Z`;
-    }
-    
-    return dateString;
+    return d.toISOString();
 }
 
 function determineRequestType(collectionStatus) {
