@@ -16,12 +16,14 @@ function saveFields() {
     const oin = document.getElementById('oin').value.trim();
     const creditorName = document.getElementById('creditorName').value.trim();
     const creditorIban = document.getElementById('creditorIban').value.trim();
+    const collectionDate = document.getElementById('collectionDate').value;
     const transactionType = document.getElementById('transactionType').value;
 
     const fieldsData = {
         oin,
         creditorName,
         creditorIban,
+        collectionDate,
         transactionType
     };
 
@@ -45,6 +47,7 @@ function loadSavedFields() {
             if (fields.oin) document.getElementById('oin').value = fields.oin;
             if (fields.creditorName) document.getElementById('creditorName').value = fields.creditorName;
             if (fields.creditorIban) document.getElementById('creditorIban').value = fields.creditorIban;
+            if (fields.collectionDate) document.getElementById('collectionDate').value = fields.collectionDate;
             if (fields.transactionType) document.getElementById('transactionType').value = fields.transactionType;
 
             const successDiv = document.getElementById('successMessage');
@@ -65,6 +68,7 @@ function clearSavedFields() {
     document.getElementById('oin').value = '';
     document.getElementById('creditorName').value = '';
     document.getElementById('creditorIban').value = '';
+    document.getElementById('collectionDate').value = getDefaultCollectionDate();
     document.getElementById('transactionType').value = 'NORMAL';
 
     const successDiv = document.getElementById('successMessage');
@@ -101,14 +105,26 @@ function getSequenceType(isFirstDirectDebit) {
     return isFirstDirectDebit ? 'FRST' : 'RCUR';
 }
 
-function getCollectionDate() {
+function getDefaultCollectionDate() {
     const date = new Date();
-    date.setDate(date.getDate() + 4);
+    date.setDate(date.getDate() + 2);
     return date.toISOString().split('T')[0];
+}
+
+function getCollectionDate() {
+    const collectionDateInput = document.getElementById('collectionDate');
+    return collectionDateInput.value || getDefaultCollectionDate();
 }
 
 function cleanIban(iban) {
     return iban ? iban.trim().replace(/\s+/g, '') : '';
+}
+
+function initializeCollectionDate() {
+    const collectionDateInput = document.getElementById('collectionDate');
+    if (!collectionDateInput.value) {
+        collectionDateInput.value = getDefaultCollectionDate();
+    }
 }
 
 function convertToXML() {
@@ -317,7 +333,7 @@ function downloadXML() {
 }
 
 function setupAutoSave() {
-    const fields = ['oin', 'creditorName', 'creditorIban', 'transactionType'];
+    const fields = ['oin', 'creditorName', 'creditorIban', 'collectionDate', 'transactionType'];
 
     fields.forEach(fieldId => {
         const element = document.getElementById(fieldId);
@@ -333,6 +349,7 @@ function setupAutoSave() {
 }
 
 window.addEventListener('load', function () {
+    initializeCollectionDate();
     loadSavedFields();
     setupAutoSave();
     const jsonInput = document.getElementById('jsonInput');
