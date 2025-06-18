@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collection Item to Shadow Ledger Converter</title>
+    <link rel="stylesheet" href="collectionItem2ShadowLedger.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Collection Item to Shadow Ledger Converter</h1>
+            <p>Convert Collection Items (JSON) into Shadow Ledger requests</p>
+        </header>
+
+        <main>
+            <div class="input-section">
+                <h2>Input Collection Item JSON</h2>
+                <textarea 
+                    id="collectionItemInput" 
+                    placeholder="Paste your Collection Item JSON here..."
+                    rows="15"
+                ></textarea>
+                
+                <div class="button-group">
+                    <button id="convertBtn" class="btn-primary">Convert to Shadow Ledger</button>
+                    <button id="clearBtn" class="btn-secondary">Clear</button>
+                    <button id="loadSampleBtn" class="btn-secondary">Load Sample</button>
+                </div>
+            </div>
+
+            <div class="output-section">
+                <div class="status-indicator">
+                    <span id="statusBadge" class="status-badge">Ready</span>
+                    <span id="requestType" class="request-type"></span>
+                </div>
+
+                <h2>Generated Shadow Ledger Request</h2>
+                <div class="output-container">
+                    <textarea 
+                        id="shadowLedgerOutput" 
+                        readonly
+                        placeholder="Shadow Ledger request will appear here..."
+                        rows="15"
+                    ></textarea>
+                    <button id="copyBtn" class="copy-btn" title="Copy to clipboard">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="mapping-rules">
+                <h3>Mapping Rules</h3>
+                <div class="rules-grid">
+                    <div class="rule-card">
+                        <h4>Payment Schedule ID</h4>
+                        <p><code>CollectionId</code> → <code>paymentScheduleId</code></p>
+                    </div>
+                    <div class="rule-card">
+                        <h4>Direct Debit Flag</h4>
+                        <p>Card Payment → <code>isDirectDebitPayment: false</code></p>
+                        <p>Other methods → <code>isDirectDebitPayment: true</code></p>
+                    </div>
+                    <div class="rule-card">
+                        <h4>Value Date</h4>
+                        <p><code>ValueDate</code> → <code>valueDate</code></p>
+                    </div>
+                    <div class="rule-card">
+                        <h4>Processing Date</h4>
+                        <p><code>ProviderDetails.ProcessingDate</code> → <code>transactionDate</code> (raise) or <code>reportedDate</code> (failed)</p>
+                    </div>
+                    <div class="rule-card">
+                        <h4>Request Type</h4>
+                        <p><strong>Raise:</strong> Created, Refunded, Collected</p>
+                        <p><strong>Failed:</strong> Rejected</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="error-section" id="errorSection" style="display: none;">
+                <h3>Error Details</h3>
+                <div id="errorMessage" class="error-message"></div>
+            </div>
+        </main>
+    </div>
+
+    <script src="collectionItem2ShadowLedger.js"></script>
+</body>
+</html>
