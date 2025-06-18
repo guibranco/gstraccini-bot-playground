@@ -91,7 +91,7 @@ function formatDate(dateString) {
 
 function formatDateTime(date = null) {
     const now = date || new Date();
-    return now.toISOString().replace(/\.\d{3}Z$/, 'Z');
+    return now.toISOString().replace(/\.\d{3}Z$/, '');
 }
 
 function generateMessageId(transactionType = 'NORMAL') {
