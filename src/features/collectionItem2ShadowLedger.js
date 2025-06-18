@@ -114,11 +114,11 @@ function formatDateTime(dateString) {
 }
 
 function determineRequestType(collectionStatus) {
-    const raiseStatuses = ['Created', 'Refunded', 'Collected'];
-    const failedStatuses = ['Rejected'];
-    
-    const normalizedStatus = collectionStatus?.trim();
-    
+    const raiseStatuses = ['created', 'refunded', 'collected'];
+    const failedStatuses = ['rejected'];
+
+    const normalizedStatus = collectionStatus?.trim().toLowerCase();
+
     if (raiseStatuses.includes(normalizedStatus)) {
         return 'raise';
     } else if (failedStatuses.includes(normalizedStatus)) {
