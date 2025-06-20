@@ -3,22 +3,413 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bookmark Parser</title>
+    <title>Bookmark Parser - Transform Your Bookmarks</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        textarea { width: 100%; height: 300px; }
-        .folder { margin-left: 20px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 0;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff, #f0f0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 300;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .card h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #4c51bf;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .icon {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .file-input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-input-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-input-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .folder-tree {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 2px dashed #e2e8f0;
+            margin-bottom: 20px;
+        }
+
+        .folder-tree::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .folder-tree::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+
+        .folder-tree::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .folder-tree::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .folder {
+            margin-left: 20px;
+            margin-bottom: 8px;
+            position: relative;
+        }
+
+        .folder-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            transition: background-color 0.2s ease;
+            cursor: pointer;
+        }
+
+        .folder-item:hover {
+            background-color: rgba(102, 126, 234, 0.1);
+        }
+
+        .folder-checkbox {
+            width: 18px;
+            height: 18px;
+            accent-color: #667eea;
+            cursor: pointer;
+        }
+
+        .folder-name {
+            font-weight: 500;
+            color: #374151;
+            user-select: none;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .output-section {
+            grid-column: 1 / -1;
+        }
+
+        .output-textarea {
+            width: 100%;
+            height: 300px;
+            padding: 20px;
+            border: none;
+            border-radius: 12px;
+            background: #1e293b;
+            color: #e2e8f0;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            resize: vertical;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .output-textarea:focus {
+            outline: none;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1), 0 0 0 3px rgba(102, 126, 234, 0.3);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #64748b;
+            font-style: italic;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border-radius: 12px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0369a1;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                min-width: unset;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .card:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .card:nth-child(3) {
+            animation-delay: 0.2s;
+        }
     </style>
 </head>
 <body>
-    <h2>Bookmark HTML to JSON Converter</h2>
-    <input type="file" id="fileInput" accept=".html">
-    <h3>Select Folders:</h3>
-    <div id="folderTree"></div>
-    <button id="generateJson">Generate JSON</button>
-    <button id="downloadJson">Download JSON</button>
-    <h3>Parsed JSON Output:</h3>
-    <textarea id="output" readonly></textarea>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Bookmark Parser</h1>
+            <p>Transform your browser bookmarks into beautiful, organized JSON data with our powerful converter tool</p>
+        </div>
+
+        <div class="main-content">
+            <div class="card">
+                <h2>
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+                    </svg>
+                    Upload Bookmarks
+                </h2>
+                <div class="file-input-wrapper">
+                    <input type="file" id="fileInput" class="file-input" accept=".html">
+                    <div class="file-input-button">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+                        </svg>
+                        Choose HTML File
+                    </div>
+                </div>
+                <div id="stats" class="stats" style="display: none;">
+                    <div class="stat-item">
+                        <span id="folderCount" class="stat-number">0</span>
+                        <span class="stat-label">Folders</span>
+                    </div>
+                    <div class="stat-item">
+                        <span id="bookmarkCount" class="stat-number">0</span>
+                        <span class="stat-label">Bookmarks</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6H12L10,4Z" />
+                    </svg>
+                    Select Folders
+                </h2>
+                <div id="folderTree" class="folder-tree">
+                    <div class="empty-state">
+                        Upload a bookmark file to see your folder structure
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button id="generateJson" class="btn btn-primary" disabled>
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M17,7H22V17H17V19A1,1 0 0,0 18,20H20V22H17.5C16.95,22 16,21.55 16,21C16,21.55 15.05,22 14.5,22H12V20H14A1,1 0 0,0 15,19V5A1,1 0 0,0 14,4H12V2H14.5C15.05,2 16,2.45 16,3C16,2.45 16.95,2 17.5,2H20V4H18A1,1 0 0,0 17,5V7M2,7H7V17H2V19A1,1 0 0,0 3,20H5V22H2.5C1.95,22 1,21.55 1,21C1,21.55 0.05,22 0.5,22H-2V20H0A1,1 0 0,0 1,19V5A1,1 0 0,0 0,4H-2V2H0.5C1.05,2 2,2.45 2,3C2,2.45 2.95,2 3.5,2H6V4H4A1,1 0 0,0 3,5V7M7,9V15H2V9H7M22,9V15H17V9H22Z" />
+                        </svg>
+                        Generate JSON
+                    </button>
+                    <button id="downloadJson" class="btn btn-secondary" disabled>
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z" />
+                        </svg>
+                        Download
+                    </button>
+                </div>
+            </div>
+
+            <div class="card output-section">
+                <h2>
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M17,7H22V17H17V19A1,1 0 0,0 18,20H20V22H17.5C16.95,22 16,21.55 16,21C16,21.55 15.05,22 14.5,22H12V20H14A1,1 0 0,0 15,19V5A1,1 0 0,0 14,4H12V2H14.5C15.05,2 16,2.45 16,3C16,2.45 16.95,2 17.5,2H20V4H18A1,1 0 0,0 17,5V7M2,7H7V17H2V19A1,1 0 0,0 3,20H5V22H2.5C1.95,22 1,21.55 1,21C1,21.55 0.05,22 0.5,22H-2V20H0A1,1 0 0,0 1,19V5A1,1 0 0,0 0,4H-2V2H0.5C1.05,2 2,2.45 2,3C2,2.45 2.95,2 3.5,2H6V4H4A1,1 0 0,0 3,5V7M7,9V15H2V9H7M22,9V15H17V9H22Z" />
+                    </svg>
+                    JSON Output
+                </h2>
+                <textarea id="output" class="output-textarea" readonly placeholder="Your generated JSON will appear here..."></textarea>
+            </div>
+        </div>
+    </div>
 
     <script>
         let allFolders = [];
@@ -32,7 +423,21 @@
             const data = await parseBookmarks(file);
             allFolders = data.folders;
             allBookmarks = data.bookmarks;
+            
+            updateStats();
             renderFolderTree();
+            
+            document.getElementById("generateJson").disabled = false;
+            
+            // Update file input button text
+            const button = document.querySelector('.file-input-button');
+            button.innerHTML = `
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" />
+                </svg>
+                ${file.name}
+            `;
+            button.style.background = 'linear-gradient(135deg, #10b981, #059669)';
         });
 
         document.getElementById("generateJson").addEventListener("click", () => {
@@ -45,6 +450,7 @@
             
             const jsonData = JSON.stringify({ folders: filteredFolders, bookmarks: filteredBookmarks }, null, 2);
             document.getElementById("output").value = jsonData;
+            document.getElementById("downloadJson").disabled = false;
         });
 
         document.getElementById("downloadJson").addEventListener("click", () => {
@@ -58,6 +464,12 @@
             link.click();
         });
 
+        function updateStats() {
+            document.getElementById("folderCount").textContent = allFolders.length;
+            document.getElementById("bookmarkCount").textContent = allBookmarks.length;
+            document.getElementById("stats").style.display = "flex";
+        }
+
         function renderFolderTree() {
             const folderTree = document.getElementById("folderTree");
             folderTree.innerHTML = "";
@@ -70,15 +482,24 @@
                     const div = document.createElement("div");
                     div.classList.add("folder");
                     
+                    const folderItem = document.createElement("div");
+                    folderItem.classList.add("folder-item");
+                    
                     const checkbox = document.createElement("input");
                     checkbox.type = "checkbox";
+                    checkbox.classList.add("folder-checkbox");
                     checkbox.value = folder.id;
                     checkbox.addEventListener("change", (event) => {
                         toggleSubfolders(folder.id, event.target.checked);
                     });
                     
-                    div.appendChild(checkbox);
-                    div.appendChild(document.createTextNode(` ${folder.name}`));
+                    const folderName = document.createElement("span");
+                    folderName.classList.add("folder-name");
+                    folderName.textContent = folder.name;
+                    
+                    folderItem.appendChild(checkbox);
+                    folderItem.appendChild(folderName);
+                    div.appendChild(folderItem);
                     container.appendChild(div);
                     
                     buildTree(folder.id, div);
