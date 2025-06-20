@@ -211,12 +211,13 @@ function read($dir)
         }
 
         .developer-photo {
-            width: 32px;
             height: 32px;
-            border-radius: 50%;
+            width: auto;
+            border-radius: 4px;
             border: 2px solid white;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
             transition: transform 0.3s ease;
+            vertical-align: middle;
         }
 
         .developer-photo:hover {
@@ -306,7 +307,6 @@ function read($dir)
                 </div>
             </div>
 
-            <!-- Pages Column -->
             <div class="col-lg-3 col-md-6">
                 <div class="card section-card h-100">
                     <div class="card-header pages-header text-center">
@@ -319,7 +319,6 @@ function read($dir)
                 </div>
             </div>
 
-            <!-- Templates Column -->
             <div class="col-lg-3 col-md-6">
                 <div class="card section-card h-100">
                     <div class="card-header templates-header text-center">
@@ -332,7 +331,6 @@ function read($dir)
                 </div>
             </div>
 
-            <!-- Tools Column -->
             <div class="col-lg-3 col-md-6">
                 <div class="card section-card h-100">
                     <div class="card-header tools-header text-center">
@@ -387,7 +385,6 @@ function read($dir)
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Animate cards on scroll
             const observerOptions = {
                 threshold: 0.1,
                 rootMargin: '0px 0px -50px 0px'
