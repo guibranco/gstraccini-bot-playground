@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>JSON to SEPA XML Converter</title>
+        <link rel="stylesheet" href="json2sepapain008.css">
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>JSON to SEPA XML Converter</h1>
+                <p>Convert Direct Debit JSON data to SEPA pain.008.001.08 XML
+                    format</p>
+            </div>
+
+            <div class="main-content">
+                <div class="input-section">
+                    <h2 class="section-title">JSON Input</h2>
+                    <div class="textarea-container">
+                        <textarea id="jsonInput"
+                            placeholder="Paste your JSON data here...">{
+    "BatchId": "94a6b2dc-9999-427b-9999-539999c9666f",
+    "Type": "DirectDebitCollect",
+    "TransactionReference": "OUT00123456-1-2-HME-8",
+    "CustomerId": "OUT00123456",
+    "AmountDue": 55.69,
+    "Iban": "IE29AIBK93115212345678 ",
+    "AccountHolderName": "John Doe",
+    "MandateId": "OUT00123456-2",
+    "MandateSignedDate": "2024-10-21",
+    "IsFirstDirectDebit": false,
+    "id": "OUT00123456-1-2-HME-8"
+}</textarea>
+                    </div>
+
+                    <div class="storage-controls">
+                        <button class="storage-btn" onclick="saveFields()">💾
+                            Save Fields</button>
+                        <button class="storage-btn clear-btn"
+                            onclick="clearSavedFields()">🗑️ Clear
+                            Saved</button>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="oin" class="form-label">OIN:</label>
+                        <input type="text" id="oin" class="form-input"
+                            placeholder="Enter OIN (e.g., IE99ZZZ999999)"
+                            value="IE99ZZZ999999">
+                    </div>
+                    <div class="form-group">
+                        <label for="creditorName" class="form-label">Creditor
+                            Account Name:</label>
+                        <input type="text" id="creditorName" class="form-input"
+                            placeholder="Enter creditor account name"
+                            value="Company Name DAC">
+                    </div>
+                    <div class="form-group">
+                        <label for="creditorIban" class="form-label">Creditor
+                            IBAN:</label>
+                        <input type="text" id="creditorIban" class="form-input"
+                            placeholder="Enter creditor IBAN"
+                            value="IE29AIBK93115212345678">
+                    </div>
+                    <div class="form-group">
+                        <label for="collectionDate" class="form-label">Collection Date:</label>
+                        <input type="date" id="collectionDate" class="form-input">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="transactionType"
+                                class="form-label">Transaction Type:</label>
+                            <select id="transactionType" class="form-input">
+                                <option value="NORMAL">NORMAL</option>
+                                <option value="RNEWAL">RENEWAL</option>
+                                <option value="RESUBM">RESUBMISSION</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="convert-btn" onclick="convertToXML()">Convert
+                        to XML</button>
+                    <div id="errorMessage"></div>
+                </div>
+
+                <div class="output-section">
+                    <h2 class="section-title">XML Output</h2>
+                    <div class="textarea-container">
+                        <textarea id="xmlOutput" class="output-textarea"
+                            readonly
+                            placeholder="XML output will appear here..."></textarea>
+                        <button class="copy-btn" onclick="copyToClipboard()"
+                            id="copyBtn" style="display: none;">Copy</button>
+                        <button class="copy-btn" onclick="downloadXML()"
+                            id="downloadBtn"
+                            style="display: none; right: 70px; background: rgba(56, 161, 105, 0.9);">Download</button>
+                    </div>
+                    <div id="successMessage"></div>
+                </div>
+            </div>
+        </div>
+        <script src="json2sepapain008.js"></script>
+    </body>
+</html>
