@@ -274,6 +274,100 @@
             border-radius: 12px;
         }
 
+        .merge-options {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .merge-options h3 {
+            margin-bottom: 15px;
+            color: #374151;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .option-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            cursor: pointer;
+            padding: 12px;
+            border-radius: 8px;
+            transition: background-color 0.2s ease;
+        }
+
+        .option-label:hover {
+            background-color: rgba(102, 126, 234, 0.05);
+        }
+
+        .radio-custom {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #d1d5db;
+            border-radius: 50%;
+            position: relative;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .option-label input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .option-label input[type="radio"]:checked + .radio-custom {
+            border-color: #667eea;
+            background-color: #667eea;
+        }
+
+        .option-label input[type="radio"]:checked + .radio-custom::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background-color: white;
+            border-radius: 50%;
+        }
+
+        .option-text {
+            flex: 1;
+        }
+
+        .option-text strong {
+            display: block;
+            color: #374151;
+            margin-bottom: 4px;
+        }
+
+        .option-text small {
+            color: #6b7280;
+            font-size: 0.875rem;
+            line-height: 1.3;
+        }
+
+        .json-button {
+            background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+        }
+
+        .json-button:hover {
+            box-shadow: 0 10px 25px rgba(245, 158, 11, 0.4) !important;
+        }
+
         .stat-item {
             text-align: center;
         }
@@ -348,7 +442,7 @@
                     <svg class="icon" viewBox="0 0 24 24">
                         <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
                     </svg>
-                    Upload Bookmarks
+                    Upload Files
                 </h2>
                 <div class="file-input-wrapper">
                     <input type="file" id="fileInput" class="file-input" accept=".html">
@@ -359,6 +453,47 @@
                         Choose HTML File
                     </div>
                 </div>
+                
+                <div class="file-input-wrapper">
+                    <input type="file" id="jsonInput" class="file-input" accept=".json">
+                    <div class="file-input-button json-button">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M5,3H7V5H5V10A2,2 0 0,1 3,12A2,2 0 0,1 5,14V19H7V21H5C3.93,20.93 3.07,20.07 3,19V15A2,2 0 0,0 1,13H0V11H1A2,2 0 0,0 3,9V5C3.07,3.93 3.93,3.07 5,3M19,3C20.07,3.07 20.93,3.93 21,5V9A2,2 0 0,0 23,11H24V13H23A2,2 0 0,0 21,15V19C20.93,20.07 20.07,20.93 19,21H17V19H19V14A2,2 0 0,1 21,12A2,2 0 0,1 19,10V5H17V3H19Z" />
+                        </svg>
+                        Load Existing JSON (Optional)
+                    </div>
+                </div>
+
+                <div id="mergeOptions" class="merge-options" style="display: none;">
+                    <h3>Merge Options</h3>
+                    <div class="option-group">
+                        <label class="option-label">
+                            <input type="radio" name="mergeStrategy" value="replace" checked>
+                            <span class="radio-custom"></span>
+                            <div class="option-text">
+                                <strong>Replace Mode</strong>
+                                <small>Replace existing data with new HTML content</small>
+                            </div>
+                        </label>
+                        <label class="option-label">
+                            <input type="radio" name="mergeStrategy" value="merge">
+                            <span class="radio-custom"></span>
+                            <div class="option-text">
+                                <strong>Merge Mode</strong>
+                                <small>Combine both sources, keeping unique items from each</small>
+                            </div>
+                        </label>
+                        <label class="option-label">
+                            <input type="radio" name="mergeStrategy" value="update">
+                            <span class="radio-custom"></span>
+                            <div class="option-text">
+                                <strong>Update Mode</strong>
+                                <small>Add new items from HTML, keep existing JSON items</small>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                
                 <div id="stats" class="stats" style="display: none;">
                     <div class="stat-item">
                         <span id="folderCount" class="stat-number">0</span>
@@ -367,6 +502,10 @@
                     <div class="stat-item">
                         <span id="bookmarkCount" class="stat-number">0</span>
                         <span class="stat-label">Bookmarks</span>
+                    </div>
+                    <div class="stat-item" id="existingStats" style="display: none;">
+                        <span id="existingCount" class="stat-number">0</span>
+                        <span class="stat-label">From JSON</span>
                     </div>
                 </div>
             </div>
@@ -414,15 +553,25 @@
     <script>
         let allFolders = [];
         let allBookmarks = [];
+        let existingFolders = [];
+        let existingBookmarks = [];
         let folderIdMap = new Map();
+        let hasExistingJson = false;
 
         document.getElementById("fileInput").addEventListener("change", async (event) => {
             const file = event.target.files[0];
             if (!file) return;
             
             const data = await parseBookmarks(file);
-            allFolders = data.folders;
-            allBookmarks = data.bookmarks;
+            const newFolders = data.folders;
+            const newBookmarks = data.bookmarks;
+            
+            // Apply merge strategy
+            const mergeStrategy = document.querySelector('input[name="mergeStrategy"]:checked').value;
+            const mergedData = applyMergeStrategy(newFolders, newBookmarks, mergeStrategy);
+            
+            allFolders = mergedData.folders;
+            allBookmarks = mergedData.bookmarks;
             
             updateStats();
             renderFolderTree();
@@ -439,6 +588,101 @@
             `;
             button.style.background = 'linear-gradient(135deg, #10b981, #059669)';
         });
+
+        document.getElementById("jsonInput").addEventListener("change", async (event) => {
+            const file = event.target.files[0];
+            if (!file) {
+                hasExistingJson = false;
+                document.getElementById("mergeOptions").style.display = "none";
+                document.getElementById("existingStats").style.display = "none";
+                return;
+            }
+            
+            try {
+                const text = await file.text();
+                const jsonData = JSON.parse(text);
+                
+                existingFolders = jsonData.folders || [];
+                existingBookmarks = jsonData.bookmarks || [];
+                hasExistingJson = true;
+                
+                document.getElementById("mergeOptions").style.display = "block";
+                document.getElementById("existingStats").style.display = "block";
+                document.getElementById("existingCount").textContent = 
+                    existingFolders.length + existingBookmarks.length;
+                
+                // Update JSON input button text
+                const jsonButton = document.querySelector('.json-button');
+                jsonButton.innerHTML = `
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" />
+                    </svg>
+                    ${file.name}
+                `;
+                jsonButton.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                
+            } catch (error) {
+                alert('Error parsing JSON file: ' + error.message);
+            }
+        });
+
+        function applyMergeStrategy(newFolders, newBookmarks, strategy) {
+            if (!hasExistingJson || strategy === 'replace') {
+                return { folders: newFolders, bookmarks: newBookmarks };
+            }
+            
+            let resultFolders = [];
+            let resultBookmarks = [];
+            
+            if (strategy === 'merge') {
+                // Merge: combine both, prioritizing new items for conflicts
+                const folderMap = new Map();
+                const bookmarkMap = new Map();
+                
+                // Add existing items first
+                existingFolders.forEach(folder => {
+                    folderMap.set(folder.id, folder);
+                });
+                existingBookmarks.forEach(bookmark => {
+                    bookmarkMap.set(bookmark.id, bookmark);
+                });
+                
+                // Add/update with new items
+                newFolders.forEach(folder => {
+                    folderMap.set(folder.id, folder);
+                });
+                newBookmarks.forEach(bookmark => {
+                    bookmarkMap.set(bookmark.id, bookmark);
+                });
+                
+                resultFolders = Array.from(folderMap.values());
+                resultBookmarks = Array.from(bookmarkMap.values());
+                
+            } else if (strategy === 'update') {
+                // Update: keep existing, add only new items that don't exist
+                const existingFolderIds = new Set(existingFolders.map(f => f.id));
+                const existingBookmarkIds = new Set(existingBookmarks.map(b => b.id));
+                
+                resultFolders = [...existingFolders];
+                resultBookmarks = [...existingBookmarks];
+                
+                // Add new folders that don't exist
+                newFolders.forEach(folder => {
+                    if (!existingFolderIds.has(folder.id)) {
+                        resultFolders.push(folder);
+                    }
+                });
+                
+                // Add new bookmarks that don't exist
+                newBookmarks.forEach(bookmark => {
+                    if (!existingBookmarkIds.has(bookmark.id)) {
+                        resultBookmarks.push(bookmark);
+                    }
+                });
+            }
+            
+            return { folders: resultFolders, bookmarks: resultBookmarks };
+        }
 
         document.getElementById("generateJson").addEventListener("click", () => {
             const selectedFolders = new Set(
@@ -496,6 +740,16 @@
                     const folderName = document.createElement("span");
                     folderName.classList.add("folder-name");
                     folderName.textContent = folder.name;
+                    
+                    // Add visual indicator for folders from existing JSON
+                    if (hasExistingJson && existingFolders.some(f => f.id === folder.id)) {
+                        const indicator = document.createElement("span");
+                        indicator.textContent = " (existing)";
+                        indicator.style.color = "#f59e0b";
+                        indicator.style.fontSize = "0.8em";
+                        indicator.style.fontWeight = "500";
+                        folderName.appendChild(indicator);
+                    }
                     
                     folderItem.appendChild(checkbox);
                     folderItem.appendChild(folderName);
