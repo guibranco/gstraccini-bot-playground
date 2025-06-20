@@ -162,7 +162,7 @@ function read($dir)
 
         .list-group-item a {
             display: block;
-            padding: 1rem 1.5rem;
+            padding: 1.25rem 2rem;
             text-decoration: none;
             color: var(--text-dark);
             font-weight: 500;
@@ -173,7 +173,7 @@ function read($dir)
         .list-group-item a:hover {
             background: var(--light-green);
             color: var(--dark-green);
-            padding-left: 2rem;
+            padding-left: 2.5rem;
         }
 
         .list-group-item a:before {
@@ -181,14 +181,14 @@ function read($dir)
             font-family: 'Font Awesome 5 Free';
             font-weight: 900;
             position: absolute;
-            left: 1rem;
+            left: 1.5rem;
             opacity: 0;
             transition: all 0.3s ease;
         }
 
         .list-group-item a:hover:before {
             opacity: 1;
-            left: 1.5rem;
+            left: 2rem;
         }
 
         .footer {
@@ -293,9 +293,9 @@ function read($dir)
         </div>
     </section>
 
-    <div class="container main-content">
-        <div class="row g-4">
-            <div class="col-lg-3 col-md-6">
+    <div class="container-fluid px-4 main-content">
+        <div class="row g-4 justify-content-center">
+            <div class="col-xl-3 col-lg-6 col-md-6">
                 <div class="card section-card h-100">
                     <div class="card-header features-header text-center">
                         <i class="fas fa-star section-icon"></i>
@@ -307,7 +307,7 @@ function read($dir)
                 </div>
             </div>
 
-            <div class="col-lg-3 col-md-6">
+            <div class="col-xl-3 col-lg-6 col-md-6">
                 <div class="card section-card h-100">
                     <div class="card-header pages-header text-center">
                         <i class="fas fa-file-alt section-icon"></i>
@@ -319,7 +319,7 @@ function read($dir)
                 </div>
             </div>
 
-            <div class="col-lg-3 col-md-6">
+            <div class="col-xl-3 col-lg-6 col-md-6">
                 <div class="card section-card h-100">
                     <div class="card-header templates-header text-center">
                         <i class="fas fa-layer-group section-icon"></i>
@@ -331,7 +331,7 @@ function read($dir)
                 </div>
             </div>
 
-            <div class="col-lg-3 col-md-6">
+            <div class="col-xl-3 col-lg-6 col-md-6">
                 <div class="card section-card h-100">
                     <div class="card-header tools-header text-center">
                         <i class="fas fa-tools section-icon"></i>
