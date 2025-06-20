@@ -38,7 +38,7 @@
 
     // Register a new FIDO device
     registerButton.addEventListener('click', async () => {
-        const response = await fetch('fido_setup.php');
+        const response = await fetch('setup.php');
         const options = await response.json();
 
         const credential = await navigator.credentials.create({
@@ -48,8 +48,9 @@
         const rawId = new Uint8Array(credential.rawId).reduce((str, byte) => str + String.fromCharCode(byte), '');
         const id = btoa(rawId);
 
-        await fetch('fido_verify.php', {
+        await fetch('verify.php', {
             method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id, rawId })
         });
 
@@ -58,15 +59,16 @@
 
     // Authenticate using a FIDO device
     authenticateButton.addEventListener('click', async () => {
-        const response = await fetch('fido_authenticate.php');
+        const response = await fetch('authenticate.php');
         const options = await response.json();
 
         const assertion = await navigator.credentials.get({
             publicKey: options
         });
 
-        await fetch('fido_verify.php', {
+        await fetch('verify.php', {
             method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(assertion)
         });
 
