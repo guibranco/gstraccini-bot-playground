@@ -7,13 +7,44 @@
         <link rel="stylesheet" href="html2jsx.css">
     </head>
     <body>
+        <div class="container">
+            <div class="header">
+                <h1>HTML to JSX Converter</h1>
+                <p>Transform your HTML code into React-ready JSX with style</p>
+            </div>
 
-        <h2>Paste your HTML here:</h2>
-        <textarea id="htmlInput"></textarea>
-        <button onclick="convertHTMLtoJSX()">Convert</button>
+            <div class="converter-grid">
+                <div class="input-section">
+                    <h2 class="section-title">HTML Input</h2>
+                    <textarea id="htmlInput"
+                        placeholder="Paste your HTML code here..."></textarea>
+                </div>
 
-        <h2>Converted JSX/TSX:</h2>
-        <textarea id="jsxOutput" readonly></textarea>
+                <div class="output-section">
+                    <h2 class="section-title">JSX Output</h2>
+                    <textarea id="jsxOutput" readonly
+                        placeholder="Converted JSX will appear here..."></textarea>
+                </div>
+            </div>
+
+            <div class="convert-section">
+                <button class="convert-btn" onclick="convertHTMLtoJSX()">
+                    <span class="btn-text">Convert to JSX</span>
+                </button>
+                <div class="status-indicator" id="statusIndicator"></div>
+            </div>
+
+            <div class="features">
+                <h3>Features</h3>
+                <ul>
+                    <li>Experience data extraction and formatting</li>
+                    <li>Company information parsing</li>
+                    <li>Role and achievement organization</li>
+                    <li>JSON structure generation</li>
+                    <li>Clean, readable output</li>
+                </ul>
+            </div>
+        </div>
 
         <script src="html2jsx.js"></script>
     </body>
