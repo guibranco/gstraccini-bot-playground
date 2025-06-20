@@ -1,837 +1,164 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bookmark Parser - Transform Your Bookmarks</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: #333;
-            line-height: 1.6;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding: 40px 0;
-        }
-
-        .header h1 {
-            font-size: 3.5rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #ffffff, #f0f0f0);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 10px;
-            text-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-
-        .header p {
-            font-size: 1.2rem;
-            color: rgba(255, 255, 255, 0.9);
-            font-weight: 300;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
-        }
-
-        .card h2 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: #4c51bf;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .icon {
-            width: 24px;
-            height: 24px;
-            fill: currentColor;
-        }
-
-        .file-input-wrapper {
-            position: relative;
-            display: inline-block;
-            width: 100%;
-            margin-bottom: 20px;
-        }
-
-        .file-input {
-            position: absolute;
-            opacity: 0;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
-        }
-
-        .file-input-button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            width: 100%;
-            padding: 15px 20px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .file-input-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
-        }
-
-        .folder-tree {
-            max-height: 400px;
-            overflow-y: auto;
-            padding: 15px;
-            background: #f8fafc;
-            border-radius: 12px;
-            border: 2px dashed #e2e8f0;
-            margin-bottom: 20px;
-        }
-
-        .folder-tree::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .folder-tree::-webkit-scrollbar-track {
-            background: #f1f5f9;
-            border-radius: 4px;
-        }
-
-        .folder-tree::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-
-        .folder-tree::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
-
-        .folder {
-            margin-left: 20px;
-            margin-bottom: 8px;
-            position: relative;
-        }
-
-        .folder-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 12px;
-            border-radius: 8px;
-            transition: background-color 0.2s ease;
-            cursor: pointer;
-        }
-
-        .folder-item:hover {
-            background-color: rgba(102, 126, 234, 0.1);
-        }
-
-        .folder-checkbox {
-            width: 18px;
-            height: 18px;
-            accent-color: #667eea;
-            cursor: pointer;
-        }
-
-        .folder-name {
-            font-weight: 500;
-            color: #374151;
-            user-select: none;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            flex: 1;
-            min-width: 120px;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
-        }
-
-        .btn-secondary {
-            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4);
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        .output-section {
-            grid-column: 1 / -1;
-        }
-
-        .output-textarea {
-            width: 100%;
-            height: 300px;
-            padding: 20px;
-            border: none;
-            border-radius: 12px;
-            background: #1e293b;
-            color: #e2e8f0;
-            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-            font-size: 0.9rem;
-            line-height: 1.5;
-            resize: vertical;
-            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .output-textarea:focus {
-            outline: none;
-            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1), 0 0 0 3px rgba(102, 126, 234, 0.3);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #64748b;
-            font-style: italic;
-        }
-
-        .stats {
-            display: flex;
-            justify-content: space-around;
-            margin: 20px 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
-            border-radius: 12px;
-        }
-
-        .merge-options {
-            margin: 20px 0;
-            padding: 20px;
-            background: #f8fafc;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .merge-options h3 {
-            margin-bottom: 15px;
-            color: #374151;
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
-
-        .option-group {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .option-label {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            cursor: pointer;
-            padding: 12px;
-            border-radius: 8px;
-            transition: background-color 0.2s ease;
-        }
-
-        .option-label:hover {
-            background-color: rgba(102, 126, 234, 0.05);
-        }
-
-        .radio-custom {
-            width: 20px;
-            height: 20px;
-            border: 2px solid #d1d5db;
-            border-radius: 50%;
-            position: relative;
-            transition: all 0.2s ease;
-            flex-shrink: 0;
-            margin-top: 2px;
-        }
-
-        .option-label input[type="radio"] {
-            position: absolute;
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .option-label input[type="radio"]:checked + .radio-custom {
-            border-color: #667eea;
-            background-color: #667eea;
-        }
-
-        .option-label input[type="radio"]:checked + .radio-custom::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 8px;
-            height: 8px;
-            background-color: white;
-            border-radius: 50%;
-        }
-
-        .option-text {
-            flex: 1;
-        }
-
-        .option-text strong {
-            display: block;
-            color: #374151;
-            margin-bottom: 4px;
-        }
-
-        .option-text small {
-            color: #6b7280;
-            font-size: 0.875rem;
-            line-height: 1.3;
-        }
-
-        .json-button {
-            background: linear-gradient(135deg, #f59e0b, #d97706) !important;
-        }
-
-        .json-button:hover {
-            box-shadow: 0 10px 25px rgba(245, 158, 11, 0.4) !important;
-        }
-
-        .stat-item {
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #0369a1;
-            display: block;
-        }
-
-        .stat-label {
-            font-size: 0.9rem;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        @media (max-width: 768px) {
-            .main-content {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            
-            .header h1 {
-                font-size: 2.5rem;
-            }
-            
-            .action-buttons {
-                flex-direction: column;
-            }
-            
-            .btn {
-                min-width: unset;
-            }
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .card {
-            animation: fadeInUp 0.6s ease-out;
-        }
-
-        .card:nth-child(2) {
-            animation-delay: 0.1s;
-        }
-
-        .card:nth-child(3) {
-            animation-delay: 0.2s;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>📚 Bookmark Parser</h1>
-            <p>Transform your browser bookmarks into beautiful, organized JSON data with our powerful converter tool</p>
-        </div>
-
-        <div class="main-content">
-            <div class="card">
-                <h2>
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
-                    </svg>
-                    Upload Files
-                </h2>
-                <div class="file-input-wrapper">
-                    <input type="file" id="fileInput" class="file-input" accept=".html">
-                    <div class="file-input-button">
-                        <svg class="icon" viewBox="0 0 24 24">
-                            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
-                        </svg>
-                        Choose HTML File
-                    </div>
-                </div>
-                
-                <div class="file-input-wrapper">
-                    <input type="file" id="jsonInput" class="file-input" accept=".json">
-                    <div class="file-input-button json-button">
-                        <svg class="icon" viewBox="0 0 24 24">
-                            <path d="M5,3H7V5H5V10A2,2 0 0,1 3,12A2,2 0 0,1 5,14V19H7V21H5C3.93,20.93 3.07,20.07 3,19V15A2,2 0 0,0 1,13H0V11H1A2,2 0 0,0 3,9V5C3.07,3.93 3.93,3.07 5,3M19,3C20.07,3.07 20.93,3.93 21,5V9A2,2 0 0,0 23,11H24V13H23A2,2 0 0,0 21,15V19C20.93,20.07 20.07,20.93 19,21H17V19H19V14A2,2 0 0,1 21,12A2,2 0 0,1 19,10V5H17V3H19Z" />
-                        </svg>
-                        Load Existing JSON (Optional)
-                    </div>
-                </div>
-
-                <div id="mergeOptions" class="merge-options" style="display: none;">
-                    <h3>Merge Options</h3>
-                    <div class="option-group">
-                        <label class="option-label">
-                            <input type="radio" name="mergeStrategy" value="replace" checked>
-                            <span class="radio-custom"></span>
-                            <div class="option-text">
-                                <strong>Replace Mode</strong>
-                                <small>Replace existing data with new HTML content</small>
-                            </div>
-                        </label>
-                        <label class="option-label">
-                            <input type="radio" name="mergeStrategy" value="merge">
-                            <span class="radio-custom"></span>
-                            <div class="option-text">
-                                <strong>Merge Mode</strong>
-                                <small>Combine both sources, keeping unique items from each</small>
-                            </div>
-                        </label>
-                        <label class="option-label">
-                            <input type="radio" name="mergeStrategy" value="update">
-                            <span class="radio-custom"></span>
-                            <div class="option-text">
-                                <strong>Update Mode</strong>
-                                <small>Add new items from HTML, keep existing JSON items</small>
-                            </div>
-                        </label>
-                    </div>
-                </div>
-                
-                <div id="stats" class="stats" style="display: none;">
-                    <div class="stat-item">
-                        <span id="folderCount" class="stat-number">0</span>
-                        <span class="stat-label">Folders</span>
-                    </div>
-                    <div class="stat-item">
-                        <span id="bookmarkCount" class="stat-number">0</span>
-                        <span class="stat-label">Bookmarks</span>
-                    </div>
-                    <div class="stat-item" id="existingStats" style="display: none;">
-                        <span id="existingCount" class="stat-number">0</span>
-                        <span class="stat-label">From JSON</span>
-                    </div>
-                </div>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Bookmark Parser - Transform Your Bookmarks</title>
+        <link rel="stylesheet" href="bookmarks2json.css">
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>📚 Bookmark Parser</h1>
+                <p>Transform your browser bookmarks into beautiful, organized
+                    JSON data with our powerful converter tool</p>
             </div>
 
-            <div class="card">
-                <h2>
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <path d="M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6H12L10,4Z" />
-                    </svg>
-                    Select Folders
-                </h2>
-                <div id="folderTree" class="folder-tree">
-                    <div class="empty-state">
-                        Upload a bookmark file to see your folder structure
+            <div class="main-content">
+                <div class="card">
+                    <h2>
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path
+                                d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+                        </svg>
+                        Upload Files
+                    </h2>
+
+                    <div class="file-input-wrapper">
+                        <input type="file" id="jsonInput" class="file-input"
+                            accept=".json">
+                        <div class="file-input-button json-button">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <path
+                                    d="M5,3H7V5H5V10A2,2 0 0,1 3,12A2,2 0 0,1 5,14V19H7V21H5C3.93,20.93 3.07,20.07 3,19V15A2,2 0 0,0 1,13H0V11H1A2,2 0 0,0 3,9V5C3.07,3.93 3.93,3.07 5,3M19,3C20.07,3.07 20.93,3.93 21,5V9A2,2 0 0,0 23,11H24V13H23A2,2 0 0,0 21,15V19C20.93,20.07 20.07,20.93 19,21H17V19H19V14A2,2 0 0,1 21,12A2,2 0 0,1 19,10V5H17V3H19Z" />
+                            </svg>
+                            Load Existing JSON (Optional)
+                        </div>
+                    </div>
+
+                    <div class="file-input-wrapper">
+                        <input type="file" id="fileInput" class="file-input"
+                            accept=".html">
+                        <div class="file-input-button">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <path
+                                    d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+                            </svg>
+                            Choose HTML File
+                        </div>
+                    </div>
+
+                    <div id="mergeOptions" class="merge-options"
+                        style="display: none;">
+                        <h3>Merge Options</h3>
+                        <div class="option-group">
+                            <label class="option-label">
+                                <input type="radio" name="mergeStrategy"
+                                    value="replace" checked>
+                                <span class="radio-custom"></span>
+                                <div class="option-text">
+                                    <strong>Replace Mode</strong>
+                                    <small>Replace existing data with new HTML
+                                        content</small>
+                                </div>
+                            </label>
+                            <label class="option-label">
+                                <input type="radio" name="mergeStrategy"
+                                    value="merge">
+                                <span class="radio-custom"></span>
+                                <div class="option-text">
+                                    <strong>Merge Mode</strong>
+                                    <small>Combine both sources, keeping unique
+                                        items from each</small>
+                                </div>
+                            </label>
+                            <label class="option-label">
+                                <input type="radio" name="mergeStrategy"
+                                    value="update">
+                                <span class="radio-custom"></span>
+                                <div class="option-text">
+                                    <strong>Update Mode</strong>
+                                    <small>Add new items from HTML, keep
+                                        existing JSON items</small>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="existingStats" class="stats"
+                        style="display: none;">
+                        <div class="stat-item">
+                            <span id="existingFolderCount"
+                                class="stat-number">0</span>
+                            <span class="stat-label">Existing Folders</span>
+                        </div>
+                        <div class="stat-item">
+                            <span id="existingBookmarkCount"
+                                class="stat-number">0</span>
+                            <span class="stat-label">Existing Bookmarks</span>
+                        </div>
+                    </div>
+
+                    <div id="stats" class="stats" style="display: none;">
+                        <div class="stat-item">
+                            <span id="folderCount" class="stat-number">0</span>
+                            <span class="stat-label">Folders</span>
+                        </div>
+                        <div class="stat-item">
+                            <span id="bookmarkCount"
+                                class="stat-number">0</span>
+                            <span class="stat-label">Bookmarks</span>
+                        </div>
+                    </div>                    
+                </div>
+
+                <div class="card">
+                    <h2>
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path
+                                d="M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6H12L10,4Z" />
+                        </svg>
+                        Select Folders
+                    </h2>
+                    <div id="folderTree" class="folder-tree">
+                        <div class="empty-state">
+                            Upload a bookmark file to see your folder structure
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button id="generateJson" class="btn btn-primary"
+                            disabled>
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <path
+                                    d="M17,7H22V17H17V19A1,1 0 0,0 18,20H20V22H17.5C16.95,22 16,21.55 16,21C16,21.55 15.05,22 14.5,22H12V20H14A1,1 0 0,0 15,19V5A1,1 0 0,0 14,4H12V2H14.5C15.05,2 16,2.45 16,3C16,2.45 16.95,2 17.5,2H20V4H18A1,1 0 0,0 17,5V7M2,7H7V17H2V19A1,1 0 0,0 3,20H5V22H2.5C1.95,22 1,21.55 1,21C1,21.55 0.05,22 0.5,22H-2V20H0A1,1 0 0,0 1,19V5A1,1 0 0,0 0,4H-2V2H0.5C1.05,2 2,2.45 2,3C2,2.45 2.95,2 3.5,2H6V4H4A1,1 0 0,0 3,5V7M7,9V15H2V9H7M22,9V15H17V9H22Z" />
+                            </svg>
+                            Generate JSON
+                        </button>
+                        <button id="downloadJson" class="btn btn-secondary"
+                            disabled>
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <path
+                                    d="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z" />
+                            </svg>
+                            Download
+                        </button>
                     </div>
                 </div>
-                <div class="action-buttons">
-                    <button id="generateJson" class="btn btn-primary" disabled>
-                        <svg class="icon" viewBox="0 0 24 24">
-                            <path d="M17,7H22V17H17V19A1,1 0 0,0 18,20H20V22H17.5C16.95,22 16,21.55 16,21C16,21.55 15.05,22 14.5,22H12V20H14A1,1 0 0,0 15,19V5A1,1 0 0,0 14,4H12V2H14.5C15.05,2 16,2.45 16,3C16,2.45 16.95,2 17.5,2H20V4H18A1,1 0 0,0 17,5V7M2,7H7V17H2V19A1,1 0 0,0 3,20H5V22H2.5C1.95,22 1,21.55 1,21C1,21.55 0.05,22 0.5,22H-2V20H0A1,1 0 0,0 1,19V5A1,1 0 0,0 0,4H-2V2H0.5C1.05,2 2,2.45 2,3C2,2.45 2.95,2 3.5,2H6V4H4A1,1 0 0,0 3,5V7M7,9V15H2V9H7M22,9V15H17V9H22Z" />
-                        </svg>
-                        Generate JSON
-                    </button>
-                    <button id="downloadJson" class="btn btn-secondary" disabled>
-                        <svg class="icon" viewBox="0 0 24 24">
-                            <path d="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z" />
-                        </svg>
-                        Download
-                    </button>
-                </div>
-            </div>
 
-            <div class="card output-section">
-                <h2>
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <path d="M17,7H22V17H17V19A1,1 0 0,0 18,20H20V22H17.5C16.95,22 16,21.55 16,21C16,21.55 15.05,22 14.5,22H12V20H14A1,1 0 0,0 15,19V5A1,1 0 0,0 14,4H12V2H14.5C15.05,2 16,2.45 16,3C16,2.45 16.95,2 17.5,2H20V4H18A1,1 0 0,0 17,5V7M2,7H7V17H2V19A1,1 0 0,0 3,20H5V22H2.5C1.95,22 1,21.55 1,21C1,21.55 0.05,22 0.5,22H-2V20H0A1,1 0 0,0 1,19V5A1,1 0 0,0 0,4H-2V2H0.5C1.05,2 2,2.45 2,3C2,2.45 2.95,2 3.5,2H6V4H4A1,1 0 0,0 3,5V7M7,9V15H2V9H7M22,9V15H17V9H22Z" />
-                    </svg>
-                    JSON Output
-                </h2>
-                <textarea id="output" class="output-textarea" readonly placeholder="Your generated JSON will appear here..."></textarea>
+                <div class="card output-section">
+                    <h2>
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path
+                                d="M17,7H22V17H17V19A1,1 0 0,0 18,20H20V22H17.5C16.95,22 16,21.55 16,21C16,21.55 15.05,22 14.5,22H12V20H14A1,1 0 0,0 15,19V5A1,1 0 0,0 14,4H12V2H14.5C15.05,2 16,2.45 16,3C16,2.45 16.95,2 17.5,2H20V4H18A1,1 0 0,0 17,5V7M2,7H7V17H2V19A1,1 0 0,0 3,20H5V22H2.5C1.95,22 1,21.55 1,21C1,21.55 0.05,22 0.5,22H-2V20H0A1,1 0 0,0 1,19V5A1,1 0 0,0 0,4H-2V2H0.5C1.05,2 2,2.45 2,3C2,2.45 2.95,2 3.5,2H6V4H4A1,1 0 0,0 3,5V7M7,9V15H2V9H7M22,9V15H17V9H22Z" />
+                        </svg>
+                        JSON Output
+                    </h2>
+                    <textarea id="output" class="output-textarea" readonly
+                        placeholder="Your generated JSON will appear here..."></textarea>
+                </div>
             </div>
         </div>
-    </div>
 
-    <script>
-        let allFolders = [];
-        let allBookmarks = [];
-        let existingFolders = [];
-        let existingBookmarks = [];
-        let folderIdMap = new Map();
-        let hasExistingJson = false;
-
-        document.getElementById("fileInput").addEventListener("change", async (event) => {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            const data = await parseBookmarks(file);
-            const newFolders = data.folders;
-            const newBookmarks = data.bookmarks;
-            
-            // Apply merge strategy
-            const mergeStrategy = document.querySelector('input[name="mergeStrategy"]:checked').value;
-            const mergedData = applyMergeStrategy(newFolders, newBookmarks, mergeStrategy);
-            
-            allFolders = mergedData.folders;
-            allBookmarks = mergedData.bookmarks;
-            
-            updateStats();
-            renderFolderTree();
-            
-            document.getElementById("generateJson").disabled = false;
-            
-            // Update file input button text
-            const button = document.querySelector('.file-input-button');
-            button.innerHTML = `
-                <svg class="icon" viewBox="0 0 24 24">
-                    <path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" />
-                </svg>
-                ${file.name}
-            `;
-            button.style.background = 'linear-gradient(135deg, #10b981, #059669)';
-        });
-
-        document.getElementById("jsonInput").addEventListener("change", async (event) => {
-            const file = event.target.files[0];
-            if (!file) {
-                hasExistingJson = false;
-                document.getElementById("mergeOptions").style.display = "none";
-                document.getElementById("existingStats").style.display = "none";
-                return;
-            }
-            
-            try {
-                const text = await file.text();
-                const jsonData = JSON.parse(text);
-                
-                existingFolders = jsonData.folders || [];
-                existingBookmarks = jsonData.bookmarks || [];
-                hasExistingJson = true;
-                
-                document.getElementById("mergeOptions").style.display = "block";
-                document.getElementById("existingStats").style.display = "block";
-                document.getElementById("existingCount").textContent = 
-                    existingFolders.length + existingBookmarks.length;
-                
-                // Update JSON input button text
-                const jsonButton = document.querySelector('.json-button');
-                jsonButton.innerHTML = `
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" />
-                    </svg>
-                    ${file.name}
-                `;
-                jsonButton.style.background = 'linear-gradient(135deg, #10b981, #059669)';
-                
-            } catch (error) {
-                alert('Error parsing JSON file: ' + error.message);
-            }
-        });
-
-        function applyMergeStrategy(newFolders, newBookmarks, strategy) {
-            if (!hasExistingJson || strategy === 'replace') {
-                return { folders: newFolders, bookmarks: newBookmarks };
-            }
-            
-            let resultFolders = [];
-            let resultBookmarks = [];
-            
-            if (strategy === 'merge') {
-                // Merge: combine both, prioritizing new items for conflicts
-                const folderMap = new Map();
-                const bookmarkMap = new Map();
-                
-                // Add existing items first
-                existingFolders.forEach(folder => {
-                    folderMap.set(folder.id, folder);
-                });
-                existingBookmarks.forEach(bookmark => {
-                    bookmarkMap.set(bookmark.id, bookmark);
-                });
-                
-                // Add/update with new items
-                newFolders.forEach(folder => {
-                    folderMap.set(folder.id, folder);
-                });
-                newBookmarks.forEach(bookmark => {
-                    bookmarkMap.set(bookmark.id, bookmark);
-                });
-                
-                resultFolders = Array.from(folderMap.values());
-                resultBookmarks = Array.from(bookmarkMap.values());
-                
-            } else if (strategy === 'update') {
-                // Update: keep existing, add only new items that don't exist
-                const existingFolderIds = new Set(existingFolders.map(f => f.id));
-                const existingBookmarkIds = new Set(existingBookmarks.map(b => b.id));
-                
-                resultFolders = [...existingFolders];
-                resultBookmarks = [...existingBookmarks];
-                
-                // Add new folders that don't exist
-                newFolders.forEach(folder => {
-                    if (!existingFolderIds.has(folder.id)) {
-                        resultFolders.push(folder);
-                    }
-                });
-                
-                // Add new bookmarks that don't exist
-                newBookmarks.forEach(bookmark => {
-                    if (!existingBookmarkIds.has(bookmark.id)) {
-                        resultBookmarks.push(bookmark);
-                    }
-                });
-            }
-            
-            return { folders: resultFolders, bookmarks: resultBookmarks };
-        }
-
-        document.getElementById("generateJson").addEventListener("click", () => {
-            const selectedFolders = new Set(
-                [...document.querySelectorAll("input[type='checkbox']:checked")].map(checkbox => checkbox.value)
-            );
-            
-            const filteredFolders = allFolders.filter(folder => selectedFolders.has(folder.id));
-            const filteredBookmarks = allBookmarks.filter(bookmark => selectedFolders.has(bookmark.folderId));
-            
-            const jsonData = JSON.stringify({ folders: filteredFolders, bookmarks: filteredBookmarks }, null, 2);
-            document.getElementById("output").value = jsonData;
-            document.getElementById("downloadJson").disabled = false;
-        });
-
-        document.getElementById("downloadJson").addEventListener("click", () => {
-            const jsonData = document.getElementById("output").value;
-            if (!jsonData) return;
-            
-            const blob = new Blob([jsonData], { type: "application/json" });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = "bookmarks.json";
-            link.click();
-        });
-
-        function updateStats() {
-            document.getElementById("folderCount").textContent = allFolders.length;
-            document.getElementById("bookmarkCount").textContent = allBookmarks.length;
-            document.getElementById("stats").style.display = "flex";
-        }
-
-        function renderFolderTree() {
-            const folderTree = document.getElementById("folderTree");
-            folderTree.innerHTML = "";
-
-            function buildTree(parentId, container) {
-                const children = allFolders.filter(folder => folder.parentId === parentId);
-                if (!children.length) return;
-                
-                children.forEach(folder => {
-                    const div = document.createElement("div");
-                    div.classList.add("folder");
-                    
-                    const folderItem = document.createElement("div");
-                    folderItem.classList.add("folder-item");
-                    
-                    const checkbox = document.createElement("input");
-                    checkbox.type = "checkbox";
-                    checkbox.classList.add("folder-checkbox");
-                    checkbox.value = folder.id;
-                    checkbox.addEventListener("change", (event) => {
-                        toggleSubfolders(folder.id, event.target.checked);
-                    });
-                    
-                    const folderName = document.createElement("span");
-                    folderName.classList.add("folder-name");
-                    folderName.textContent = folder.name;
-                    
-                    // Add visual indicator for folders from existing JSON
-                    if (hasExistingJson && existingFolders.some(f => f.id === folder.id)) {
-                        const indicator = document.createElement("span");
-                        indicator.textContent = " (existing)";
-                        indicator.style.color = "#f59e0b";
-                        indicator.style.fontSize = "0.8em";
-                        indicator.style.fontWeight = "500";
-                        folderName.appendChild(indicator);
-                    }
-                    
-                    folderItem.appendChild(checkbox);
-                    folderItem.appendChild(folderName);
-                    div.appendChild(folderItem);
-                    container.appendChild(div);
-                    
-                    buildTree(folder.id, div);
-                });
-            }
-
-            buildTree(null, folderTree);
-        }
-
-        function toggleSubfolders(parentId, isChecked) {
-            const childCheckboxes = document.querySelectorAll(`input[type='checkbox']`);
-            
-            childCheckboxes.forEach(childCheckbox => {
-                if (allFolders.some(folder => folder.id === childCheckbox.value && folder.parentId === parentId)) {
-                    childCheckbox.checked = isChecked;
-                    toggleSubfolders(childCheckbox.value, isChecked);
-                }
-            });
-        }
-
-        async function parseBookmarks(file) {
-            const text = await file.text();
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(text, "text/html");
-
-            let folders = [];
-            let bookmarks = [];
-            folderIdMap.clear();
-
-            function processNode(node, parentId = null) {
-                for (const child of node.children) {
-                    if (child.tagName === "DT") {
-                        let firstChild = child.firstElementChild;
-                        if (!firstChild) continue;
-                        
-                        if (firstChild.tagName === "H3") {
-                            let folderId = generateUniqueId(firstChild.textContent);
-                            folders.push({ id: folderId, name: firstChild.textContent, parentId });
-
-                            let nextSibling = firstChild.nextElementSibling;
-                            if (nextSibling && nextSibling.tagName === "DL") {
-                                processNode(nextSibling, folderId);
-                            }
-                        } else if (firstChild.tagName === "A") {
-                            bookmarks.push({
-                                id: generateUniqueId(firstChild.textContent),
-                                title: firstChild.textContent,
-                                url: firstChild.getAttribute("HREF"),
-                                description: "",
-                                thumbnail: "",
-                                tags: [],
-                                folderId: parentId,
-                                favorite: false,
-                                dateAdded: new Date(parseInt(firstChild.getAttribute("ADD_DATE") || "0") * 1000).toISOString(),
-                            });
-                        }
-                    } else if (child.tagName === "DL") {
-                        processNode(child, parentId);
-                    }
-                }
-            }
-
-            function generateUniqueId(name) {
-                let baseId = name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
-                let uniqueId = baseId;
-                let counter = 1;
-                while (folderIdMap.has(uniqueId)) {
-                    uniqueId = `${baseId}-${counter++}`;
-                }
-                folderIdMap.set(uniqueId, true);
-                return uniqueId;
-            }
-
-            const rootDL = doc.querySelector("BODY > DL");
-            if (rootDL) processNode(rootDL);
-
-            return { folders, bookmarks };
-        }
-    </script>
-</body>
+        <script src="bookmarks2json.js"></script>
+    </body>
 </html>
