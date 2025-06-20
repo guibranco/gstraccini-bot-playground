@@ -70,7 +70,7 @@ $dynamicSections .= generateSection("Comments", $comments);
 $dynamicSections .= generateSection("Issues", $issues);
 $dynamicSections .= generateSection("Repositories", $repositories);
 
-$emailTemplate = file_get_contents('report.html');
+$emailTemplate = file_get_contents('email_html.template');
 $emailTemplate = str_replace('{{dynamicSections}}', $dynamicSections, $emailTemplate);
 
 echo $emailTemplate;
