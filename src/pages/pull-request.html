@@ -7,124 +7,653 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
     <style>
-        .status-success { color: #28a745; }  /* Green for success */
-        .status-failed { color: #dc3545; }   /* Red for failure */
-        .status-pending { color: #ffc107; }  /* Yellow for pending */
-        .label { margin-right: 5px; }        /* Spacing between labels */
-        .file-item, .commit-item { margin-bottom: 10px; }  /* File and Commit styling */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #3b82f6;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: #334155;
+        }
+
+        * {
+            transition: all 0.3s ease;
+        }
+
+        body {
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        .hero-section {
+            background: var(--primary-gradient);
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .pr-number {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            display: inline-block;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .enhanced-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            margin-bottom: 2rem;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .enhanced-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary-gradient);
+        }
+
+        .enhanced-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4);
+        }
+
+        .card-header {
+            background: rgba(102, 126, 234, 0.1);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.5rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .status-success { 
+            color: var(--success-color);
+            filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.3));
+        }
+        
+        .status-failed { 
+            color: var(--danger-color);
+            filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.3));
+        }
+        
+        .status-pending { 
+            color: var(--warning-color);
+            filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.3));
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .file-item, .commit-item {
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border-left: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .file-item {
+            border-left-color: var(--info-color);
+        }
+
+        .commit-item {
+            border-left-color: var(--success-color);
+        }
+
+        .file-item:hover, .commit-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(4px);
+        }
+
+        .file-item i, .commit-item i {
+            margin-right: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            animation: slideIn 0.6s ease forwards;
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        .check-item:last-child {
+            border-bottom: none;
+        }
+
+        .check-item i {
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .check-item:nth-child(1) { animation-delay: 0.1s; }
+        .check-item:nth-child(2) { animation-delay: 0.2s; }
+        .check-item:nth-child(3) { animation-delay: 0.3s; }
+        .check-item:nth-child(4) { animation-delay: 0.4s; }
+        .check-item:nth-child(5) { animation-delay: 0.5s; }
+
+        .label-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .label-bug {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .label-review {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+
+        .reviewer-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .reviewer-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .reviewer-item i {
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .command-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .command-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary-gradient);
+        }
+
+        .command-item i {
+            margin-right: 0.75rem;
+            color: var(--success-color);
+        }
+
+        .btn-enhanced {
+            background: var(--primary-gradient);
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            color: white;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn-enhanced:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+        .author-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            margin-top: 0.5rem;
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .floating-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+            animation: float 20s infinite linear;
+        }
+
+        .floating-circle:nth-child(1) {
+            width: 100px;
+            height: 100px;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .floating-circle:nth-child(2) {
+            width: 150px;
+            height: 150px;
+            top: 60%;
+            right: 10%;
+            animation-delay: -10s;
+        }
+
+        .floating-circle:nth-child(3) {
+            width: 80px;
+            height: 80px;
+            top: 30%;
+            right: 30%;
+            animation-delay: -5s;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-20px) rotate(120deg); }
+            66% { transform: translateY(10px) rotate(240deg); }
+            100% { transform: translateY(0px) rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 1rem 0;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .card-body, .card-header {
+                padding: 1rem;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h1 class="text-center">Pull Request Details</h1>
+    <div class="floating-elements">
+        <div class="floating-circle"></div>
+        <div class="floating-circle"></div>
+        <div class="floating-circle"></div>
+    </div>
 
-        <!-- Pull Request Summary -->
-        <div class="card mb-4">
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="container">
+            <div class="hero-content text-center">
+                <div class="pr-number">
+                    <i class="bi bi-git"></i> #1234
+                </div>
+                <h1 class="display-4 fw-bold mb-3">Fix the issue with X</h1>
+                <p class="lead mb-0">This PR fixes the issue with X, improves Y, and ensures Z</p>
+                <div class="author-badge">
+                    <i class="bi bi-person-circle"></i>
+                    <span>John Doe (@johndoe)</span>
+                    <span class="mx-2">•</span>
+                    <i class="bi bi-calendar3"></i>
+                    <span>Oct 13, 2024</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Stats Overview -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">3</div>
+                <div class="text-muted">Files Changed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">2</div>
+                <div class="text-muted">Commits</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">2</div>
+                <div class="text-muted">Reviewers</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">8</div>
+                <div class="text-muted">Checks Run</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">62%</div>
+                <div class="text-muted">Success Rate</div>
+            </div>
+        </div>
+
+        <!-- Labels and Status -->
+        <div class="enhanced-card">
             <div class="card-header">
-                <h3 class="mb-0">#1234 - Fix the issue with X</h3>
-                <p class="text-muted mb-0">Opened by <strong>@johndoe</strong> on <strong>Oct 13, 2024</strong></p>
+                <h5 class="mb-0">
+                    <i class="bi bi-tags me-2"></i>
+                    Labels & Status
+                </h5>
             </div>
             <div class="card-body">
-                <p><strong>Description:</strong> This PR fixes the issue with X, improves Y, and ensures Z.</p>
-
-                <!-- Labels -->
-                <h5>Labels:</h5>
-                <div class="mb-3">
-                    <span class="badge bg-primary label">bug</span>
-                    <span class="badge bg-warning label">needs-review</span>
+                <div class="mb-4">
+                    <h6 class="mb-3">Labels</h6>
+                    <span class="label-badge label-bug">
+                        <i class="bi bi-bug me-1"></i>bug
+                    </span>
+                    <span class="label-badge label-review">
+                        <i class="bi bi-eye me-1"></i>needs-review
+                    </span>
                 </div>
 
-                <!-- Requested Reviewers -->
-                <h5>Requested Reviewers:</h5>
-                <ul class="list-unstyled mb-3">
-                    <li><i class="bi bi-person"></i> @alice</li>
-                    <li><i class="bi bi-person"></i> @bob</li>
-                </ul>
-
-                <!-- Reviewers -->
-                <h5>Reviewers:</h5>
-                <ul class="list-unstyled mb-3">
-                    <li><i class="bi bi-check-circle-fill text-success"></i> @alice (Approved)</li>
-                    <li><i class="bi bi-x-circle-fill text-danger"></i> @bob (Changes Requested)</li>
-                </ul>
-
-                <!-- Commands (Bot triggered) -->
-                <h5>Commands:</h5>
-                <ul class="list-group mb-3">
-                    <li class="list-group-item"><i class="bi bi-terminal"></i> /retest</li>
-                    <li class="list-group-item"><i class="bi bi-terminal"></i> /merge</li>
-                </ul>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="mb-3">Requested Reviewers</h6>
+                        <div class="reviewer-item">
+                            <i class="bi bi-person-plus text-info"></i>
+                            <span>@alice</span>
+                        </div>
+                        <div class="reviewer-item">
+                            <i class="bi bi-person-plus text-info"></i>
+                            <span>@bob</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="mb-3">Review Status</h6>
+                        <div class="reviewer-item">
+                            <i class="bi bi-check-circle-fill status-success"></i>
+                            <span>@alice (Approved)</span>
+                        </div>
+                        <div class="reviewer-item">
+                            <i class="bi bi-x-circle-fill status-failed"></i>
+                            <span>@bob (Changes Requested)</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Files Changed -->
-        <div class="card mb-4">
+        <!-- Commands -->
+        <div class="enhanced-card">
             <div class="card-header">
-                <h5>Files Changed</h5>
+                <h5 class="mb-0">
+                    <i class="bi bi-terminal me-2"></i>
+                    Available Commands
+                </h5>
             </div>
             <div class="card-body">
-                <ul class="list-unstyled">
-                    <li class="file-item"><i class="bi bi-file-earmark-text"></i> file1.py</li>
-                    <li class="file-item"><i class="bi bi-file-earmark-text"></i> file2.py</li>
-                    <li class="file-item"><i class="bi bi-file-earmark-text"></i> README.md</li>
-                </ul>
+                <div class="command-item">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    <span>/retest</span>
+                </div>
+                <div class="command-item">
+                    <i class="bi bi-git"></i>
+                    <span>/merge</span>
+                </div>
             </div>
         </div>
 
-        <!-- Commits -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5>Commits</h5>
-            </div>
-            <div class="card-body">
-                <ul class="list-unstyled">
-                    <li class="commit-item"><i class="bi bi-git-commit"></i> abc123 - Initial commit fixing issue X (by @johndoe)</li>
-                    <li class="commit-item"><i class="bi bi-git-commit"></i> def456 - Refactored file Y (by @alice)</li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Check Status Overview -->
         <div class="row">
-            <div class="col-md-6">
-                <div class="card mb-4">
+            <!-- Files and Commits -->
+            <div class="col-lg-6">
+                <!-- Files Changed -->
+                <div class="enhanced-card">
                     <div class="card-header">
-                        <h5>Check Status (General)</h5>
+                        <h5 class="mb-0">
+                            <i class="bi bi-files me-2"></i>
+                            Files Changed
+                        </h5>
                     </div>
                     <div class="card-body">
-                        <ul class="list-unstyled">
-                            <li><i class="bi bi-check-circle-fill status-success"></i> CI/CD Passed</li>
-                            <li><i class="bi bi-check-circle-fill status-success"></i> Lint Passed</li>
-                            <li><i class="bi bi-x-circle-fill status-failed"></i> Unit Tests Failed</li>
-                        </ul>
+                        <div class="file-item">
+                            <i class="bi bi-file-earmark-code"></i>
+                            <span>file1.py</span>
+                        </div>
+                        <div class="file-item">
+                            <i class="bi bi-file-earmark-code"></i>
+                            <span>file2.py</span>
+                        </div>
+                        <div class="file-item">
+                            <i class="bi bi-file-earmark-text"></i>
+                            <span>README.md</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Commits -->
+                <div class="enhanced-card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-clock-history me-2"></i>
+                            Commits
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="commit-item">
+                            <i class="bi bi-git"></i>
+                            <div>
+                                <div class="fw-bold">abc123</div>
+                                <div class="text-muted small">Initial commit fixing issue X (by @johndoe)</div>
+                            </div>
+                        </div>
+                        <div class="commit-item">
+                            <i class="bi bi-git"></i>
+                            <div>
+                                <div class="fw-bold">def456</div>
+                                <div class="text-muted small">Refactored file Y (by @alice)</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-6">
-                <div class="card mb-4">
+            <!-- Check Status -->
+            <div class="col-lg-6">
+                <!-- General Check Status -->
+                <div class="enhanced-card">
                     <div class="card-header">
-                        <h5>Check Status (Bot)</h5>
+                        <h5 class="mb-0">
+                            <i class="bi bi-shield-check me-2"></i>
+                            General Checks
+                        </h5>
                     </div>
                     <div class="card-body">
-                        <ul class="list-unstyled">
-                            <li><i class="bi bi-check-circle-fill status-success"></i> Check Commit</li>
-                            <li><i class="bi bi-check-circle-fill status-success"></i> Check Pull Request</li>
-                            <li><i class="bi bi-check-circle-fill status-success"></i> Check Pull Request Description</li>
-                            <li><i class="bi bi-x-circle-fill status-failed"></i> Check Pull Request Content</li>
-                            <li><i class="bi bi-exclamation-circle-fill status-pending"></i> Check Pull Request Size</li>
-                        </ul>
+                        <div class="check-item">
+                            <i class="bi bi-check-circle-fill status-success"></i>
+                            <span>CI/CD Pipeline</span>
+                        </div>
+                        <div class="check-item">
+                            <i class="bi bi-check-circle-fill status-success"></i>
+                            <span>Code Linting</span>
+                        </div>
+                        <div class="check-item">
+                            <i class="bi bi-x-circle-fill status-failed pulse"></i>
+                            <span>Unit Tests</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bot Check Status -->
+                <div class="enhanced-card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-robot me-2"></i>
+                            Automated PR Checks
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="check-item">
+                            <i class="bi bi-check-circle-fill status-success"></i>
+                            <span>Commit Validation</span>
+                        </div>
+                        <div class="check-item">
+                            <i class="bi bi-check-circle-fill status-success"></i>
+                            <span>PR Format Check</span>
+                        </div>
+                        <div class="check-item">
+                            <i class="bi bi-check-circle-fill status-success"></i>
+                            <span>Description Quality</span>
+                        </div>
+                        <div class="check-item">
+                            <i class="bi bi-x-circle-fill status-failed pulse"></i>
+                            <span>Content Analysis</span>
+                        </div>
+                        <div class="check-item">
+                            <i class="bi bi-exclamation-circle-fill status-pending pulse"></i>
+                            <span>Size Validation</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Return to Dashboard Button -->
-        <div class="text-center">
-            <a href="dashboard.php" class="btn btn-secondary">Back to Dashboard</a>
+        <!-- Action Buttons -->
+        <div class="text-center mb-5">
+            <a href="dashboard.php" class="btn-enhanced">
+                <i class="bi bi-arrow-left"></i>
+                Back to Dashboard
+            </a>
         </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Add interactive effects
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate stats on load
+            const statNumbers = document.querySelectorAll('.stat-number');
+            statNumbers.forEach(stat => {
+                const finalValue = stat.textContent;
+                let currentValue = 0;
+                const increment = finalValue.includes('%') ? 1 : Math.ceil(parseInt(finalValue) / 20);
+                const timer = setInterval(() => {
+                    currentValue += increment;
+                    if (currentValue >= parseInt(finalValue)) {
+                        stat.textContent = finalValue;
+                        clearInterval(timer);
+                    } else {
+                        stat.textContent = finalValue.includes('%') ? currentValue + '%' : currentValue;
+                    }
+                }, 50);
+            });
+
+            // Add hover effects to cards
+            const cards = document.querySelectorAll('.enhanced-card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-8px) scale(1.02)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+
+            // Add click effects to command items
+            const commandItems = document.querySelectorAll('.command-item');
+            commandItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.98)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1)';
+                    }, 150);
+                });
+            });
+        });
+    </script>
 </body>
 </html>
