@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>System Notifications</title>
+        <title>GStraccini Bot - Notifications</title>
         <link
             href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
             rel="stylesheet">
@@ -11,123 +11,637 @@
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
             rel="stylesheet">
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <style>
+            :root {
+                --primary-blue: #2563eb;
+                --light-blue: #3b82f6;
+                --dark-blue: #1d4ed8;
+                --accent-blue: #60a5fa;
+                --bg-light: #f8fafc;
+                --bg-card: #ffffff;
+                --text-primary: #1e293b;
+                --text-secondary: #64748b;
+                --border-light: #e2e8f0;
+                --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+                --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            }
+
+            body {
+                background: linear-gradient(135deg, var(--bg-light) 0%, #e0f2fe 100%);
+                min-height: 100vh;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                color: var(--text-primary);
+            }
+
+            .header-section {
+                background: linear-gradient(135deg, var(--primary-blue) 0%, var(--light-blue) 100%);
+                color: white;
+                padding: 2rem 0;
+                margin-bottom: 2rem;
+                box-shadow: var(--shadow-lg);
+            }
+
+            .header-content {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+            }
+
+            .bot-avatar {
+                width: 60px;
+                height: 60px;
+                background: linear-gradient(135deg, #ffffff20, #ffffff40);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.5rem;
+                border: 3px solid rgba(255, 255, 255, 0.3);
+            }
+
+            .header-title {
+                margin: 0;
+                font-weight: 600;
+                font-size: 2rem;
+            }
+
+            .header-subtitle {
+                margin: 0;
+                opacity: 0.9;
+                font-size: 1.1rem;
+            }
+
+            .stats-bar {
+                background: var(--bg-card);
+                border-radius: 12px;
+                padding: 1rem;
+                margin-bottom: 2rem;
+                box-shadow: var(--shadow-md);
+                border: 1px solid var(--border-light);
+            }
+
+            .stat-item {
+                text-align: center;
+                padding: 0.5rem;
+            }
+
+            .stat-number {
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: var(--primary-blue);
+            }
+
+            .stat-label {
+                font-size: 0.875rem;
+                color: var(--text-secondary);
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .section-card {
+                background: var(--bg-card);
+                border-radius: 16px;
+                box-shadow: var(--shadow-md);
+                border: 1px solid var(--border-light);
+                overflow: hidden;
+                margin-bottom: 2rem;
+                transition: all 0.3s ease;
+            }
+
+            .section-card:hover {
+                box-shadow: var(--shadow-lg);
+                transform: translateY(-2px);
+            }
+
+            .section-header {
+                background: linear-gradient(135deg, var(--primary-blue) 0%, var(--light-blue) 100%);
+                color: white;
+                padding: 1.5rem;
+                border-bottom: none;
+            }
+
+            .section-title {
+                margin: 0;
+                font-size: 1.25rem;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .pending-action-item {
+                border: none;
+                border-bottom: 1px solid var(--border-light);
+                padding: 1rem 1.5rem;
+                transition: all 0.3s ease;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .pending-action-item:last-child {
+                border-bottom: none;
+            }
+
+            .pending-action-item:hover {
+                background: linear-gradient(135deg, #fef7ff 0%, #f0f9ff 100%);
+                transform: translateX(4px);
+            }
+
+            .pending-action-item::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 0;
+                height: 100%;
+                width: 4px;
+                background: var(--primary-blue);
+                transform: scaleY(0);
+                transition: transform 0.3s ease;
+            }
+
+            .pending-action-item:hover::before {
+                transform: scaleY(1);
+            }
+
+            .action-icon {
+                color: var(--primary-blue);
+                width: 20px;
+                text-align: center;
+                margin-right: 0.75rem;
+            }
+
+            .nav-tabs {
+                border: none;
+                background: var(--bg-card);
+                border-radius: 12px 12px 0 0;
+                padding: 0.5rem 0.5rem 0;
+            }
+
+            .nav-tabs .nav-link {
+                border: none;
+                border-radius: 8px;
+                color: var(--text-secondary);
+                font-weight: 500;
+                padding: 0.75rem 1.5rem;
+                margin: 0 0.25rem;
+                transition: all 0.3s ease;
+                position: relative;
+            }
+
+            .nav-tabs .nav-link:hover {
+                background: rgba(37, 99, 235, 0.1);
+                color: var(--primary-blue);
+            }
+
+            .nav-tabs .nav-link.active {
+                background: var(--primary-blue);
+                color: white;
+                box-shadow: var(--shadow-sm);
+            }
+
+            .tab-content {
+                background: var(--bg-card);
+                border-radius: 0 0 12px 12px;
+                min-height: 400px;
+            }
+
+            .notification-item {
+                border: none;
+                border-bottom: 1px solid var(--border-light);
+                padding: 1.25rem 1.5rem;
+                transition: all 0.3s ease;
+                position: relative;
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+            }
+
+            .notification-item:last-child {
+                border-bottom: none;
+            }
+
+            .notification-item:hover {
+                background: linear-gradient(135deg, #fefbff 0%, #f0f9ff 100%);
+                transform: translateX(4px);
+            }
+
+            .notification-avatar {
+                border-radius: 50%;
+                border: 2px solid var(--border-light);
+                transition: all 0.3s ease;
+            }
+
+            .notification-item:hover .notification-avatar {
+                border-color: var(--primary-blue);
+                transform: scale(1.05);
+            }
+
+            .notification-content {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+            }
+
+            .notification-icon {
+                color: var(--primary-blue);
+                width: 20px;
+                text-align: center;
+            }
+
+            .notification-text {
+                color: var(--text-primary);
+                font-weight: 500;
+                margin: 0;
+            }
+
+            .notification-meta {
+                font-size: 0.875rem;
+                color: var(--text-secondary);
+                margin-top: 0.25rem;
+            }
+
+            .pagination {
+                justify-content: center;
+                margin: 1.5rem 0 0;
+                gap: 0.5rem;
+            }
+
+            .page-item .page-link {
+                border: 1px solid var(--border-light);
+                color: var(--text-secondary);
+                font-weight: 500;
+                border-radius: 8px;
+                padding: 0.5rem 0.75rem;
+                transition: all 0.3s ease;
+            }
+
+            .page-item .page-link:hover {
+                background: var(--primary-blue);
+                border-color: var(--primary-blue);
+                color: white;
+                transform: translateY(-1px);
+            }
+
+            .page-item.active .page-link {
+                background: var(--primary-blue);
+                border-color: var(--primary-blue);
+                color: white;
+                box-shadow: var(--shadow-sm);
+            }
+
+            .empty-state {
+                text-align: center;
+                padding: 3rem 1.5rem;
+                color: var(--text-secondary);
+            }
+
+            .empty-state-icon {
+                font-size: 3rem;
+                margin-bottom: 1rem;
+                opacity: 0.6;
+            }
+
+            .badge-count {
+                background: #ef4444;
+                color: white;
+                border-radius: 50%;
+                font-size: 0.75rem;
+                padding: 0.25rem 0.5rem;
+                margin-left: 0.5rem;
+                min-width: 1.5rem;
+                height: 1.5rem;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            @keyframes slideIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .fade-in {
+                animation: slideIn 0.5s ease-out;
+            }
+
+            @media (max-width: 768px) {
+                .header-content {
+                    flex-direction: column;
+                    text-align: center;
+                }
+
+                .stats-bar .row > div {
+                    margin-bottom: 1rem;
+                }
+
+                .nav-tabs .nav-link {
+                    padding: 0.5rem 1rem;
+                    font-size: 0.875rem;
+                }
+
+                .notification-item {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 0.75rem;
+                }
+
+                .notification-content {
+                    width: 100%;
+                }
+            }
+        </style>
     </head>
     <body>
+        <!-- Header Section -->
+        <div class="header-section">
+            <div class="container">
+                <div class="header-content">
+                    <div class="bot-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div>
+                        <h1 class="header-title">GStraccini Bot</h1>
+                        <p class="header-subtitle">Notification Center</p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <div class="container mt-5">
+        <div class="container">
+            <!-- Stats Bar -->
+            <div class="stats-bar">
+                <div class="row">
+                    <div class="col-md-3 col-6">
+                        <div class="stat-item">
+                            <div class="stat-number" id="unread-count">12</div>
+                            <div class="stat-label">Unread</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="stat-item">
+                            <div class="stat-number" id="pending-count">3</div>
+                            <div class="stat-label">Pending Actions</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="stat-item">
+                            <div class="stat-number" id="total-count">47</div>
+                            <div class="stat-label">Total Today</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="stat-item">
+                            <div class="stat-number" id="response-time">2.3s</div>
+                            <div class="stat-label">Avg Response</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Pending Actions Section -->
-            <h2>Pending Actions</h2>
-            <div class="list-group mb-5" id="pending-actions-list">
-                <!-- Example pending action (repeat this block dynamically) -->
-                <a href="#" class="list-group-item list-group-item-action">
-                    <i class="fas fa-exclamation-circle"></i> Complete Profile
-                    Setup
-                </a>
-                <a href="#" class="list-group-item list-group-item-action">
-                    <i class="fas fa-tasks"></i> Approve New User Requests
-                </a>
+            <div class="section-card fade-in">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-clock"></i>
+                        Pending Actions
+                        <span class="badge-count" id="pending-badge">3</span>
+                    </h2>
+                </div>
+                <div id="pending-actions-list">
+                    <a href="#" class="list-group-item pending-action-item">
+                        <i class="fas fa-user-plus action-icon"></i>
+                        <div>
+                            <div class="notification-text">Complete Profile Setup</div>
+                            <div class="notification-meta">Required for enhanced features</div>
+                        </div>
+                    </a>
+                    <a href="#" class="list-group-item pending-action-item">
+                        <i class="fas fa-user-check action-icon"></i>
+                        <div>
+                            <div class="notification-text">Approve New User Requests</div>
+                            <div class="notification-meta">5 users waiting for approval</div>
+                        </div>
+                    </a>
+                    <a href="#" class="list-group-item pending-action-item">
+                        <i class="fas fa-cog action-icon"></i>
+                        <div>
+                            <div class="notification-text">Update Repository Settings</div>
+                            <div class="notification-meta">Security settings need review</div>
+                        </div>
+                    </a>
+                </div>
             </div>
 
             <!-- Notifications Section -->
-            <h2>Notifications</h2>
-
-            <!-- Tabs for notification filtering -->
-            <ul class="nav nav-tabs" id="notificationTabs" role="tablist">
-                <li class="nav-item">
-                    <button class="nav-link active" id="unread-tab"
-                        data-bs-toggle="tab" data-bs-target="#unread"
-                        type="button" role="tab"><i class="fas fa-envelope"></i>
-                        Unread</button>
-                </li>
-                <li class="nav-item">
-                    <button class="nav-link" id="read-tab" data-bs-toggle="tab"
-                        data-bs-target="#read" type="button" role="tab"><i
-                            class="fas fa-envelope-open"></i> Read</button>
-                </li>
-                <li class="nav-item">
-                    <button class="nav-link" id="all-tab" data-bs-toggle="tab"
-                        data-bs-target="#all" type="button" role="tab"><i
-                            class="fas fa-list"></i> View All</button>
-                </li>
-            </ul>
-
-            <!-- Tab Content -->
-            <div class="tab-content" id="notificationTabsContent">
-                <!-- Unread Tab -->
-                <div class="tab-pane fade show active" id="unread"
-                    role="tabpanel">
-                    <div class="list-group" id="unread-list"></div>
-                    <nav>
-                        <ul class="pagination" id="unread-pagination"></ul>
-                    </nav>
+            <div class="section-card fade-in">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-bell"></i>
+                        Notifications
+                    </h2>
                 </div>
-                <!-- Read Tab -->
-                <div class="tab-pane fade" id="read" role="tabpanel">
-                    <div class="list-group" id="read-list"></div>
-                    <nav>
-                        <ul class="pagination" id="read-pagination"></ul>
-                    </nav>
-                </div>
-                <!-- View All Tab -->
-                <div class="tab-pane fade" id="all" role="tabpanel">
-                    <div class="list-group" id="all-list"></div>
-                    <nav>
-                        <ul class="pagination" id="all-pagination"></ul>
-                    </nav>
+
+                <!-- Tabs for notification filtering -->
+                <ul class="nav nav-tabs" id="notificationTabs" role="tablist">
+                    <li class="nav-item">
+                        <button class="nav-link active" id="unread-tab"
+                            data-bs-toggle="tab" data-bs-target="#unread"
+                            type="button" role="tab">
+                            <i class="fas fa-envelope"></i> Unread
+                            <span class="badge-count">12</span>
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" id="read-tab" data-bs-toggle="tab"
+                            data-bs-target="#read" type="button" role="tab">
+                            <i class="fas fa-envelope-open"></i> Read
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" id="all-tab" data-bs-toggle="tab"
+                            data-bs-target="#all" type="button" role="tab">
+                            <i class="fas fa-list"></i> View All
+                        </button>
+                    </li>
+                </ul>
+
+                <!-- Tab Content -->
+                <div class="tab-content" id="notificationTabsContent">
+                    <!-- Unread Tab -->
+                    <div class="tab-pane fade show active" id="unread" role="tabpanel">
+                        <div class="list-group" id="unread-list"></div>
+                        <nav>
+                            <ul class="pagination" id="unread-pagination"></ul>
+                        </nav>
+                    </div>
+                    <!-- Read Tab -->
+                    <div class="tab-pane fade" id="read" role="tabpanel">
+                        <div class="list-group" id="read-list"></div>
+                        <nav>
+                            <ul class="pagination" id="read-pagination"></ul>
+                        </nav>
+                    </div>
+                    <!-- View All Tab -->
+                    <div class="tab-pane fade" id="all" role="tabpanel">
+                        <div class="list-group" id="all-list"></div>
+                        <nav>
+                            <ul class="pagination" id="all-pagination"></ul>
+                        </nav>
+                    </div>
                 </div>
             </div>
         </div>
 
         <script>
-// Simulated function to fetch paginated notifications from the backend (would use AJAX)
+// Enhanced notification data with more realistic examples
+const notificationData = {
+    'unread': [
+        { sender: 'John Doe', avatar: 'https://ui-avatars.com/api/?name=John+Doe&background=2563eb&color=fff', title: 'New pull request submitted for review', type: 'pull_request', id: 1, time: '5 minutes ago' },
+        { sender: 'GitHub', avatar: 'https://ui-avatars.com/api/?name=GitHub&background=333&color=fff', title: 'Security vulnerability detected in dependencies', type: 'issue', id: 2, time: '1 hour ago' },
+        { sender: 'Sarah Wilson', avatar: 'https://ui-avatars.com/api/?name=Sarah+Wilson&background=7c3aed&color=fff', title: 'Code review completed with suggestions', type: 'pull_request', id: 3, time: '2 hours ago' },
+        { sender: 'System', avatar: 'https://ui-avatars.com/api/?name=System&background=059669&color=fff', title: 'Repository backup completed successfully', type: 'repository', id: 4, time: '3 hours ago' },
+        { sender: 'Mike Chen', avatar: 'https://ui-avatars.com/api/?name=Mike+Chen&background=dc2626&color=fff', title: 'New issue reported: Login functionality bug', type: 'issue', id: 5, time: '4 hours ago' },
+        { sender: 'CI/CD Pipeline', avatar: 'https://ui-avatars.com/api/?name=CI&background=f59e0b&color=fff', title: 'Build failed on main branch', type: 'issue', id: 6, time: '5 hours ago' },
+        { sender: 'Emma Davis', avatar: 'https://ui-avatars.com/api/?name=Emma+Davis&background=ec4899&color=fff', title: 'Documentation update ready for review', type: 'pull_request', id: 7, time: '6 hours ago' },
+        { sender: 'Bot Admin', avatar: 'https://ui-avatars.com/api/?name=Bot&background=2563eb&color=fff', title: 'Weekly repository statistics report', type: 'comms', id: 8, time: '1 day ago' },
+        { sender: 'Alex Rodriguez', avatar: 'https://ui-avatars.com/api/?name=Alex+Rodriguez&background=0891b2&color=fff', title: 'Feature request: Dark mode implementation', type: 'issue', id: 9, time: '1 day ago' },
+        { sender: 'Quality Gate', avatar: 'https://ui-avatars.com/api/?name=QG&background=16a34a&color=fff', title: 'Code quality check passed', type: 'repository', id: 10, time: '2 days ago' },
+        { sender: 'Security Scanner', avatar: 'https://ui-avatars.com/api/?name=Security&background=dc2626&color=fff', title: 'No security issues found in latest scan', type: 'repository', id: 11, time: '2 days ago' },
+        { sender: 'Team Lead', avatar: 'https://ui-avatars.com/api/?name=Team&background=7c2d12&color=fff', title: 'Sprint planning meeting scheduled', type: 'comms', id: 12, time: '3 days ago' }
+    ],
+    'read': [
+        { sender: 'System', avatar: 'https://ui-avatars.com/api/?name=System&background=059669&color=fff', title: 'System maintenance completed successfully', type: 'comms', id: 13, time: '1 week ago' },
+        { sender: 'DevOps Team', avatar: 'https://ui-avatars.com/api/?name=DevOps&background=7c3aed&color=fff', title: 'Infrastructure update deployed', type: 'repository', id: 14, time: '1 week ago' },
+        { sender: 'Lisa Park', avatar: 'https://ui-avatars.com/api/?name=Lisa+Park&background=dc2626&color=fff', title: 'Bug fix merged to production', type: 'pull_request', id: 15, time: '1 week ago' },
+        { sender: 'Monitor Bot', avatar: 'https://ui-avatars.com/api/?name=Monitor&background=f59e0b&color=fff', title: 'Performance metrics look good', type: 'repository', id: 16, time: '1 week ago' },
+        { sender: 'Tom Anderson', avatar: 'https://ui-avatars.com/api/?name=Tom+Anderson&background=0891b2&color=fff', title: 'API documentation updated', type: 'pull_request', id: 17, time: '2 weeks ago' }
+    ]
+};
+
+// Combine all notifications for 'all' filter
+notificationData['all'] = [...notificationData['unread'], ...notificationData['read']];
+
+// Simulated function to fetch paginated notifications
 function fetchNotifications(filter, page = 1) {
-    const itemsPerPage = 50;
-
-    // Simulated example data (replace this with actual AJAX calls)
-    const notifications = {
-        'unread': [
-            { sender: 'John', avatar: 'john-avatar.jpg', title: 'You have a new message.', type: 'issue', id: 1 },
-            // add more unread notifications...
-        ],
-        'read': [
-            { sender: 'System', avatar: 'system-avatar.png', title: 'System maintenance scheduled.', type: 'comms', id: 2 },
-            // add more read notifications...
-        ],
-        'all': [
-            // include both read and unread...
-        ]
-    };
-
-    return paginate(notifications[filter], itemsPerPage, page);
+    const itemsPerPage = 10;
+    const notifications = notificationData[filter] || [];
+    return paginate(notifications, itemsPerPage, page);
 }
 
-// Paginate function (divides notifications into pages)
+// Paginate function
 function paginate(items, itemsPerPage, page) {
     const start = (page - 1) * itemsPerPage;
     const paginatedItems = items.slice(start, start + itemsPerPage);
     const totalPages = Math.ceil(items.length / itemsPerPage);
-    return { paginatedItems, totalPages };
+    return { paginatedItems, totalPages, totalItems: items.length };
 }
 
 // Update UI with paginated notifications
 function updateNotificationList(notifications, listElement, paginationElement, currentPage, filter) {
-    $(listElement).empty();
-    notifications.paginatedItems.forEach(notification => {
-        const iconClass = getIconClass(notification.type);
-        $(listElement).append(`
-            <a href="#" class="list-group-item list-group-item-action">
-                <img src="${notification.avatar}" alt="${notification.sender}" class="rounded-circle me-2" width="40" height="40">
-                <i class="fas ${iconClass} me-2"></i> ${notification.title}
-            </a>
+    const $listElement = $(listElement);
+    $listElement.empty();
+    
+    if (notifications.paginatedItems.length === 0) {
+        $listElement.append(`
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-inbox"></i>
+                </div>
+                <h5>No notifications found</h5>
+                <p>You're all caught up! No ${filter} notifications at the moment.</p>
+            </div>
         `);
-    });
+    } else {
+        notifications.paginatedItems.forEach((notification, index) => {
+            setTimeout(() => {
+                const iconClass = getIconClass(notification.type);
+                $listElement.append(`
+                    <div class="notification-item fade-in" style="animation-delay: ${index * 0.1}s">
+                        <img src="${notification.avatar}" alt="${notification.sender}" class="notification-avatar" width="40" height="40">
+                        <div class="notification-content">
+                            <i class="fas ${iconClass} notification-icon"></i>
+                            <div>
+                                <div class="notification-text">${notification.title}</div>
+                                <div class="notification-meta">From ${notification.sender} • ${notification.time}</div>
+                            </div>
+                        </div>
+                    </div>
+                `);
+            }, index * 50);
+        });
+    }
 
-    // Pagination
-    $(paginationElement).empty();
-    for (let i = 1; i <= notifications.totalPages; i++) {
-        $(paginationElement).append(`
+    // Update pagination
+    updatePagination(paginationElement, notifications.totalPages, currentPage, filter);
+}
+
+// Update pagination
+function updatePagination(paginationElement, totalPages, currentPage, filter) {
+    const $paginationElement = $(paginationElement);
+    $paginationElement.empty();
+    
+    if (totalPages <= 1) return;
+
+    // Previous button
+    if (currentPage > 1) {
+        $paginationElement.append(`
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="fetchAndDisplayNotifications('${filter}', ${currentPage - 1})">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+        `);
+    }
+
+    // Page numbers
+    const startPage = Math.max(1, currentPage - 2);
+    const endPage = Math.min(totalPages, currentPage + 2);
+
+    if (startPage > 1) {
+        $paginationElement.append(`
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="fetchAndDisplayNotifications('${filter}', 1)">1</a>
+            </li>
+        `);
+        if (startPage > 2) {
+            $paginationElement.append(`<li class="page-item disabled"><span class="page-link">...</span></li>`);
+        }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+        $paginationElement.append(`
             <li class="page-item ${i === currentPage ? 'active' : ''}">
                 <a class="page-link" href="#" onclick="fetchAndDisplayNotifications('${filter}', ${i})">${i}</a>
+            </li>
+        `);
+    }
+
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+            $paginationElement.append(`<li class="page-item disabled"><span class="page-link">...</span></li>`);
+        }
+        $paginationElement.append(`
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="fetchAndDisplayNotifications('${filter}', ${totalPages})">${totalPages}</a>
+            </li>
+        `);
+    }
+
+    // Next button
+    if (currentPage < totalPages) {
+        $paginationElement.append(`
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="fetchAndDisplayNotifications('${filter}', ${currentPage + 1})">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
             </li>
         `);
     }
@@ -148,20 +662,44 @@ function getIconClass(type) {
         case 'pull_request': return 'fa-code-branch';
         case 'repository': return 'fa-folder';
         case 'comms': return 'fa-comments';
-        case 'other': default: return 'fa-info-circle';
+        case 'other': 
+        default: return 'fa-info-circle';
     }
 }
 
-// Initial load with Unread notifications
+// Update stats
+function updateStats() {
+    $('#unread-count').text(notificationData.unread.length);
+    $('#pending-count').text($('#pending-actions-list .pending-action-item').length);
+    $('#total-count').text(notificationData.all.length);
+}
+
+// Initial load
 $(document).ready(function () {
+    updateStats();
     fetchAndDisplayNotifications('unread');
     
     // Event listeners for tabs
-    $('#unread-tab').on('click', function () { fetchAndDisplayNotifications('unread'); });
-    $('#read-tab').on('click', function () { fetchAndDisplayNotifications('read'); });
-    $('#all-tab').on('click', function () { fetchAndDisplayNotifications('all'); });
-});
+    $('#unread-tab').on('click', function () { 
+        setTimeout(() => fetchAndDisplayNotifications('unread'), 150); 
+    });
+    $('#read-tab').on('click', function () { 
+        setTimeout(() => fetchAndDisplayNotifications('read'), 150); 
+    });
+    $('#all-tab').on('click', function () { 
+        setTimeout(() => fetchAndDisplayNotifications('all'), 150); 
+    });
 
+    // Add click handlers for pending actions
+    $('.pending-action-item').on('click', function(e) {
+        e.preventDefault();
+        $(this).addClass('opacity-50');
+        setTimeout(() => {
+            $(this).remove();
+            updateStats();
+        }, 300);
+    });
+});
 </script>
 
         <script
