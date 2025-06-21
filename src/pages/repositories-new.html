@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GStraccini Bot - Repository Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0d6efd;
+            --secondary-blue: #084298;
+            --light-blue: #e7f1ff;
+            --success-green: #198754;
+            --warning-orange: #fd7e14;
+            --danger-red: #dc3545;
+            --dark-text: #212529;
+            --muted-text: #6c757d;
+            --border-color: #dee2e6;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        .header-section {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.15);
+        }
+
+        .bot-icon {
+            font-size: 2.5rem;
+            margin-right: 1rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .main-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, var(--light-blue) 0%, #fff 100%);
+            border: 2px solid var(--primary-blue);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-blue);
+        }
+
+        .stat-label {
+            color: var(--muted-text);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .enhanced-table {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            border: none;
+        }
+
+        .enhanced-table thead {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            color: white;
+        }
+
+        .enhanced-table thead th {
+            border: none;
+            padding: 1.2rem 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        .enhanced-table tbody tr {
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .enhanced-table tbody tr:hover {
+            background-color: var(--light-blue);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.1);
+        }
+
+        .enhanced-table tbody td {
+            padding: 1.2rem 1rem;
+            vertical-align: middle;
+            border: none;
+        }
+
+        .repo-name {
+            font-weight: 600;
+            color: var(--dark-text);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .repo-icon {
+            color: var(--primary-blue);
+            font-size: 1.1rem;
+        }
+
+        .status-badge {
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: none;
+            min-width: 120px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .status-connected {
+            background: linear-gradient(135deg, var(--success-green) 0%, #157347 100%);
+            color: white;
+        }
+
+        .status-disconnected {
+            background: linear-gradient(135deg, var(--warning-orange) 0%, #e25d0e 100%);
+            color: white;
+        }
+
+        .action-btn {
+            border-radius: 8px;
+            padding: 0.6rem 1.2rem;
+            font-weight: 600;
+            border: none;
+            transition: all 0.3s ease;
+            min-width: 100px;
+        }
+
+        .btn-connect {
+            background: linear-gradient(135deg, var(--success-green) 0%, #157347 100%);
+            color: white;
+        }
+
+        .btn-connect:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(25, 135, 84, 0.3);
+            color: white;
+        }
+
+        .btn-disconnect {
+            background: linear-gradient(135deg, var(--danger-red) 0%, #b02a37 100%);
+            color: white;
+        }
+
+        .btn-disconnect:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+            color: white;
+        }
+
+        .bulk-actions {
+            background: var(--light-blue);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border: 2px solid var(--primary-blue);
+        }
+
+        .bulk-select {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--primary-blue);
+            font-weight: 600;
+        }
+
+        .primary-action-btn {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 0.8rem 2rem;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.2);
+        }
+
+        .primary-action-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(13, 110, 253, 0.3);
+            color: white;
+        }
+
+        .primary-action-btn:disabled {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+            color: white;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .custom-checkbox {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--primary-blue);
+            cursor: pointer;
+        }
+
+        .custom-checkbox:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .loading-spinner {
+            display: none;
+            margin-left: 0.5rem;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(13, 110, 253, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(13, 110, 253, 0); }
+        }
+
+        @media (max-width: 768px) {
+            .bot-icon {
+                font-size: 2rem;
+                margin-right: 0.5rem;
+            }
+            
+            .main-container {
+                padding: 1rem;
+                margin: 0 0.5rem 2rem 0.5rem;
+            }
+            
+            .enhanced-table {
+                font-size: 0.9rem;
+            }
+            
+            .bulk-actions {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header-section">
+        <div class="container">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-robot bot-icon"></i>
+                <div>
+                    <h1 class="mb-0">GStraccini Bot</h1>
+                    <p class="mb-0 opacity-75">Repository Management Dashboard</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="main-container fade-in">
+            <div class="stats-card">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number">3</div>
+                        <div class="stat-label">Total Repositories</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">2</div>
+                        <div class="stat-label">Connected</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">1</div>
+                        <div class="stat-label">Available to Connect</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">67%</div>
+                        <div class="stat-label">Coverage Rate</div>
+                    </div>
+                </div>
+            </div>
+
+            <table class="table enhanced-table">
+                <thead>
+                    <tr>
+                        <th width="60">
+                            <input type="checkbox" id="select-all" class="custom-checkbox">
+                        </th>
+                        <th>Repository</th>
+                        <th width="160">Status</th>
+                        <th width="120">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <input type="checkbox" class="repo-checkbox custom-checkbox" data-repo-id="1" disabled checked>
+                        </td>
+                        <td>
+                            <div class="repo-name">
+                                <i class="fab fa-github repo-icon"></i>
+                                Repository-1
+                            </div>
+                        </td>
+                        <td>
+                            <span class="status-badge status-connected">
+                                <i class="fas fa-check-circle"></i>
+                                Connected
+                            </span>
+                        </td>
+                        <td>
+                            <button class="action-btn btn-disconnect" data-repo-id="1">
+                                <i class="fas fa-unlink"></i>
+                                Disconnect
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="checkbox" class="repo-checkbox custom-checkbox" data-repo-id="2">
+                        </td>
+                        <td>
+                            <div class="repo-name">
+                                <i class="fab fa-github repo-icon"></i>
+                                Repository-2
+                            </div>
+                        </td>
+                        <td>
+                            <span class="status-badge status-disconnected">
+                                <i class="fas fa-exclamation-circle"></i>
+                                Not Connected
+                            </span>
+                        </td>
+                        <td>
+                            <button class="action-btn btn-connect" data-repo-id="2">
+                                <i class="fas fa-link"></i>
+                                Connect
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="checkbox" class="repo-checkbox custom-checkbox" data-repo-id="3" disabled checked>
+                        </td>
+                        <td>
+                            <div class="repo-name">
+                                <i class="fab fa-github repo-icon"></i>
+                                Repository-3
+                            </div>
+                        </td>
+                        <td>
+                            <span class="status-badge status-connected">
+                                <i class="fas fa-check-circle"></i>
+                                Connected
+                            </span>
+                        </td>
+                        <td>
+                            <button class="action-btn btn-disconnect" data-repo-id="3">
+                                <i class="fas fa-unlink"></i>
+                                Disconnect
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="bulk-actions d-flex justify-content-between align-items-center">
+                <div class="bulk-select">
+                    <input type="checkbox" id="select-all-bottom" class="custom-checkbox">
+                    <label for="select-all-bottom" class="mb-0">
+                        <i class="fas fa-list-check"></i>
+                        Select All Available
+                    </label>
+                </div>
+                <button id="connect-selected-btn" class="primary-action-btn" disabled>
+                    <i class="fas fa-plug"></i>
+                    Connect Selected Repositories
+                    <div class="loading-spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const checkboxes = document.querySelectorAll('.repo-checkbox:not([disabled])');
+        const connectButton = document.getElementById('connect-selected-btn');
+        const selectAll = document.getElementById('select-all');
+        const selectAllBottom = document.getElementById('select-all-bottom');
+        const loadingSpinner = connectButton.querySelector('.loading-spinner');
+
+        // Enhanced enable/disable logic for Connect button
+        function updateConnectButton() {
+            const anyChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
+            connectButton.disabled = !anyChecked;
+            
+            if (anyChecked) {
+                connectButton.classList.add('pulse');
+            } else {
+                connectButton.classList.remove('pulse');
+            }
+        }
+
+        // Add event listeners to checkboxes
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateConnectButton);
+        });
+
+        // Enhanced select all functionality
+        function toggleSelectAll(status) {
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = status;
+            });
+            updateConnectButton();
+        }
+
+        selectAll.addEventListener('change', () => {
+            toggleSelectAll(selectAll.checked);
+            selectAllBottom.checked = selectAll.checked;
+        });
+
+        selectAllBottom.addEventListener('change', () => {
+            toggleSelectAll(selectAllBottom.checked);
+            selectAll.checked = selectAllBottom.checked;
+        });
+
+        // Enhanced connect selected functionality with loading state
+        connectButton.addEventListener('click', async () => {
+            const selectedRepos = Array.from(checkboxes)
+                .filter(checkbox => checkbox.checked)
+                .map(checkbox => checkbox.dataset.repoId);
+
+            if (selectedRepos.length === 0) return;
+
+            // Show loading state
+            connectButton.disabled = true;
+            connectButton.classList.remove('pulse');
+            loadingSpinner.style.display = 'inline-block';
+            
+            try {
+                // Simulate API call
+                console.log('Connecting repositories:', selectedRepos);
+                
+                // Simulate processing time
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Update UI for connected repositories
+                selectedRepos.forEach(repoId => {
+                    const checkbox = document.querySelector(`[data-repo-id="${repoId}"]`);
+                    const row = checkbox.closest('tr');
+                    
+                    // Update status badge
+                    const statusBadge = row.querySelector('.status-badge');
+                    statusBadge.className = 'status-badge status-connected';
+                    statusBadge.innerHTML = '<i class="fas fa-check-circle"></i> Connected';
+                    
+                    // Update action button
+                    const actionBtn = row.querySelector('.action-btn');
+                    actionBtn.className = 'action-btn btn-disconnect';
+                    actionBtn.innerHTML = '<i class="fas fa-unlink"></i> Disconnect';
+                    
+                    // Disable and check the checkbox
+                    checkbox.disabled = true;
+                    checkbox.checked = true;
+                });
+                
+                // Update stats
+                updateStats();
+                
+                // Reset select all checkboxes
+                selectAll.checked = false;
+                selectAllBottom.checked = false;
+                
+            } catch (error) {
+                console.error('Error connecting repositories:', error);
+            } finally {
+                // Hide loading state
+                loadingSpinner.style.display = 'none';
+                updateConnectButton();
+            }
+        });
+
+        // Individual action buttons
+        document.addEventListener('click', async (e) => {
+            if (e.target.classList.contains('btn-connect') || e.target.closest('.btn-connect')) {
+                const btn = e.target.classList.contains('btn-connect') ? e.target : e.target.closest('.btn-connect');
+                const repoId = btn.dataset.repoId;
+                
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
+                
+                // Simulate API call
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                // Update UI
+                const row = btn.closest('tr');
+                const statusBadge = row.querySelector('.status-badge');
+                const checkbox = row.querySelector('.repo-checkbox');
+                
+                statusBadge.className = 'status-badge status-connected';
+                statusBadge.innerHTML = '<i class="fas fa-check-circle"></i> Connected';
+                
+                btn.className = 'action-btn btn-disconnect';
+                btn.innerHTML = '<i class="fas fa-unlink"></i> Disconnect';
+                btn.disabled = false;
+                
+                checkbox.disabled = true;
+                checkbox.checked = true;
+                
+                updateStats();
+            }
+            
+            if (e.target.classList.contains('btn-disconnect') || e.target.closest('.btn-disconnect')) {
+                const btn = e.target.classList.contains('btn-disconnect') ? e.target : e.target.closest('.btn-disconnect');
+                const repoId = btn.dataset.repoId;
+                
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Disconnecting...';
+                
+                // Simulate API call
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                // Update UI
+                const row = btn.closest('tr');
+                const statusBadge = row.querySelector('.status-badge');
+                const checkbox = row.querySelector('.repo-checkbox');
+                
+                statusBadge.className = 'status-badge status-disconnected';
+                statusBadge.innerHTML = '<i class="fas fa-exclamation-circle"></i> Not Connected';
+                
+                btn.className = 'action-btn btn-connect';
+                btn.innerHTML = '<i class="fas fa-link"></i> Connect';
+                btn.disabled = false;
+                
+                checkbox.disabled = false;
+                checkbox.checked = false;
+                
+                updateStats();
+            }
+        });
+
+        // Update statistics
+        function updateStats() {
+            const totalRepos = document.querySelectorAll('.repo-checkbox').length;
+            const connectedRepos = document.querySelectorAll('.status-connected').length;
+            const availableRepos = totalRepos - connectedRepos;
+            const coverageRate = Math.round((connectedRepos / totalRepos) * 100);
+            
+            document.querySelector('.stat-item:nth-child(1) .stat-number').textContent = totalRepos;
+            document.querySelector('.stat-item:nth-child(2) .stat-number').textContent = connectedRepos;
+            document.querySelector('.stat-item:nth-child(3) .stat-number').textContent = availableRepos;
+            document.querySelector('.stat-item:nth-child(4) .stat-number').textContent = coverageRate + '%';
+        }
+
+        // Initialize
+        updateConnectButton();
+    </script>
+</body>
+</html>
