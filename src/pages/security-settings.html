@@ -1,173 +1,809 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Account Security</title>
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    .alert-dismissible .btn-close {
-      position: relative;
-      top: -2px;
-      right: -5px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GStraccini Bot - Security Settings</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #2563eb;
+            --dark-blue: #1e40af;
+            --light-blue: #3b82f6;
+            --accent-blue: #60a5fa;
+            --bg-blue: #eff6ff;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --border-color: #e2e8f0;
+            --success-green: #10b981;
+            --danger-red: #ef4444;
+            --warning-orange: #f59e0b;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        .main-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .header-section {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.2);
+        }
+
+        .header-section h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .bot-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .security-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .security-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--bg-blue);
+        }
+
+        .section-header h2 {
+            color: var(--text-dark);
+            font-weight: 600;
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        .alert {
+            border: none;
+            border-radius: 0.75rem;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
+            border-left-color: var(--success-green);
+            color: #064e3b;
+        }
+
+        .alert-danger {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1));
+            border-left-color: var(--danger-red);
+            color: #7f1d1d;
+        }
+
+        .alert-warning {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(217, 119, 6, 0.1));
+            border-left-color: var(--warning-orange);
+            color: #78350f;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            border: 2px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-blue), var(--light-blue));
+            border: none;
+            border-radius: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+            background: linear-gradient(135deg, var(--dark-blue), var(--primary-blue));
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-green), #059669);
+            border: none;
+            border-radius: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger-red), #dc2626);
+            border: none;
+            border-radius: 0.75rem;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+        }
+
+        .collapse-trigger {
+            background: linear-gradient(135deg, var(--accent-blue), var(--primary-blue));
+            border: none;
+            border-radius: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(96, 165, 250, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .collapse-trigger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(96, 165, 250, 0.4);
+            color: white;
+        }
+
+        .collapse-content {
+            background: var(--bg-blue);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .qr-code-container {
+            text-align: center;
+            background: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .qr-placeholder {
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(45deg, #f1f5f9, #e2e8f0);
+            border: 2px dashed var(--primary-blue);
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: var(--primary-blue);
+            font-size: 2rem;
+        }
+
+        .device-list {
+            background: white;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+        }
+
+        .device-item {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+
+        .device-item:last-child {
+            border-bottom: none;
+        }
+
+        .device-item:hover {
+            background-color: var(--bg-blue);
+        }
+
+        .device-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .device-icon {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .device-details h6 {
+            margin: 0;
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        .device-details small {
+            color: var(--text-light);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-green);
+        }
+
+        .status-inactive {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-red);
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.05), rgba(96, 165, 250, 0.05));
+            border: 1px solid rgba(37, 99, 235, 0.1);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-box p {
+            margin: 0;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+
+        .security-strength {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .strength-indicator {
+            flex: 1;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .strength-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .strength-weak {
+            background: var(--danger-red);
+            width: 33%;
+        }
+
+        .strength-medium {
+            background: var(--warning-orange);
+            width: 66%;
+        }
+
+        .strength-strong {
+            background: var(--success-green);
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1rem;
+            }
+            
+            .header-section h1 {
+                font-size: 2rem;
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .security-card {
+                padding: 1.5rem;
+            }
+
+            .device-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="container mt-4">
-    <h2>Security Settings</h2>
-
-    <!-- Alert Container -->
-    <div id="alertContainer"></div>
-
-    <!-- Change Password Section -->
-    <div class="card mt-3">
-      <div class="card-body">
-        <h5 class="card-title">Change Password</h5>
-        <p>If you leave these fields empty, no password will be changed.</p>
-        <form id="changePasswordForm">
-          <div class="mb-3">
-            <label for="newPassword" class="form-label">New Password</label>
-            <input type="password" class="form-control" id="newPassword" placeholder="Enter new password">
-          </div>
-          <div class="mb-3">
-            <label for="confirmPassword" class="form-label">Confirm New Password</label>
-            <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm new password">
-          </div>
-          <button type="submit" class="btn btn-primary">Update Password</button>
-        </form>
-      </div>
-    </div>
-
-    <!-- Two-Factor Authentication Section -->
-    <div class="card mt-3">
-      <div class="card-body">
-        <h5 class="card-title">Two-Factor Authentication (2FA)</h5>
-        <button class="btn btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2FA" aria-expanded="false" aria-controls="collapse2FA">
-          Enable/Disable 2FA
-        </button>
-        <div class="collapse mt-3" id="collapse2FA">
-          <p>Use Google Authenticator or another compatible app to scan the QR code or enter the code to enable 2FA.</p>
-          <img src="https://via.placeholder.com/150x150" alt="QR Code">
-          <p><small>Scan this QR code to link your Google Authenticator app.</small></p>
-          <button class="btn btn-primary" id="toggle2FA">Toggle 2FA</button>
+    <div class="main-container">
+        <!-- Header Section -->
+        <div class="header-section">
+            <h1>
+                <div class="bot-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div>
+                    <div>Security Settings</div>
+                    <small style="font-size: 1rem; opacity: 0.9;">Protect your GStraccini Bot account</small>
+                </div>
+            </h1>
         </div>
-      </div>
-    </div>
 
-    <!-- FIDO Section -->
-    <div class="card mt-3">
-      <div class="card-body">
-        <h5 class="card-title">FIDO Devices</h5>
-        <p>Manage your registered FIDO devices below.</p>
-        <!-- List of FIDO Devices -->
-        <ul class="list-group mb-3" id="fidoDeviceList">
-          <li class="list-group-item">Device 1: USB Security Key</li>
-          <li class="list-group-item">Device 2: Built-in Laptop Sensor</li>
-        </ul>
-        <button class="btn btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFIDO" aria-expanded="false" aria-controls="collapseFIDO">
-          Add New FIDO Device
-        </button>
-        <div class="collapse mt-3" id="collapseFIDO">
-          <p>Click the button below to register a new FIDO device.</p>
-          <button class="btn btn-success" id="registerFidoDevice">Register New Device</button>
+        <!-- Alert Container -->
+        <div id="alertContainer"></div>
+
+        <!-- Password Security Section -->
+        <div class="security-card">
+            <div class="section-header">
+                <div class="section-icon">
+                    <i class="fas fa-key"></i>
+                </div>
+                <h2>Password Security</h2>
+            </div>
+            
+            <div class="info-box">
+                <p><i class="fas fa-info-circle me-2 text-primary"></i>
+                   If you leave these fields empty, your password will remain unchanged. Choose a strong password with at least 8 characters.
+                </p>
+            </div>
+
+            <form id="changePasswordForm">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="newPassword" class="form-label">New Password</label>
+                        <input type="password" class="form-control" id="newPassword" placeholder="Enter new password">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                        <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm new password">
+                    </div>
+                </div>
+                
+                <div class="security-strength" id="passwordStrength" style="display: none;">
+                    <span>Password Strength:</span>
+                    <div class="strength-indicator">
+                        <div class="strength-fill" id="strengthBar"></div>
+                    </div>
+                    <span id="strengthText">Weak</span>
+                </div>
+                
+                <button type="submit" class="btn btn-primary mt-3">
+                    <i class="fas fa-save me-2"></i>Update Password
+                </button>
+            </form>
         </div>
-      </div>
+
+        <!-- Two-Factor Authentication Section -->
+        <div class="security-card">
+            <div class="section-header">
+                <div class="section-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h2>Two-Factor Authentication</h2>
+                <span class="status-badge status-inactive ms-auto" id="2faStatus">
+                    <i class="fas fa-circle"></i>
+                    Disabled
+                </span>
+            </div>
+            
+            <div class="info-box">
+                <p><i class="fas fa-shield-alt me-2 text-primary"></i>
+                   Add an extra layer of security to your account with 2FA using Google Authenticator or compatible apps.
+                </p>
+            </div>
+            
+            <button class="collapse-trigger" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2FA" aria-expanded="false" aria-controls="collapse2FA">
+                <i class="fas fa-cog"></i>
+                Manage 2FA
+                <i class="fas fa-chevron-down ms-auto"></i>
+            </button>
+            
+            <div class="collapse" id="collapse2FA">
+                <div class="collapse-content">
+                    <div class="qr-code-container">
+                        <div class="qr-placeholder">
+                            <i class="fas fa-qrcode"></i>
+                        </div>
+                        <p class="text-muted mb-0">Scan this QR code with Google Authenticator</p>
+                        <small class="text-muted">or enter the setup key manually</small>
+                    </div>
+                    
+                    <button class="btn btn-success" id="toggle2FA">
+                        <i class="fas fa-toggle-on me-2"></i>Enable 2FA
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- FIDO Devices Section -->
+        <div class="security-card">
+            <div class="section-header">
+                <div class="section-icon">
+                    <i class="fas fa-fingerprint"></i>
+                </div>
+                <h2>Security Keys (FIDO)</h2>
+            </div>
+            
+            <div class="info-box">
+                <p><i class="fas fa-key me-2 text-primary"></i>
+                   Hardware security keys provide the strongest protection against phishing and account takeover attacks.
+                </p>
+            </div>
+
+            <!-- FIDO Device List -->
+            <div class="device-list" id="fidoDeviceList">
+                <div class="device-item">
+                    <div class="device-info">
+                        <div class="device-icon">
+                            <i class="fas fa-usb"></i>
+                        </div>
+                        <div class="device-details">
+                            <h6>USB Security Key</h6>
+                            <small class="text-muted">Added on October 17, 2024</small>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="status-badge status-active">
+                            <i class="fas fa-circle"></i>
+                            Active
+                        </span>
+                        <button class="btn btn-danger btn-sm">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="device-item">
+                    <div class="device-info">
+                        <div class="device-icon">
+                            <i class="fas fa-laptop"></i>
+                        </div>
+                        <div class="device-details">
+                            <h6>Built-in Laptop Sensor</h6>
+                            <small class="text-muted">Added on September 28, 2024</small>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="status-badge status-active">
+                            <i class="fas fa-circle"></i>
+                            Active
+                        </span>
+                        <button class="btn btn-danger btn-sm">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="collapse-trigger" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFIDO" aria-expanded="false" aria-controls="collapseFIDO">
+                <i class="fas fa-plus"></i>
+                Add New Device
+                <i class="fas fa-chevron-down ms-auto"></i>
+            </button>
+            
+            <div class="collapse" id="collapseFIDO">
+                <div class="collapse-content">
+                    <div class="text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-plus-circle text-primary" style="font-size: 3rem;"></i>
+                        </div>
+                        <p class="mb-3">Click the button below to register a new FIDO security device with your account.</p>
+                        <button class="btn btn-success" id="registerFidoDevice">
+                            <i class="fas fa-fingerprint me-2"></i>Register New Device
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Enhanced alert function with better styling
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertId = 'alert-' + Date.now();
+            const iconMap = {
+                'success': 'fas fa-check-circle',
+                'danger': 'fas fa-exclamation-circle',
+                'warning': 'fas fa-exclamation-triangle',
+                'info': 'fas fa-info-circle'
+            };
+            
+            const alert = `
+                <div class="alert alert-${type} alert-dismissible fade show" id="${alertId}" role="alert">
+                    <i class="${iconMap[type]} me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>`;
+            alertContainer.innerHTML = alert;
 
-  <!-- JavaScript for Asynchronous Operations -->
-  <script>
-    // Function to show alerts
-    function showAlert(message, type) {
-      const alertContainer = document.getElementById('alertContainer');
-      const alert = `
-        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-          ${message}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>`;
-      alertContainer.innerHTML = alert;
-
-      // Automatically close the alert after 3 seconds
-      setTimeout(() => {
-        const alertNode = alertContainer.querySelector('.alert');
-        if (alertNode) {
-          const bsAlert = new bootstrap.Alert(alertNode);
-          bsAlert.close();
+            // Auto-dismiss after 4 seconds
+            setTimeout(() => {
+                const alertNode = document.getElementById(alertId);
+                if (alertNode) {
+                    const bsAlert = new bootstrap.Alert(alertNode);
+                    bsAlert.close();
+                }
+            }, 4000);
         }
-      }, 3000);
-    }
 
-    // Handle Change Password Form Submission
-    document.getElementById('changePasswordForm').addEventListener('submit', async (event) => {
-      event.preventDefault();
-      
-      const newPassword = document.getElementById('newPassword').value;
-      const confirmPassword = document.getElementById('confirmPassword').value;
+        // Password strength checker
+        function checkPasswordStrength(password) {
+            const strengthIndicator = document.getElementById('passwordStrength');
+            const strengthBar = document.getElementById('strengthBar');
+            const strengthText = document.getElementById('strengthText');
+            
+            if (password.length === 0) {
+                strengthIndicator.style.display = 'none';
+                return;
+            }
+            
+            strengthIndicator.style.display = 'flex';
+            
+            let score = 0;
+            if (password.length >= 8) score++;
+            if (/[a-z]/.test(password)) score++;
+            if (/[A-Z]/.test(password)) score++;
+            if (/[0-9]/.test(password)) score++;
+            if (/[^A-Za-z0-9]/.test(password)) score++;
+            
+            strengthBar.className = 'strength-fill';
+            if (score <= 2) {
+                strengthBar.classList.add('strength-weak');
+                strengthText.textContent = 'Weak';
+            } else if (score <= 3) {
+                strengthBar.classList.add('strength-medium');
+                strengthText.textContent = 'Medium';
+            } else {
+                strengthBar.classList.add('strength-strong');
+                strengthText.textContent = 'Strong';
+            }
+        }
 
-      if (newPassword !== confirmPassword) {
-        showAlert('Passwords do not match!', 'danger');
-        return;
-      }
-
-      try {
-        // Simulating a server call with fetch
-        const response = await fetch('/api/change-password', {
-          method: 'POST',
-          body: JSON.stringify({ newPassword }),
-          headers: { 'Content-Type': 'application/json' }
+        // Password input listeners
+        document.getElementById('newPassword').addEventListener('input', function() {
+            checkPasswordStrength(this.value);
         });
 
-        if (response.ok) {
-          showAlert('Password updated successfully!', 'success');
-        } else {
-          showAlert('Failed to update password!', 'danger');
-        }
-      } catch (error) {
-        showAlert('Error updating password!', 'danger');
-      }
-    });
+        // Handle Change Password Form Submission
+        document.getElementById('changePasswordForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
 
-    // Handle Toggle 2FA
-    document.getElementById('toggle2FA').addEventListener('click', async () => {
-      try {
-        // Simulating a server call with fetch
-        const response = await fetch('/api/toggle-2fa', { method: 'POST' });
+            if (!newPassword && !confirmPassword) {
+                showAlert('Please enter a new password to update it.', 'warning');
+                return;
+            }
 
-        if (response.ok) {
-          showAlert('2FA status changed successfully!', 'success');
-        } else {
-          showAlert('Failed to change 2FA status!', 'danger');
-        }
-      } catch (error) {
-        showAlert('Error toggling 2FA!', 'danger');
-      }
-    });
+            if (newPassword !== confirmPassword) {
+                showAlert('Passwords do not match! Please check your entries.', 'danger');
+                return;
+            }
 
-    // Handle Register New FIDO Device
-    document.getElementById('registerFidoDevice').addEventListener('click', async () => {
-      try {
-        // Simulating a server call with fetch
-        const response = await fetch('/api/register-fido-device', { method: 'POST' });
+            if (newPassword.length < 8) {
+                showAlert('Password must be at least 8 characters long.', 'warning');
+                return;
+            }
 
-        if (response.ok) {
-          showAlert('FIDO device registered successfully!', 'success');
-          // Add new device to the list (simulated)
-          const newDevice = document.createElement('li');
-          newDevice.classList.add('list-group-item');
-          newDevice.textContent = `Device 3: New FIDO Device`;
-          document.getElementById('fidoDeviceList').appendChild(newDevice);
-        } else {
-          showAlert('Failed to register FIDO device!', 'danger');
-        }
-      } catch (error) {
-        showAlert('Error registering FIDO device!', 'danger');
-      }
-    });
-  </script>
-</body>
-</html>
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Updating...';
+            submitBtn.disabled = true;
+
+            try {
+                // Simulating server call
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                const success = Math.random() > 0.2; // 80% success rate
+                
+                if (success) {
+                    showAlert('Password updated successfully! Your account is now more secure.', 'success');
+                    document.getElementById('changePasswordForm').reset();
+                    document.getElementById('passwordStrength').style.display = 'none';
+                } else {
+                    showAlert('Failed to update password. Please try again later.', 'danger');
+                }
+            } catch (error) {
+                showAlert('Network error occurred while updating password.', 'danger');
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Handle Toggle 2FA
+        document.getElementById('toggle2FA').addEventListener('click', async function() {
+            const btn = this;
+            const originalText = btn.innerHTML;
+            const statusBadge = document.getElementById('2faStatus');
+            const isEnabled = statusBadge.classList.contains('status-active');
+
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+            btn.disabled = true;
+
+            try {
+                // Simulating server call
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                const success = Math.random() > 0.15; // 85% success rate
+                
+                if (success) {
+                    if (isEnabled) {
+                        statusBadge.className = 'status-badge status-inactive ms-auto';
+                        statusBadge.innerHTML = '<i class="fas fa-circle"></i> Disabled';
+                        btn.innerHTML = '<i class="fas fa-toggle-on me-2"></i>Enable 2FA';
+                        showAlert('2FA has been disabled for your account.', 'warning');
+                    } else {
+                        statusBadge.className = 'status-badge status-active ms-auto';
+                        statusBadge.innerHTML = '<i class="fas fa-circle"></i> Enabled';
+                        btn.innerHTML = '<i class="fas fa-toggle-off me-2"></i>Disable 2FA';
+                        showAlert('2FA has been successfully enabled! Your account is now more secure.', 'success');
+                    }
+                    
+                    // Hide the collapse section
+                    setTimeout(() => {
+                        document.getElementById('collapse2FA').classList.remove('show');
+                    }, 1000);
+                } else {
+                    showAlert('Failed to change 2FA status. Please try again.', 'danger');
+                }
+            } catch (error) {
+                showAlert('Network error occurred while changing 2FA status.', 'danger');
+            } finally {
+                btn.disabled = false;
+                if (btn.innerHTML.includes('Processing')) {
+                    btn.innerHTML = originalText;
+                }
+            }
+        });
+
+        // Handle Register New FIDO Device
+        document.getElementById('registerFidoDevice').addEventListener('click', async function() {
+            const btn = this;
+            const originalText = btn.innerHTML;
+
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Registering...';
+            btn.disabled = true;
+
+            try {
+                // Simulating server call
+                await new Promise(resolve => setTimeout(resolve, 2500));
+                
+                const success = Math.random() > 0.1; // 90% success rate
+                
+                if (success) {
+                    showAlert('FIDO device registered successfully! Your new security key is now active.', 'success');
+                    
+                    // Add new device to the list
+                    const deviceTypes = [
+                        { icon: 'fa-usb', name: 'New USB Security Key' },
+                        { icon: 'fa-bluetooth', name: 'Bluetooth Security Key' },
+                        { icon: 'fa-wifi', name: 'NFC Security Key' }
+                    ];
+                    const randomDevice = deviceTypes[Math.floor(Math.random() * deviceTypes.length)];
+                    
+                    const newDevice = document.createElement('div');
+                    newDevice.className = 'device-item';
+                    newDevice.innerHTML = `
+                        <div class="device-info">
+                            <div class="device-icon">
+                                <i class="fas ${randomDevice.icon}"></i>
+                            </div>
+                            <div class="device-details">
+                                <h6>${randomDevice.name}</h6>
+                                <small class="text-muted">Added on ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</small>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="status-badge status-active">
+                                <i class="fas fa-circle"></i>
+                                Active
+                            </span>
+                            <button class="btn btn-danger btn-sm">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                    
+                    document.getElementById('fidoDeviceList').appendChild(newDevice);
+                    
+                    // Hide the collapse section
+                    setTimeout(() => {
+                        document.getElementById('collapseFIDO').classList.remove('show');
+                    }, 1000);
+                } else {
+                    showAlert('Failed to register FIDO device. Please ensure your device is connected and try again.', 'danger');
+                }
+            } catch (error) {
+                showAlert('Network error occurred while registering device.', 'danger');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+
+        // Handle device removal
+        document.addEventListener('click',
