@@ -3,120 +3,620 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System Notifications</title>
+    <title>GStraccini Bot - Notifications</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</head>
-<body>
-
-<div class="container mt-5">
-    <!-- Pending Actions Section -->
-    <h2>Pending Actions</h2>
-    <div class="list-group mb-5" id="pending-actions-list">
-        <!-- Example pending action (repeat this block dynamically) -->
-        <a href="#" class="list-group-item list-group-item-action">
-            <i class="fas fa-exclamation-circle"></i> Complete Profile Setup
-        </a>
-        <a href="#" class="list-group-item list-group-item-action">
-            <i class="fas fa-tasks"></i> Approve New User Requests
-        </a>
-        <!-- End of example pending actions -->
-    </div>
-
-    <!-- Notifications Section -->
-    <h2>Notifications</h2>
-
-    <!-- Buttons for notification filtering -->
-    <div class="mb-3">
-        <button class="btn btn-primary" id="view-all-btn">
-            <i class="fas fa-list"></i> View All
-        </button>
-        <button class="btn btn-secondary" id="unread-btn">
-            <i class="fas fa-envelope"></i> Unread
-        </button>
-        <button class="btn btn-success" id="read-btn">
-            <i class="fas fa-envelope-open"></i> Read
-        </button>
-    </div>
-
-    <!-- Notification List -->
-    <div class="list-group" id="notifications-list">
-        <!-- Example notifications (dynamically updated via async calls) -->
-        <a href="#" class="list-group-item list-group-item-action">
-            <i class="fas fa-envelope"></i> You have a new message from John.
-        </a>
-        <a href="#" class="list-group-item list-group-item-action">
-            <i class="fas fa-envelope-open"></i> System maintenance scheduled for tonight.
-        </a>
-        <!-- End of example notifications -->
-    </div>
-</div>
-
-<script>
-    // Simulated asynchronous call to get notifications
-    function fetchNotifications(filter) {
-        // This would be replaced by an actual AJAX call to the backend
-        console.log('Fetching notifications:', filter);
-
-        // Simulating different responses based on filter
-        let notifications = [];
-        if (filter === 'all') {
-            notifications = [
-                { id: 1, type: 'unread', text: 'You have a new message from John.' },
-                { id: 2, type: 'read', text: 'System maintenance scheduled for tonight.' },
-                { id: 3, type: 'unread', text: 'New updates are available.' },
-            ];
-        } else if (filter === 'unread') {
-            notifications = [
-                { id: 1, type: 'unread', text: 'You have a new message from John.' },
-                { id: 3, type: 'unread', text: 'New updates are available.' },
-            ];
-        } else if (filter === 'read') {
-            notifications = [
-                { id: 2, type: 'read', text: 'System maintenance scheduled for tonight.' },
-            ];
+    <style>
+        :root {
+            --primary-blue: #2563eb;
+            --light-blue: #3b82f6;
+            --dark-blue: #1d4ed8;
+            --accent-blue: #60a5fa;
+            --bg-light: #f8fafc;
+            --bg-card: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-light: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
 
-        // Update the notification list dynamically
-        updateNotificationList(notifications);
-    }
+        body {
+            background: linear-gradient(135deg, var(--bg-light) 0%, #e0f2fe 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-primary);
+        }
 
-    // Function to update the notification list in the UI
-    function updateNotificationList(notifications) {
-        const $notificationsList = $('#notifications-list');
-        $notificationsList.empty(); // Clear current list
+        .header-section {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--light-blue) 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+        }
 
-        notifications.forEach(notification => {
-            const icon = notification.type === 'unread' ? 'fa-envelope' : 'fa-envelope-open';
-            const notificationItem = `
-                <a href="#" class="list-group-item list-group-item-action">
-                    <i class="fas ${icon}"></i> ${notification.text}
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .bot-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #ffffff20, #ffffff40);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .header-title {
+            margin: 0;
+            font-weight: 600;
+            font-size: 2rem;
+        }
+
+        .header-subtitle {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .stats-bar {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-light);
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 0.5rem;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .section-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .section-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--light-blue) 100%);
+            color: white;
+            padding: 1.5rem;
+            border-bottom: none;
+        }
+
+        .section-title {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .pending-action-item {
+            border: none;
+            border-bottom: 1px solid var(--border-light);
+            padding: 1rem 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pending-action-item:last-child {
+            border-bottom: none;
+        }
+
+        .pending-action-item:hover {
+            background: linear-gradient(135deg, #fef7ff 0%, #f0f9ff 100%);
+            transform: translateX(4px);
+        }
+
+        .pending-action-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: var(--primary-blue);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .pending-action-item:hover::before {
+            transform: scaleY(1);
+        }
+
+        .action-icon {
+            color: var(--primary-blue);
+            width: 20px;
+            text-align: center;
+            margin-right: 0.75rem;
+        }
+
+        .filter-buttons {
+            padding: 1.5rem;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .filter-btn {
+            border: 2px solid var(--border-light);
+            color: var(--text-secondary);
+            font-weight: 500;
+            padding: 0.75rem 1.5rem;
+            margin: 0 0.5rem 0.5rem 0;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--light-blue) 100%);
+            border-color: var(--primary-blue);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .filter-btn.active:hover {
+            color: white;
+        }
+
+        .notification-item {
+            border: none;
+            border-bottom: 1px solid var(--border-light);
+            padding: 1.25rem 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification-item:hover {
+            background: linear-gradient(135deg, #fefbff 0%, #f0f9ff 100%);
+            transform: translateX(4px);
+        }
+
+        .notification-avatar {
+            border-radius: 50%;
+            border: 2px solid var(--border-light);
+            transition: all 0.3s ease;
+        }
+
+        .notification-item:hover .notification-avatar {
+            border-color: var(--primary-blue);
+            transform: scale(1.05);
+        }
+
+        .notification-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .notification-icon {
+            color: var(--primary-blue);
+            width: 20px;
+            text-align: center;
+        }
+
+        .notification-text {
+            color: var(--text-primary);
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .notification-meta {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.6;
+        }
+
+        .badge-count {
+            background: #ef4444;
+            color: white;
+            border-radius: 50%;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            margin-left: 0.5rem;
+            min-width: 1.5rem;
+            height: 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .notification-type-unread {
+            background: linear-gradient(135deg, #fef3c7 0%, #fef7cd 100%);
+            border-left: 4px solid #f59e0b;
+        }
+
+        .notification-type-read {
+            background: linear-gradient(135deg, #f0fdf4 0%, #f7fee7 100%);
+            border-left: 4px solid #22c55e;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 0.3s ease-in-out;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .stats-bar .row > div {
+                margin-bottom: 1rem;
+            }
+
+            .filter-btn {
+                width: 100%;
+                margin: 0 0 0.5rem 0;
+            }
+
+            .notification-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+
+            .notification-content {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <div class="header-section">
+        <div class="container">
+            <div class="header-content">
+                <div class="bot-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div>
+                    <h1 class="header-title">GStraccini Bot</h1>
+                    <p class="header-subtitle">Notification Center</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="row">
+                <div class="col-md-3 col-6">
+                    <div class="stat-item">
+                        <div class="stat-number" id="unread-count">2</div>
+                        <div class="stat-label">Unread</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-item">
+                        <div class="stat-number" id="pending-count">2</div>
+                        <div class="stat-label">Pending Actions</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-item">
+                        <div class="stat-number" id="total-count">3</div>
+                        <div class="stat-label">Total</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-item">
+                        <div class="stat-number" id="response-time">1.8s</div>
+                        <div class="stat-label">Avg Response</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Actions Section -->
+        <div class="section-card fade-in">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-clock"></i>
+                    Pending Actions
+                    <span class="badge-count" id="pending-badge">2</span>
+                </h2>
+            </div>
+            <div id="pending-actions-list">
+                <a href="#" class="list-group-item pending-action-item">
+                    <i class="fas fa-user-plus action-icon"></i>
+                    <div>
+                        <div class="notification-text">Complete Profile Setup</div>
+                        <div class="notification-meta">Required for enhanced features</div>
+                    </div>
                 </a>
-            `;
-            $notificationsList.append(notificationItem);
+                <a href="#" class="list-group-item pending-action-item">
+                    <i class="fas fa-user-check action-icon"></i>
+                    <div>
+                        <div class="notification-text">Approve New User Requests</div>
+                        <div class="notification-meta">Action required</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Notifications Section -->
+        <div class="section-card fade-in">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-bell"></i>
+                    Notifications
+                </h2>
+            </div>
+
+            <!-- Filter Buttons -->
+            <div class="filter-buttons">
+                <button class="btn filter-btn active" id="view-all-btn">
+                    <i class="fas fa-list"></i> View All
+                    <span class="badge-count" id="all-badge">3</span>
+                </button>
+                <button class="btn filter-btn" id="unread-btn">
+                    <i class="fas fa-envelope"></i> Unread
+                    <span class="badge-count" id="unread-badge">2</span>
+                </button>
+                <button class="btn filter-btn" id="read-btn">
+                    <i class="fas fa-envelope-open"></i> Read
+                    <span class="badge-count" id="read-badge">1</span>
+                </button>
+            </div>
+
+            <!-- Notification List -->
+            <div class="list-group" id="notifications-list"></div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced notification data
+        const notificationData = {
+            'all': [
+                { 
+                    id: 1, 
+                    type: 'unread', 
+                    text: 'You have a new message from John.',
+                    sender: 'John Doe',
+                    avatar: 'https://ui-avatars.com/api/?name=John+Doe&background=2563eb&color=fff',
+                    time: '5 minutes ago',
+                    icon: 'fa-envelope'
+                },
+                { 
+                    id: 2, 
+                    type: 'read', 
+                    text: 'System maintenance scheduled for tonight.',
+                    sender: 'System',
+                    avatar: 'https://ui-avatars.com/api/?name=System&background=059669&color=fff',
+                    time: '2 hours ago',
+                    icon: 'fa-envelope-open'
+                },
+                { 
+                    id: 3, 
+                    type: 'unread', 
+                    text: 'New updates are available.',
+                    sender: 'Update Bot',
+                    avatar: 'https://ui-avatars.com/api/?name=Update&background=7c3aed&color=fff',
+                    time: '1 hour ago',
+                    icon: 'fa-envelope'
+                },
+            ],
+            'unread': [
+                { 
+                    id: 1, 
+                    type: 'unread', 
+                    text: 'You have a new message from John.',
+                    sender: 'John Doe',
+                    avatar: 'https://ui-avatars.com/api/?name=John+Doe&background=2563eb&color=fff',
+                    time: '5 minutes ago',
+                    icon: 'fa-envelope'
+                },
+                { 
+                    id: 3, 
+                    type: 'unread', 
+                    text: 'New updates are available.',
+                    sender: 'Update Bot',
+                    avatar: 'https://ui-avatars.com/api/?name=Update&background=7c3aed&color=fff',
+                    time: '1 hour ago',
+                    icon: 'fa-envelope'
+                },
+            ],
+            'read': [
+                { 
+                    id: 2, 
+                    type: 'read', 
+                    text: 'System maintenance scheduled for tonight.',
+                    sender: 'System',
+                    avatar: 'https://ui-avatars.com/api/?name=System&background=059669&color=fff',
+                    time: '2 hours ago',
+                    icon: 'fa-envelope-open'
+                },
+            ]
+        };
+
+        // Simulated asynchronous call to get notifications
+        function fetchNotifications(filter) {
+            console.log('Fetching notifications:', filter);
+            
+            const notifications = notificationData[filter] || [];
+            updateNotificationList(notifications);
+            updateStats();
+        }
+
+        // Function to update the notification list in the UI
+        function updateNotificationList(notifications) {
+            const $notificationsList = $('#notifications-list');
+            $notificationsList.empty();
+
+            if (notifications.length === 0) {
+                $notificationsList.append(`
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-inbox"></i>
+                        </div>
+                        <h5>No notifications found</h5>
+                        <p>You're all caught up! No notifications in this category.</p>
+                    </div>
+                `);
+            } else {
+                notifications.forEach((notification, index) => {
+                    setTimeout(() => {
+                        const typeClass = `notification-type-${notification.type}`;
+                        const notificationItem = `
+                            <div class="notification-item ${typeClass} fade-in" style="animation-delay: ${index * 0.1}s">
+                                <img src="${notification.avatar}" alt="${notification.sender}" class="notification-avatar" width="40" height="40">
+                                <div class="notification-content">
+                                    <i class="fas ${notification.icon} notification-icon"></i>
+                                    <div>
+                                        <div class="notification-text">${notification.text}</div>
+                                        <div class="notification-meta">From ${notification.sender} • ${notification.time}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        $notificationsList.append(notificationItem);
+                    }, index * 100);
+                });
+            }
+        }
+
+        // Update button states
+        function updateButtonStates(activeFilter) {
+            $('.filter-btn').removeClass('active');
+            $(`#${activeFilter}-btn`).addClass('active').addClass('pulse');
+            
+            setTimeout(() => {
+                $('.filter-btn').removeClass('pulse');
+            }, 300);
+        }
+
+        // Update statistics
+        function updateStats() {
+            $('#unread-count').text(notificationData.unread.length);
+            $('#pending-count').text($('#pending-actions-list .pending-action-item').length);
+            $('#total-count').text(notificationData.all.length);
+            
+            // Update badge counts
+            $('#all-badge').text(notificationData.all.length);
+            $('#unread-badge').text(notificationData.unread.length);
+            $('#read-badge').text(notificationData.read.length);
+        }
+
+        // Event listeners for filter buttons
+        $('#view-all-btn').on('click', function () {
+            fetchNotifications('all');
+            updateButtonStates('view-all');
         });
-    }
 
-    // Event listeners for filter buttons
-    $('#view-all-btn').on('click', function () {
-        fetchNotifications('all');
-    });
+        $('#unread-btn').on('click', function () {
+            fetchNotifications('unread');
+            updateButtonStates('unread');
+        });
 
-    $('#unread-btn').on('click', function () {
-        fetchNotifications('unread');
-    });
+        $('#read-btn').on('click', function () {
+            fetchNotifications('read');
+            updateButtonStates('read');
+        });
 
-    $('#read-btn').on('click', function () {
-        fetchNotifications('read');
-    });
+        // Initial load with all notifications
+        $(document).ready(function () {
+            updateStats();
+            fetchNotifications('all');
+            
+            // Add click handlers for pending actions
+            $('.pending-action-item').on('click', function(e) {
+                e.preventDefault();
+                $(this).addClass('opacity-50');
+                setTimeout(() => {
+                    $(this).remove();
+                    updateStats();
+                }, 300);
+            });
+        });
+    </script>
 
-    // Initial load with all notifications
-    $(document).ready(function () {
-        fetchNotifications('all');
-    });
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
