@@ -3,110 +3,632 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bot-Installed Repositories</title>
+    <title>GStraccini Bot - Repositories</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        .status-success { color: #28a745; }  /* Green for success */
-        .status-failed { color: #dc3545; }   /* Red for failure */
-        .status-pending { color: #ffc107; }  /* Yellow for pending */
+        :root {
+            --primary-blue: #2563eb;
+            --secondary-blue: #1e40af;
+            --light-blue: #dbeafe;
+            --accent-blue: #3b82f6;
+            --success-green: #10b981;
+            --warning-yellow: #f59e0b;
+            --danger-red: #ef4444;
+            --dark-gray: #1f2937;
+            --light-gray: #f8fafc;
+            --border-color: #e5e7eb;
+        }
+
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+
+        .main-header {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 1rem 1rem;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.2);
+        }
+
+        .bot-logo {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .page-title {
+            font-weight: 700;
+            font-size: 2.5rem;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-subtitle {
+            opacity: 0.9;
+            font-weight: 400;
+            margin-top: 0.5rem;
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+
+        .stat-label {
+            color: #6b7280;
+            font-weight: 500;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .repositories-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .card-header-custom {
+            background: linear-gradient(135deg, var(--light-blue) 0%, #f1f5f9 100%);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.5rem;
+        }
+
+        .table-custom {
+            margin: 0;
+        }
+
+        .table-custom thead th {
+            background: #f8fafc;
+            border: none;
+            font-weight: 600;
+            color: var(--dark-gray);
+            padding: 1rem;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .table-custom tbody tr {
+            transition: all 0.2s ease;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .table-custom tbody tr:hover {
+            background: linear-gradient(135deg, var(--light-blue) 0%, #f8fafc 100%);
+            transform: scale(1.001);
+        }
+
+        .table-custom tbody td {
+            padding: 1.25rem 1rem;
+            vertical-align: middle;
+            border: none;
+        }
+
+        .org-name {
+            font-weight: 600;
+            color: var(--dark-gray);
+        }
+
+        .repo-name {
+            font-weight: 700;
+            color: var(--primary-blue);
+            text-decoration: none;
+        }
+
+        .repo-name:hover {
+            color: var(--secondary-blue);
+            text-decoration: underline;
+        }
+
+        .metric-value {
+            font-weight: 600;
+            color: var(--dark-gray);
+        }
+
+        .metric-icon {
+            margin-right: 0.5rem;
+            opacity: 0.7;
+        }
+
+        .language-badge {
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            margin-right: 0.25rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .status-success { 
+            color: var(--success-green);
+            animation: pulse-success 2s infinite;
+        }
+        
+        .status-failed { 
+            color: var(--danger-red);
+            animation: pulse-danger 2s infinite;
+        }
+        
+        .status-pending { 
+            color: var(--warning-yellow);
+            animation: pulse-warning 2s infinite;
+        }
+
+        @keyframes pulse-success {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        @keyframes pulse-danger {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        @keyframes pulse-warning {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-blue) 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary-custom:hover {
+            background: linear-gradient(135deg, var(--secondary-blue) 0%, var(--primary-blue) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-input {
+            border-radius: 12px;
+            border: 2px solid var(--border-color);
+            padding: 0.75rem 1rem 0.75rem 3rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+        }
+
+        .modal-content-custom {
+            border-radius: 16px;
+            border: none;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-header-custom {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            color: white;
+            border-radius: 16px 16px 0 0;
+            padding: 1.5rem;
+        }
+
+        .form-control-custom {
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            padding: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control-custom:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #6b7280;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .filter-tags {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-tag {
+            background: var(--light-blue);
+            color: var(--primary-blue);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-tag:hover {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .filter-tag.active {
+            background: var(--primary-blue);
+            color: white;
+        }
     </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <!-- Page Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1>Installed Repositories</h1>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addRepoModal">
-                Add New Repository
-            </button>
+    <!-- Main Header -->
+    <div class="main-header">
+        <div class="container">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                    <div class="bot-logo">
+                        <i class="fab fa-github fs-4"></i>
+                    </div>
+                    <div>
+                        <h1 class="page-title">GStraccini Bot</h1>
+                        <p class="page-subtitle mb-0">Repository Management Dashboard</p>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-primary-custom btn-lg" data-bs-toggle="modal" data-bs-target="#addRepoModal">
+                    <i class="fas fa-plus me-2"></i>Add Repository
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="stats-card text-center">
+                    <div class="stat-number">12</div>
+                    <div class="stat-label">Total Repositories</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stats-card text-center">
+                    <div class="stat-number">8</div>
+                    <div class="stat-label">Active</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stats-card text-center">
+                    <div class="stat-number">127k</div>
+                    <div class="stat-label">Total Stars</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stats-card text-center">
+                    <div class="stat-number">2.1k</div>
+                    <div class="stat-label">Total Forks</div>
+                </div>
+            </div>
         </div>
 
-        <!-- Repositories List Table -->
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Repositories</h5>
+        <!-- Repositories List -->
+        <div class="repositories-card">
+            <div class="card-header-custom">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0 fw-bold text-dark">Monitored Repositories</h5>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-sync-alt me-1"></i>Refresh
+                        </button>
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-download me-1"></i>Export
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Search and Filters -->
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="form-control search-input" placeholder="Search repositories...">
+                </div>
+                
+                <div class="filter-tags">
+                    <div class="filter-tag active">All</div>
+                    <div class="filter-tag">Passing</div>
+                    <div class="filter-tag">Failing</div>
+                    <div class="filter-tag">JavaScript</div>
+                    <div class="filter-tag">TypeScript</div>
+                    <div class="filter-tag">Python</div>
+                </div>
             </div>
-            <div class="card-body">
-                <table class="table table-hover">
-                    <thead class="table-light">
+            
+            <div class="table-responsive">
+                <table class="table table-custom">
+                    <thead>
                         <tr>
                             <th scope="col">Organization</th>
-                            <th scope="col">Name</th>
+                            <th scope="col">Repository</th>
                             <th scope="col">Stars</th>
                             <th scope="col">Forks</th>
-                            <th scope="col">Open Issues</th>
-                            <th scope="col">Open PRs</th>
+                            <th scope="col">Issues</th>
+                            <th scope="col">PRs</th>
                             <th scope="col">Languages</th>
-                            <th scope="col">Main Branch Status</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Example Row -->
                         <tr>
-                            <td>octocat</td>
-                            <td>hello-world</td>
-                            <td><i class="fas fa-star"></i> 1.5k</td>
-                            <td><i class="fas fa-code-branch"></i> 350</td>
-                            <td><i class="fas fa-circle-exclamation"></i> 25</td>
-                            <td><i class="fas fa-code-pull-request"></i> 10</td>
+                            <td class="org-name">octocat</td>
                             <td>
-                                <span class="badge bg-primary">JavaScript</span>
-                                <span class="badge bg-secondary">HTML</span>
+                                <a href="#" class="repo-name">hello-world</a>
+                                <div class="text-muted small">Updated 2 hours ago</div>
                             </td>
-                            <td><i class="fas fa-circle-check status-success"></i> Passing</td>
+                            <td class="metric-value">
+                                <i class="fas fa-star metric-icon text-warning"></i>1.5k
+                            </td>
+                            <td class="metric-value">
+                                <i class="fas fa-code-branch metric-icon text-info"></i>350
+                            </td>
+                            <td class="metric-value">
+                                <i class="fas fa-circle-exclamation metric-icon text-danger"></i>25
+                            </td>
+                            <td class="metric-value">
+                                <i class="fas fa-code-pull-request metric-icon text-success"></i>10
+                            </td>
+                            <td>
+                                <span class="language-badge bg-warning text-dark">JavaScript</span>
+                                <span class="language-badge bg-secondary text-white">HTML</span>
+                            </td>
+                            <td>
+                                <i class="fas fa-circle-check status-success fs-5"></i>
+                                <span class="fw-semibold text-success">Passing</span>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-outline-secondary">
+                                        <i class="fas fa-cog"></i>
+                                    </button>
+                                </div>
+                            </td>
                         </tr>
                         <tr>
-                            <td>microsoft</td>
-                            <td>vscode</td>
-                            <td><i class="fas fa-star"></i> 123k</td>
-                            <td><i class="fas fa-code-branch"></i> 10.2k</td>
-                            <td><i class="fas fa-circle-exclamation"></i> 500</td>
-                            <td><i class="fas fa-code-pull-request"></i> 75</td>
+                            <td class="org-name">microsoft</td>
                             <td>
-                                <span class="badge bg-primary">TypeScript</span>
-                                <span class="badge bg-info">CSS</span>
-                                <span class="badge bg-warning">C++</span>
+                                <a href="#" class="repo-name">vscode</a>
+                                <div class="text-muted small">Updated 5 minutes ago</div>
                             </td>
-                            <td><i class="fas fa-circle-xmark status-failed"></i> Failing</td>
+                            <td class="metric-value">
+                                <i class="fas fa-star metric-icon text-warning"></i>123k
+                            </td>
+                            <td class="metric-value">
+                                <i class="fas fa-code-branch metric-icon text-info"></i>10.2k
+                            </td>
+                            <td class="metric-value">
+                                <i class="fas fa-circle-exclamation metric-icon text-danger"></i>500
+                            </td>
+                            <td class="metric-value">
+                                <i class="fas fa-code-pull-request metric-icon text-success"></i>75
+                            </td>
+                            <td>
+                                <span class="language-badge bg-primary text-white">TypeScript</span>
+                                <span class="language-badge bg-info text-white">CSS</span>
+                                <span class="language-badge bg-dark text-white">C++</span>
+                            </td>
+                            <td>
+                                <i class="fas fa-circle-xmark status-failed fs-5"></i>
+                                <span class="fw-semibold text-danger">Failing</span>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-outline-secondary">
+                                        <i class="fas fa-cog"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="org-name">facebook</td>
+                            <td>
+                                <a href="#" class="repo-name">react</a>
+                                <div class="text-muted small">Updated 1 day ago</div>
+                            </td>
+                            <td class="metric-value">
+                                <i class="fas fa-star metric-icon text-warning"></i>205k
+                            </td>
+                            <td class="metric-value">
+                                <i class="fas fa-code-branch metric-icon text-info"></i>42.3k
+                            </td>
+                            <td class="metric-value">
+                                <i class="fas fa-circle-exclamation metric-icon text-danger"></i>1.2k
+                            </td>
+                            <td class="metric-value">
+                                <i class="fas fa-code-pull-request metric-icon text-success"></i>180
+                            </td>
+                            <td>
+                                <span class="language-badge bg-warning text-dark">JavaScript</span>
+                                <span class="language-badge bg-secondary text-white">HTML</span>
+                            </td>
+                            <td>
+                                <i class="fas fa-circle-dot status-pending fs-5"></i>
+                                <span class="fw-semibold text-warning">Running</span>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-outline-secondary">
+                                        <i class="fas fa-cog"></i>
+                                    </button>
+                                </div>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
+    </div>
 
-        <!-- Add Repository Modal -->
-        <div class="modal fade" id="addRepoModal" tabindex="-1" aria-labelledby="addRepoModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="addRepoModalLabel">Add New Repository</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form>
-                            <div class="mb-3">
-                                <label for="githubIntegration" class="form-label">GitHub Integration</label>
-                                <select class="form-select" id="githubIntegration">
+    <!-- Add Repository Modal -->
+    <div class="modal fade" id="addRepoModal" tabindex="-1" aria-labelledby="addRepoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content modal-content-custom">
+                <div class="modal-header modal-header-custom">
+                    <h5 class="modal-title fw-bold" id="addRepoModalLabel">
+                        <i class="fab fa-github me-2"></i>Add New Repository
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="githubIntegration" class="form-label fw-semibold">GitHub Integration</label>
+                                <select class="form-select form-control-custom" id="githubIntegration">
                                     <option selected>Choose integration...</option>
-                                    <option value="1">Organization 1</option>
-                                    <option value="2">Organization 2</option>
-                                    <option value="3">Organization 3</option>
+                                    <option value="1">Personal Account</option>
+                                    <option value="2">Organization Alpha</option>
+                                    <option value="3">Organization Beta</option>
                                 </select>
                             </div>
-                            <div class="mb-3">
-                                <label for="repoName" class="form-label">Repository Name</label>
-                                <input type="text" class="form-control" id="repoName" placeholder="e.g. hello-world">
+                            <div class="col-md-6 mb-3">
+                                <label for="repoName" class="form-label fw-semibold">Repository Name</label>
+                                <input type="text" class="form-control form-control-custom" id="repoName" placeholder="e.g. hello-world">
                             </div>
-                            <button type="submit" class="btn btn-primary">Add Repository</button>
-                        </form>
-                    </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Monitoring Options</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="monitorIssues" checked>
+                                        <label class="form-check-label" for="monitorIssues">
+                                            Monitor Issues
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="monitorPRs" checked>
+                                        <label class="form-check-label" for="monitorPRs">
+                                            Monitor Pull Requests
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="monitorCommits">
+                                        <label class="form-check-label" for="monitorCommits">
+                                            Monitor Commits
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="monitorReleases">
+                                        <label class="form-check-label" for="monitorReleases">
+                                            Monitor Releases
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary-custom">
+                                <i class="fas fa-plus me-2"></i>Add Repository
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Bootstrap JS & FontAwesome -->
+    <!-- Bootstrap JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Add some interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            // Filter tags functionality
+            const filterTags = document.querySelectorAll('.filter-tag');
+            filterTags.forEach(tag => {
+                tag.addEventListener('click', function() {
+                    filterTags.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // Search functionality (basic)
+            const searchInput = document.querySelector('.search-input');
+            searchInput.addEventListener('input', function() {
+                // Add search logic here
+                console.log('Searching for:', this.value);
+            });
+
+            // Simulate real-time updates
+            setInterval(() => {
+                const timestamps = document.querySelectorAll('.text-muted.small');
+                timestamps.forEach(timestamp => {
+                    // This would be replaced with actual timestamp updates
+                });
+            }, 60000);
+        });
+    </script>
 </body>
 </html>
