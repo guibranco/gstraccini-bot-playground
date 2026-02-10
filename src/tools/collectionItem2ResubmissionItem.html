@@ -78,7 +78,7 @@
 <div id="error" class="error"></div>
 
 <div class="footer">
-    CreatedDate & ModifiedDate use current datetime with offset · ResubmissionDueDate uses current date only
+    Sequence is always 1 · CreatedDate & ModifiedDate use current datetime with offset · ResubmissionDueDate uses current date only
 </div>
 
 <script>
@@ -128,7 +128,7 @@
             const nowIso = toIsoWithOffset(now);
             const today = dateOnly(now);
 
-            const sequence = Math.max(1, (input.Sequence ?? 1) - 1);
+            const sequence = 1;
 
             const output = {
                 Sequence: sequence,
