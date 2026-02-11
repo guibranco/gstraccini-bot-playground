@@ -19,13 +19,13 @@
     }
 
     .container {
-        max-width: 1400px;
+        max-width: 1500px;
         margin: auto;
     }
 
     textarea {
         width: 100%;
-        height: 300px;
+        height: 250px;
         padding: 15px;
         font-family: monospace;
         font-size: 14px;
@@ -66,6 +66,7 @@
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 20px;
+        margin-top: 20px;
     }
 
     .card {
@@ -75,28 +76,40 @@
         box-shadow: 0 5px 15px rgba(0,0,0,0.05);
     }
 
+    .diff-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .diff-box {
+        background: #111827;
+        color: #f3f4f6;
+        padding: 15px;
+        border-radius: 10px;
+        font-family: monospace;
+        font-size: 13px;
+        white-space: pre-wrap;
+        overflow-x: auto;
+        max-height: 500px;
+    }
+
+    .added { background-color: rgba(34,197,94,0.3); }
+    .removed { background-color: rgba(239,68,68,0.3); }
+    .changed { background-color: rgba(234,179,8,0.3); }
+
     label {
         font-weight: bold;
         display: block;
         margin-bottom: 8px;
-    }
-
-    .button-row {
-        display: flex;
-        align-items: center;
-    }
-
-    .footer-note {
-        margin-top: 15px;
-        font-size: 13px;
-        color: #666;
     }
 </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Collection Document Transformer</h1>
+    <h1>Collection Document Transformer + Diff Viewer</h1>
 
     <div class="card">
         <label>Original JSON Document</label>
@@ -106,27 +119,24 @@
 
     <div class="grid">
         <div class="card">
-            <label>Updated Original (IsLatest = false)</label>
+            <label>Updated Original</label>
             <textarea id="updatedOriginal" readonly></textarea>
-            <div class="button-row">
-                <button class="copy-btn" onclick="copyToClipboard('updatedOriginal', this)">Copy JSON</button>
-            </div>
+            <button class="copy-btn" onclick="copyToClipboard('updatedOriginal', this)">Copy JSON</button>
         </div>
 
         <div class="card">
-            <label>New Rejected Document (IsLatest = true)</label>
+            <label>New Rejected Document</label>
             <textarea id="newRejected" readonly></textarea>
-            <div class="button-row">
-                <button class="copy-btn" onclick="copyToClipboard('newRejected', this)">Copy JSON</button>
-            </div>
+            <button class="copy-btn" onclick="copyToClipboard('newRejected', this)">Copy JSON</button>
         </div>
     </div>
 
-    <div class="footer-note">
-        ✔ ModifiedDate is generated using current local ISO datetime with offset  
-        ✔ ModifiedBy is set to guilhermes@outsurance.ie  
-        ✔ Cosmos system properties are removed  
-        ✔ Copy buttons included
+    <div class="card">
+        <label>JSON Diff Viewer</label>
+        <div class="diff-container">
+            <div id="diffLeft" class="diff-box"></div>
+            <div id="diffRight" class="diff-box"></div>
+        </div>
     </div>
 </div>
 
@@ -135,7 +145,6 @@ function getCurrentIsoWithOffset() {
     const now = new Date();
     const tzOffset = -now.getTimezoneOffset();
     const diff = tzOffset >= 0 ? '+' : '-';
-
     const pad = (n) => String(Math.floor(Math.abs(n))).padStart(2, '0');
 
     return now.getFullYear() +
@@ -162,20 +171,17 @@ function removeCosmosFields(obj) {
 function processJson() {
     try {
         const input = JSON.parse(document.getElementById("inputJson").value);
-
         const currentDate = getCurrentIsoWithOffset();
         const email = "guilhermes@outsurance.ie";
 
         removeCosmosFields(input);
 
-        // First document
         const updatedOriginal = JSON.parse(JSON.stringify(input));
         updatedOriginal.IsLatest = false;
         updatedOriginal.ModifiedBy = email;
         updatedOriginal.ModifiedDate = currentDate;
         updatedOriginal.id = `${input.id}-${input.CollectionStatus}`;
 
-        // Second document
         const rejectedDoc = JSON.parse(JSON.stringify(updatedOriginal));
         rejectedDoc.IsLatest = true;
         rejectedDoc.CollectionStatus = "Rejected";
@@ -185,8 +191,6 @@ function processJson() {
             ErrorCode: "NOT_FOUND",
             ErrorMessage: "Transaction not found in Global Payments gateway"
         };
-        rejectedDoc.ModifiedBy = email;
-        rejectedDoc.ModifiedDate = currentDate;
 
         document.getElementById("updatedOriginal").value =
             JSON.stringify(updatedOriginal, null, 4);
@@ -194,38 +198,62 @@ function processJson() {
         document.getElementById("newRejected").value =
             JSON.stringify(rejectedDoc, null, 4);
 
-    } catch (err) {
-        alert("Invalid JSON input ❌");
+        renderDiff(updatedOriginal, rejectedDoc);
+
+    } catch {
+        alert("Invalid JSON input");
     }
+}
+
+function renderDiff(left, right) {
+    const leftStr = JSON.stringify(left, null, 4).split("\n");
+    const rightStr = JSON.stringify(right, null, 4).split("\n");
+
+    let leftHtml = "";
+    let rightHtml = "";
+
+    const maxLength = Math.max(leftStr.length, rightStr.length);
+
+    for (let i = 0; i < maxLength; i++) {
+        const l = leftStr[i] || "";
+        const r = rightStr[i] || "";
+
+        if (!l && r) {
+            leftHtml += "\n";
+            rightHtml += `<div class="added">${escapeHtml(r)}</div>`;
+        } else if (l && !r) {
+            leftHtml += `<div class="removed">${escapeHtml(l)}</div>`;
+            rightHtml += "\n";
+        } else if (l !== r) {
+            leftHtml += `<div class="changed">${escapeHtml(l)}</div>`;
+            rightHtml += `<div class="changed">${escapeHtml(r)}</div>`;
+        } else {
+            leftHtml += escapeHtml(l) + "\n";
+            rightHtml += escapeHtml(r) + "\n";
+        }
+    }
+
+    document.getElementById("diffLeft").innerHTML = leftHtml;
+    document.getElementById("diffRight").innerHTML = rightHtml;
+}
+
+function escapeHtml(text) {
+    return text.replace(/&/g, "&amp;")
+               .replace(/</g, "&lt;")
+               .replace(/>/g, "&gt;");
 }
 
 async function copyToClipboard(elementId, button) {
     const text = document.getElementById(elementId).value;
+    await navigator.clipboard.writeText(text);
 
-    try {
-        if (navigator.clipboard) {
-            await navigator.clipboard.writeText(text);
-        } else {
-            // Fallback
-            const temp = document.createElement("textarea");
-            temp.value = text;
-            document.body.appendChild(temp);
-            temp.select();
-            document.execCommand("copy");
-            document.body.removeChild(temp);
-        }
+    button.classList.add("copied");
+    button.innerText = "Copied ✓";
 
-        button.classList.add("copied");
-        button.innerText = "Copied ✓";
-
-        setTimeout(() => {
-            button.classList.remove("copied");
-            button.innerText = "Copy JSON";
-        }, 2000);
-
-    } catch (err) {
-        alert("Copy failed ❌");
-    }
+    setTimeout(() => {
+        button.classList.remove("copied");
+        button.innerText = "Copy JSON";
+    }, 2000);
 }
 </script>
 
