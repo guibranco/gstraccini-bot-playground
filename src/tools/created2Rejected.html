@@ -5,186 +5,249 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Collection Status Transformer</title>
 
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        background: #f4f6f9;
-        margin: 0;
-        padding: 30px;
-    }
+:root {
+    --bg: #f3f6fb;
+    --card-bg: rgba(255,255,255,0.75);
+    --text: #111827;
+    --subtle: #6b7280;
+    --primary: #6366f1;
+    --primary-hover: #4f46e5;
+    --success: #10b981;
+    --success-hover: #059669;
+    --border: rgba(0,0,0,0.08);
+    --diff-bg: #111827;
+}
 
-    h1 {
-        text-align: center;
-        margin-bottom: 30px;
-    }
+[data-theme="dark"] {
+    --bg: #0f172a;
+    --card-bg: rgba(30,41,59,0.75);
+    --text: #f1f5f9;
+    --subtle: #94a3b8;
+    --primary: #818cf8;
+    --primary-hover: #6366f1;
+    --success: #34d399;
+    --success-hover: #10b981;
+    --border: rgba(255,255,255,0.08);
+    --diff-bg: #020617;
+}
 
-    .container {
-        max-width: 1500px;
-        margin: auto;
-    }
+* {
+    box-sizing: border-box;
+}
 
-    input[type="email"] {
-        width: 100%;
-        padding: 10px;
-        border-radius: 8px;
-        border: 1px solid #ccc;
-        margin-bottom: 10px;
-        font-size: 14px;
-    }
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    background-attachment: fixed;
+    margin: 0;
+    padding: 40px;
+    transition: background 0.3s ease;
+}
 
-    textarea {
-        width: 100%;
-        height: 250px;
-        padding: 15px;
-        font-family: monospace;
-        font-size: 14px;
-        border-radius: 8px;
-        border: 1px solid #ccc;
-        resize: vertical;
-    }
+[data-theme="dark"] body {
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+}
 
-    button {
-        padding: 10px 18px;
-        font-size: 14px;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        margin: 10px 5px 10px 0;
-        background-color: #2563eb;
-        color: white;
-        transition: 0.3s;
-    }
+.container {
+    max-width: 1500px;
+    margin: auto;
+}
 
-    button:hover {
-        background-color: #1e40af;
-    }
+h1 {
+    text-align: center;
+    color: white;
+    margin-bottom: 30px;
+    font-weight: 700;
+}
 
-    .copy-btn {
-        background-color: #16a34a;
-    }
+.card {
+    background: var(--card-bg);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 25px;
+    margin-bottom: 25px;
+    transition: all 0.3s ease;
+}
 
-    .copy-btn:hover {
-        background-color: #15803d;
-    }
+label {
+    font-weight: 600;
+    color: var(--text);
+    display: block;
+    margin-bottom: 8px;
+}
 
-    .copied {
-        background-color: #22c55e !important;
-    }
+input, textarea {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    font-size: 14px;
+    font-family: monospace;
+    background: rgba(255,255,255,0.6);
+    transition: 0.3s;
+}
 
-    .grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-        margin-top: 20px;
-    }
+[data-theme="dark"] input,
+[data-theme="dark"] textarea {
+    background: rgba(15,23,42,0.6);
+    color: white;
+}
 
-    .card {
-        background: white;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-    }
+textarea {
+    height: 220px;
+    resize: vertical;
+}
 
-    .diff-container {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-        margin-top: 20px;
-    }
+button {
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    transition: 0.2s ease;
+}
 
-    .diff-box {
-        background: #111827;
-        color: #f3f4f6;
-        padding: 15px;
-        border-radius: 10px;
-        font-family: monospace;
-        font-size: 13px;
-        white-space: pre-wrap;
-        overflow-x: auto;
-        max-height: 500px;
-    }
+.primary-btn {
+    background: var(--primary);
+    color: white;
+}
 
-    .added { background-color: rgba(34,197,94,0.3); }
-    .removed { background-color: rgba(239,68,68,0.3); }
-    .changed { background-color: rgba(234,179,8,0.3); }
+.primary-btn:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+}
 
-    label {
-        font-weight: bold;
-        display: block;
-        margin-bottom: 8px;
-    }
+.copy-btn {
+    background: var(--success);
+    color: white;
+}
+
+.copy-btn:hover {
+    background: var(--success-hover);
+}
+
+.toggle-btn {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    float: right;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+}
+
+.diff-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.diff-box {
+    background: var(--diff-bg);
+    color: #e5e7eb;
+    padding: 15px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-family: monospace;
+    white-space: pre-wrap;
+    max-height: 500px;
+    overflow: auto;
+}
+
+.added { background: rgba(34,197,94,0.3); }
+.removed { background: rgba(239,68,68,0.3); }
+.changed { background: rgba(234,179,8,0.3); }
+
+.footer {
+    text-align: center;
+    color: white;
+    margin-top: 30px;
+    opacity: 0.8;
+}
 </style>
 </head>
+
 <body>
 
 <div class="container">
-    <h1>Collection Document Transformer + Diff Viewer</h1>
+
+    <button class="toggle-btn" onclick="toggleTheme()">Toggle Dark Mode</button>
+
+    <h1>Collection Document Transformer</h1>
 
     <div class="card">
-        <label>User email (used as ModifiedBy)</label>
+        <label>User email (ModifiedBy)</label>
         <input type="email" id="userEmail" placeholder="Enter your email..." />
     </div>
 
     <div class="card">
-        <label>Original JSON Document</label>
-        <textarea id="inputJson" placeholder="Paste original document here..."></textarea>
-        <button onclick="processJson()">Generate Documents</button>
+        <label>Original JSON</label>
+        <textarea id="inputJson"></textarea>
+        <br><br>
+        <button class="primary-btn" onclick="processJson()">Generate Documents</button>
     </div>
 
     <div class="grid">
         <div class="card">
-            <label>Updated Original (IsLatest = false)</label>
+            <label>Updated original (historic)</label>
             <textarea id="updatedOriginal" readonly></textarea>
-            <button class="copy-btn" onclick="copyToClipboard('updatedOriginal', this)">Copy JSON</button>
+            <br>
+            <button class="copy-btn" onclick="copyToClipboard('updatedOriginal', this)">Copy</button>
         </div>
 
         <div class="card">
-            <label>New Rejected Document (IsLatest = true)</label>
+            <label>New rejected (latest)</label>
             <textarea id="newRejected" readonly></textarea>
-            <button class="copy-btn" onclick="copyToClipboard('newRejected', this)">Copy JSON</button>
+            <br>
+            <button class="copy-btn" onclick="copyToClipboard('newRejected', this)">Copy</button>
         </div>
     </div>
 
     <div class="card">
-        <label>JSON Diff Viewer</label>
+        <label>Diff viewer</label>
         <div class="diff-container">
             <div id="diffLeft" class="diff-box"></div>
             <div id="diffRight" class="diff-box"></div>
         </div>
     </div>
+
+    <div class="footer">
+        Built with 💙 for fast collection debugging
+    </div>
+
 </div>
 
 <script>
-const EMAIL_STORAGE_KEY = "collection_transformer_email";
+const EMAIL_KEY = "collection_email";
+const THEME_KEY = "collection_theme";
 
 window.onload = function () {
-    const savedEmail = localStorage.getItem(EMAIL_STORAGE_KEY);
-    if (savedEmail) {
-        document.getElementById("userEmail").value = savedEmail;
-    }
+    const savedEmail = localStorage.getItem(EMAIL_KEY);
+    if (savedEmail) document.getElementById("userEmail").value = savedEmail;
 
     document.getElementById("userEmail").addEventListener("input", function () {
-        localStorage.setItem(EMAIL_STORAGE_KEY, this.value);
+        localStorage.setItem(EMAIL_KEY, this.value);
     });
+
+    const savedTheme = localStorage.getItem(THEME_KEY);
+    if (savedTheme) document.documentElement.setAttribute("data-theme", savedTheme);
 };
 
-function getCurrentIsoWithOffset() {
-    const now = new Date();
-    const tzOffset = -now.getTimezoneOffset();
-    const diff = tzOffset >= 0 ? '+' : '-';
-    const pad = (n) => String(Math.floor(Math.abs(n))).padStart(2, '0');
+function toggleTheme() {
+    const current = document.documentElement.getAttribute("data-theme");
+    const newTheme = current === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", newTheme);
+    localStorage.setItem(THEME_KEY, newTheme);
+}
 
-    return now.getFullYear() +
-        '-' + pad(now.getMonth() + 1) +
-        '-' + pad(now.getDate()) +
-        'T' + pad(now.getHours()) +
-        ':' + pad(now.getMinutes()) +
-        ':' + pad(now.getSeconds()) +
-        '.' + String(now.getMilliseconds()).padStart(7, '0') +
-        diff +
-        pad(tzOffset / 60) +
-        ':' +
-        pad(tzOffset % 60);
+function getCurrentIso() {
+    return new Date().toISOString();
 }
 
 function removeCosmosFields(obj) {
@@ -196,51 +259,38 @@ function removeCosmosFields(obj) {
 }
 
 function processJson() {
-    try {
-        const email = document.getElementById("userEmail").value.trim();
-        if (!email) {
-            alert("Please enter your email first.");
-            return;
-        }
+    const email = document.getElementById("userEmail").value.trim();
+    if (!email) return alert("Please enter your email.");
 
-        const input = JSON.parse(document.getElementById("inputJson").value);
-        const currentDate = getCurrentIsoWithOffset();
-        const originalId = input.id;
+    const input = JSON.parse(document.getElementById("inputJson").value);
+    const originalId = input.id;
+    const now = getCurrentIso();
 
-        removeCosmosFields(input);
+    removeCosmosFields(input);
 
-        // ---- Updated original (historic version) ----
-        const updatedOriginal = JSON.parse(JSON.stringify(input));
-        updatedOriginal.IsLatest = false;
-        updatedOriginal.ModifiedBy = email;
-        updatedOriginal.ModifiedDate = currentDate;
-        updatedOriginal.id = `${originalId}-${input.CollectionStatus}`;
+    const updatedOriginal = JSON.parse(JSON.stringify(input));
+    updatedOriginal.IsLatest = false;
+    updatedOriginal.ModifiedBy = email;
+    updatedOriginal.ModifiedDate = now;
+    updatedOriginal.id = `${originalId}-${input.CollectionStatus}`;
 
-        // ---- New rejected (latest version) ----
-        const rejectedDoc = JSON.parse(JSON.stringify(input));
-        rejectedDoc.IsLatest = true;
-        rejectedDoc.CollectionStatus = "Rejected";
-        rejectedDoc.ProviderDetails = {
-            ProcessingDate: currentDate,
-            Filename: null,
-            ErrorCode: "NOT_FOUND",
-            ErrorMessage: "Transaction not found in Global Payments gateway"
-        };
-        rejectedDoc.ModifiedBy = email;
-        rejectedDoc.ModifiedDate = currentDate;
-        rejectedDoc.id = originalId; // 🔥 important fix
+    const rejectedDoc = JSON.parse(JSON.stringify(input));
+    rejectedDoc.IsLatest = true;
+    rejectedDoc.CollectionStatus = "Rejected";
+    rejectedDoc.ProviderDetails = {
+        ProcessingDate: now,
+        Filename: null,
+        ErrorCode: "NOT_FOUND",
+        ErrorMessage: "Transaction not found in Global Payments gateway"
+    };
+    rejectedDoc.ModifiedBy = email;
+    rejectedDoc.ModifiedDate = now;
+    rejectedDoc.id = originalId;
 
-        document.getElementById("updatedOriginal").value =
-            JSON.stringify(updatedOriginal, null, 4);
+    document.getElementById("updatedOriginal").value = JSON.stringify(updatedOriginal, null, 4);
+    document.getElementById("newRejected").value = JSON.stringify(rejectedDoc, null, 4);
 
-        document.getElementById("newRejected").value =
-            JSON.stringify(rejectedDoc, null, 4);
-
-        renderDiff(updatedOriginal, rejectedDoc);
-
-    } catch {
-        alert("Invalid JSON input");
-    }
+    renderDiff(updatedOriginal, rejectedDoc);
 }
 
 function renderDiff(left, right) {
@@ -249,49 +299,31 @@ function renderDiff(left, right) {
 
     let leftHtml = "";
     let rightHtml = "";
+    const max = Math.max(leftStr.length, rightStr.length);
 
-    const maxLength = Math.max(leftStr.length, rightStr.length);
-
-    for (let i = 0; i < maxLength; i++) {
+    for (let i = 0; i < max; i++) {
         const l = leftStr[i] || "";
         const r = rightStr[i] || "";
 
-        if (!l && r) {
-            leftHtml += "\n";
-            rightHtml += `<div class="added">${escapeHtml(r)}</div>`;
-        } else if (l && !r) {
-            leftHtml += `<div class="removed">${escapeHtml(l)}</div>`;
-            rightHtml += "\n";
-        } else if (l !== r) {
-            leftHtml += `<div class="changed">${escapeHtml(l)}</div>`;
-            rightHtml += `<div class="changed">${escapeHtml(r)}</div>`;
+        if (!l && r) rightHtml += `<div class="added">${r}</div>`;
+        else if (l && !r) leftHtml += `<div class="removed">${l}</div>`;
+        else if (l !== r) {
+            leftHtml += `<div class="changed">${l}</div>`;
+            rightHtml += `<div class="changed">${r}</div>`;
         } else {
-            leftHtml += escapeHtml(l) + "\n";
-            rightHtml += escapeHtml(r) + "\n";
+            leftHtml += l + "\n";
+            rightHtml += r + "\n";
         }
     }
 
-    document.getElementById("diffLeft").innerHTML = leftHtml;
-    document.getElementById("diffRight").innerHTML = rightHtml;
+    diffLeft.innerHTML = leftHtml;
+    diffRight.innerHTML = rightHtml;
 }
 
-function escapeHtml(text) {
-    return text.replace(/&/g, "&amp;")
-               .replace(/</g, "&lt;")
-               .replace(/>/g, "&gt;");
-}
-
-async function copyToClipboard(elementId, button) {
-    const text = document.getElementById(elementId).value;
-    await navigator.clipboard.writeText(text);
-
-    button.classList.add("copied");
-    button.innerText = "Copied ✓";
-
-    setTimeout(() => {
-        button.classList.remove("copied");
-        button.innerText = "Copy JSON";
-    }, 2000);
+async function copyToClipboard(id, btn) {
+    await navigator.clipboard.writeText(document.getElementById(id).value);
+    btn.innerText = "Copied ✓";
+    setTimeout(() => btn.innerText = "Copy", 1500);
 }
 </script>
 
