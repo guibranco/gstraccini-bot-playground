@@ -23,6 +23,15 @@
         margin: auto;
     }
 
+    input[type="email"] {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        margin-bottom: 10px;
+        font-size: 14px;
+    }
+
     textarea {
         width: 100%;
         height: 250px;
@@ -112,6 +121,11 @@
     <h1>Collection Document Transformer + Diff Viewer</h1>
 
     <div class="card">
+        <label>User email (used as ModifiedBy)</label>
+        <input type="email" id="userEmail" placeholder="Enter your email..." />
+    </div>
+
+    <div class="card">
         <label>Original JSON Document</label>
         <textarea id="inputJson" placeholder="Paste original document here..."></textarea>
         <button onclick="processJson()">Generate Documents</button>
@@ -141,6 +155,19 @@
 </div>
 
 <script>
+const EMAIL_STORAGE_KEY = "collection_transformer_email";
+
+window.onload = function () {
+    const savedEmail = localStorage.getItem(EMAIL_STORAGE_KEY);
+    if (savedEmail) {
+        document.getElementById("userEmail").value = savedEmail;
+    }
+
+    document.getElementById("userEmail").addEventListener("input", function () {
+        localStorage.setItem(EMAIL_STORAGE_KEY, this.value);
+    });
+};
+
 function getCurrentIsoWithOffset() {
     const now = new Date();
     const tzOffset = -now.getTimezoneOffset();
@@ -170,9 +197,15 @@ function removeCosmosFields(obj) {
 
 function processJson() {
     try {
+        const email = document.getElementById("userEmail").value.trim();
+
+        if (!email) {
+            alert("Please enter your email first.");
+            return;
+        }
+
         const input = JSON.parse(document.getElementById("inputJson").value);
         const currentDate = getCurrentIsoWithOffset();
-        const email = "guilhermes@outsurance.ie";
 
         removeCosmosFields(input);
 
@@ -191,6 +224,8 @@ function processJson() {
             ErrorCode: "NOT_FOUND",
             ErrorMessage: "Transaction not found in Global Payments gateway"
         };
+        rejectedDoc.ModifiedBy = email;
+        rejectedDoc.ModifiedDate = currentDate;
 
         document.getElementById("updatedOriginal").value =
             JSON.stringify(updatedOriginal, null, 4);
