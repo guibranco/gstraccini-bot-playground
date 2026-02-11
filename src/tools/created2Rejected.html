@@ -133,13 +133,13 @@
 
     <div class="grid">
         <div class="card">
-            <label>Updated Original</label>
+            <label>Updated Original (IsLatest = false)</label>
             <textarea id="updatedOriginal" readonly></textarea>
             <button class="copy-btn" onclick="copyToClipboard('updatedOriginal', this)">Copy JSON</button>
         </div>
 
         <div class="card">
-            <label>New Rejected Document</label>
+            <label>New Rejected Document (IsLatest = true)</label>
             <textarea id="newRejected" readonly></textarea>
             <button class="copy-btn" onclick="copyToClipboard('newRejected', this)">Copy JSON</button>
         </div>
@@ -198,7 +198,6 @@ function removeCosmosFields(obj) {
 function processJson() {
     try {
         const email = document.getElementById("userEmail").value.trim();
-
         if (!email) {
             alert("Please enter your email first.");
             return;
@@ -206,16 +205,19 @@ function processJson() {
 
         const input = JSON.parse(document.getElementById("inputJson").value);
         const currentDate = getCurrentIsoWithOffset();
+        const originalId = input.id;
 
         removeCosmosFields(input);
 
+        // ---- Updated original (historic version) ----
         const updatedOriginal = JSON.parse(JSON.stringify(input));
         updatedOriginal.IsLatest = false;
         updatedOriginal.ModifiedBy = email;
         updatedOriginal.ModifiedDate = currentDate;
-        updatedOriginal.id = `${input.id}-${input.CollectionStatus}`;
+        updatedOriginal.id = `${originalId}-${input.CollectionStatus}`;
 
-        const rejectedDoc = JSON.parse(JSON.stringify(updatedOriginal));
+        // ---- New rejected (latest version) ----
+        const rejectedDoc = JSON.parse(JSON.stringify(input));
         rejectedDoc.IsLatest = true;
         rejectedDoc.CollectionStatus = "Rejected";
         rejectedDoc.ProviderDetails = {
@@ -226,6 +228,7 @@ function processJson() {
         };
         rejectedDoc.ModifiedBy = email;
         rejectedDoc.ModifiedDate = currentDate;
+        rejectedDoc.id = originalId; // 🔥 important fix
 
         document.getElementById("updatedOriginal").value =
             JSON.stringify(updatedOriginal, null, 4);
