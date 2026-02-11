@@ -35,12 +35,12 @@
     }
 
     button {
-        padding: 12px 20px;
-        font-size: 16px;
+        padding: 10px 18px;
+        font-size: 14px;
         border: none;
         border-radius: 8px;
         cursor: pointer;
-        margin: 15px 0;
+        margin: 10px 5px 10px 0;
         background-color: #2563eb;
         color: white;
         transition: 0.3s;
@@ -48,6 +48,18 @@
 
     button:hover {
         background-color: #1e40af;
+    }
+
+    .copy-btn {
+        background-color: #16a34a;
+    }
+
+    .copy-btn:hover {
+        background-color: #15803d;
+    }
+
+    .copied {
+        background-color: #22c55e !important;
     }
 
     .grid {
@@ -67,6 +79,11 @@
         font-weight: bold;
         display: block;
         margin-bottom: 8px;
+    }
+
+    .button-row {
+        display: flex;
+        align-items: center;
     }
 
     .footer-note {
@@ -91,18 +108,25 @@
         <div class="card">
             <label>Updated Original (IsLatest = false)</label>
             <textarea id="updatedOriginal" readonly></textarea>
+            <div class="button-row">
+                <button class="copy-btn" onclick="copyToClipboard('updatedOriginal', this)">Copy JSON</button>
+            </div>
         </div>
 
         <div class="card">
             <label>New Rejected Document (IsLatest = true)</label>
             <textarea id="newRejected" readonly></textarea>
+            <div class="button-row">
+                <button class="copy-btn" onclick="copyToClipboard('newRejected', this)">Copy JSON</button>
+            </div>
         </div>
     </div>
 
     <div class="footer-note">
-        ✔ ModifiedDate is generated using current local ISO datetime with offset.  
+        ✔ ModifiedDate is generated using current local ISO datetime with offset  
         ✔ ModifiedBy is set to guilhermes@outsurance.ie  
-        ✔ Cosmos system properties are removed.
+        ✔ Cosmos system properties are removed  
+        ✔ Copy buttons included
     </div>
 </div>
 
@@ -144,17 +168,15 @@ function processJson() {
 
         removeCosmosFields(input);
 
-        // -------- First document (update existing) --------
+        // First document
         const updatedOriginal = JSON.parse(JSON.stringify(input));
-
         updatedOriginal.IsLatest = false;
         updatedOriginal.ModifiedBy = email;
         updatedOriginal.ModifiedDate = currentDate;
         updatedOriginal.id = `${input.id}-${input.CollectionStatus}`;
 
-        // -------- Second document (new rejected) --------
+        // Second document
         const rejectedDoc = JSON.parse(JSON.stringify(updatedOriginal));
-
         rejectedDoc.IsLatest = true;
         rejectedDoc.CollectionStatus = "Rejected";
         rejectedDoc.ProviderDetails = {
@@ -163,7 +185,6 @@ function processJson() {
             ErrorCode: "NOT_FOUND",
             ErrorMessage: "Transaction not found in Global Payments gateway"
         };
-
         rejectedDoc.ModifiedBy = email;
         rejectedDoc.ModifiedDate = currentDate;
 
@@ -175,6 +196,35 @@ function processJson() {
 
     } catch (err) {
         alert("Invalid JSON input ❌");
+    }
+}
+
+async function copyToClipboard(elementId, button) {
+    const text = document.getElementById(elementId).value;
+
+    try {
+        if (navigator.clipboard) {
+            await navigator.clipboard.writeText(text);
+        } else {
+            // Fallback
+            const temp = document.createElement("textarea");
+            temp.value = text;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand("copy");
+            document.body.removeChild(temp);
+        }
+
+        button.classList.add("copied");
+        button.innerText = "Copied ✓";
+
+        setTimeout(() => {
+            button.classList.remove("copied");
+            button.innerText = "Copy JSON";
+        }, 2000);
+
+    } catch (err) {
+        alert("Copy failed ❌");
     }
 }
 </script>
