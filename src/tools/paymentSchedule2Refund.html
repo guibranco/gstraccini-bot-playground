@@ -22,10 +22,12 @@
         }
 
         .container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+            display: flex;
+            flex-direction: column;
             gap: 20px;
             padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
         .card {
@@ -38,7 +40,6 @@
         }
 
         textarea {
-            flex: 1;
             width: 100%;
             background: #111827;
             color: #e5e7eb;
@@ -48,6 +49,12 @@
             font-family: monospace;
             font-size: 13px;
             resize: vertical;
+        }
+
+        #outputJson,
+        #createdCollectionOutputJson,
+        #refundedCollectionOutputJson {
+            min-height: 400px;
         }
 
         button {
@@ -81,7 +88,8 @@
             font-size: 13px;
         }
 
-        input[type="text"], input[type="datetime-local"] {
+        input[type="text"],
+        input[type="datetime-local"] {
             width: 100%;
             padding: 8px;
             margin-bottom: 10px;
@@ -90,21 +98,16 @@
             background: #111827;
             color: #f3f4f6;
         }
-
-        @media (max-width: 1000px) {
-            .container {
-                grid-template-columns: 1fr;
-            }
-        }
     </style>
 </head>
 <body>
     <header>Payment Schedule Refund Generator</header>
 
     <div class="container">
+
         <div class="card">
             <h3>Input Schedule</h3>
-            <textarea id="inputJson">{
+            <textarea id="inputJson" style="min-height:350px;">{
     "$type": "Stratos.Core.PolicyAdmin.CosmosDB.Documents.PaymentSchedules.PaymentScheduleCoreDocument, Stratos.Core.CosmosDB",
     "PolicyNumber": "OUTSTG00135448",
     "RiskId": 1,
@@ -187,23 +190,52 @@
             <h3>Refund configuration</h3>
             <div class="controls">
                 <input type="text" id="modifiedBy" placeholder="Modified by (persisted)" />
-                <input type="datetime-local" id="collectionCreatedDate" />
+                
+                <input 
+                    type="datetime-local" 
+                    id="collectionCreatedDate" 
+                    step="1" 
+                />
             </div>
+
             <div class="schedule-items" id="scheduleItems"></div>
+
             <button onclick="generateRefund()">Generate refund schedule</button>
-            <h3>Schedule output</h3>
-            <button type="button" id="copyScheduleBtn" onclick="copyToClipboard('outputJson', this)" disabled>Copy schedule</button>
-            <textarea id="outputJson" oninput="toggleCopyButton('outputJson','copyScheduleBtn')"></textarea>
-            <h3 style="margin-top:15px;">Created collection document</h3>
-            <button type="button" id="copyCreatedBtn" onclick="copyToClipboard('createdCollectionOutputJson', this)" disabled>Copy created collection</button>
-            <textarea id="createdCollectionOutputJson" oninput="toggleCopyButton('createdCollectionOutputJson','copyCreatedBtn')"></textarea>
-            <h3 style="margin-top:15px;">Refunded collection document</h3>
-            <button type="button" id="copyRefundedBtn" onclick="copyToClipboard('refundedCollectionOutputJson', this)" disabled>Copy refunded collection</button>
-            <textarea id="refundedCollectionOutputJson" oninput="toggleCopyButton('refundedCollectionOutputJson','copyRefundedBtn')"></textarea>
         </div>
+
+        <div class="card">
+            <h3>Schedule output</h3>
+            <button type="button" id="copyScheduleBtn"
+                onclick="copyToClipboard('outputJson', this)" disabled>
+                Copy schedule
+            </button>
+            <textarea id="outputJson"
+                oninput="toggleCopyButton('outputJson','copyScheduleBtn')"></textarea>
+        </div>
+
+        <div class="card">
+            <h3>Created collection document</h3>
+            <button type="button" id="copyCreatedBtn"
+                onclick="copyToClipboard('createdCollectionOutputJson', this)" disabled>
+                Copy created collection
+            </button>
+            <textarea id="createdCollectionOutputJson"
+                oninput="toggleCopyButton('createdCollectionOutputJson','copyCreatedBtn')"></textarea>
+        </div>
+
+        <div class="card">
+            <h3>Refunded collection document</h3>
+            <button type="button" id="copyRefundedBtn"
+                onclick="copyToClipboard('refundedCollectionOutputJson', this)" disabled>
+                Copy refunded collection
+            </button>
+            <textarea id="refundedCollectionOutputJson"
+                oninput="toggleCopyButton('refundedCollectionOutputJson','copyRefundedBtn')"></textarea>
+        </div>
+
     </div>
 
-    <script>
+     <script>
         const modifiedByInput = document.getElementById("modifiedBy");
         const collectionCreatedDateInput = document.getElementById("collectionCreatedDate");
 
