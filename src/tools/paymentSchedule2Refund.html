@@ -13,12 +13,20 @@
         }
 
         header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
             padding: 20px;
             text-align: center;
             font-size: 24px;
             font-weight: 600;
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(6px);
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            transition: box-shadow 0.2s ease;
+        }
+
+        header.scrolled {
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
         }
 
         .container {
@@ -238,10 +246,19 @@
      <script>
         const modifiedByInput = document.getElementById("modifiedBy");
         const collectionCreatedDateInput = document.getElementById("collectionCreatedDate");
+        const header = document.getElementById("mainHeader");
 
         modifiedByInput.value = localStorage.getItem("modifiedBy") || "";
         modifiedByInput.addEventListener("input", () => {
             localStorage.setItem("modifiedBy", modifiedByInput.value);
+        });
+
+        window.addEventListener("scroll", () => {
+            if (window.scrollY > 10) {
+                header.classList.add("scrolled");
+            } else {
+                header.classList.remove("scrolled");
+            }
         });
 
         let loadedSchedule = null;
