@@ -325,10 +325,11 @@
             const today = now.toISOString().split("T")[0];
             const modifiedBy = modifiedByInput.value || schedule.ModifiedBy;
 
-            schedule.ModifiedBy = modifiedBy;
-
             const createdDateValue = collectionCreatedDateInput.value;
             const isoCreated = createdDateValue ? toOffsetISOString(createdDateValue) : null;
+
+            schedule.ModifiedBy = modifiedBy;
+            schedule.ModifiedDate = nowIso;
 
             const generatedRefundItems = [];
             let totalRefundAmount = 0;
@@ -383,9 +384,9 @@
                     OriginalTransactionReference: null,
                     SourceSystem: "PolicyAdmin",
                     CreatedBy: modifiedBy,
-                    CreatedDate: isoCreated,
+                    CreatedDate: nowIso,
                     ModifiedBy: modifiedBy,
-                    ModifiedDate: isoCreated,
+                    ModifiedDate: nowIso,
                 };
 
                 createdCollectionDoc = {
