@@ -192,10 +192,13 @@
             <div class="schedule-items" id="scheduleItems"></div>
             <button onclick="generateRefund()">Generate refund schedule</button>
             <h3>Schedule output</h3>
+            <button type="button" onclick="copyToClipboard('outputJson')">Copy schedule</button>
             <textarea id="outputJson"></textarea>
             <h3 style="margin-top:15px;">Created collection document</h3>
+            <button type="button" onclick="copyToClipboard('createdCollectionOutputJson')">Copy created collection</button>
             <textarea id="createdCollectionOutputJson"></textarea>
             <h3 style="margin-top:15px;">Refunded collection document</h3>
+            <button type="button" onclick="copyToClipboard('refundedCollectionOutputJson')">Copy refunded collection</button>
             <textarea id="refundedCollectionOutputJson"></textarea>
         </div>
     </div>
@@ -373,7 +376,17 @@
                 : "";
             document.getElementById("refundedCollectionOutputJson").value = refundedCollectionDoc
                 ? JSON.stringify(refundedCollectionDoc, null, 4)
-                : "";("outputJson").value = JSON.stringify(schedule, null, 4);
+                : "";
+        }
+
+        function copyToClipboard(elementId) {
+            const textarea = document.getElementById(elementId);
+            if (!textarea.value) return;
+
+            textarea.select();
+            textarea.setSelectionRange(0, 999999);
+            document.execCommand("copy");
+        }("outputJson").value = JSON.stringify(schedule, null, 4);
         }
     </script>
 </body>
