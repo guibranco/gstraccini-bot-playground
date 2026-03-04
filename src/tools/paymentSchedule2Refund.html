@@ -109,7 +109,7 @@
     </style>
 </head>
 <body>
-    <header>Payment Schedule Refund Generator</header>
+    <header id="mainHeader">Payment Schedule Refund Generator</header>
 
     <div class="container">
 
@@ -212,33 +212,33 @@
         </div>
 
         <div class="card">
-            <h3>Schedule output</h3>
+            <h3>Schedule output</h3>            
+            <textarea id="outputJson"
+                oninput="toggleCopyButton('outputJson','copyScheduleBtn')"></textarea>
             <button type="button" id="copyScheduleBtn"
                 onclick="copyToClipboard('outputJson', this)" disabled>
                 Copy schedule
             </button>
-            <textarea id="outputJson"
-                oninput="toggleCopyButton('outputJson','copyScheduleBtn')"></textarea>
         </div>
 
         <div class="card">
-            <h3>Created collection document</h3>
+            <h3>Created collection document</h3>            
+            <textarea id="createdCollectionOutputJson"
+                oninput="toggleCopyButton('createdCollectionOutputJson','copyCreatedBtn')"></textarea>
             <button type="button" id="copyCreatedBtn"
                 onclick="copyToClipboard('createdCollectionOutputJson', this)" disabled>
                 Copy created collection
             </button>
-            <textarea id="createdCollectionOutputJson"
-                oninput="toggleCopyButton('createdCollectionOutputJson','copyCreatedBtn')"></textarea>
         </div>
 
         <div class="card">
-            <h3>Refunded collection document</h3>
+            <h3>Refunded collection document</h3>            
+            <textarea id="refundedCollectionOutputJson"
+                oninput="toggleCopyButton('refundedCollectionOutputJson','copyRefundedBtn')"></textarea>
             <button type="button" id="copyRefundedBtn"
                 onclick="copyToClipboard('refundedCollectionOutputJson', this)" disabled>
                 Copy refunded collection
             </button>
-            <textarea id="refundedCollectionOutputJson"
-                oninput="toggleCopyButton('refundedCollectionOutputJson','copyRefundedBtn')"></textarea>
         </div>
 
     </div>
@@ -367,7 +367,9 @@
                     RiskId: schedule.RiskId,
                     RiskCode: schedule.RiskCode,
                     RiskMajorVersion: schedule.RiskMajorVersion,
-                    IsRealtime: true,
+                    RerateBatchItemId: null,
+                    IsRenewal: false,
+                    IsRealtime: false,
                     IsResubmission: false,
                     ResubmissionId: null,
                     AmountDue: totalRefundAmount,
@@ -375,47 +377,30 @@
                     DueDate: today,
                     ValueDate: today,
                     CollectionFrequency: schedule.CollectionFrequency,
-                    _ts: Math.floor(Date.now() / 1000)
+                    Sequence: 1,
+                    PaymentMethod: null,
+                    TransactionReference: schedule.PolicyNumber + "-" + schedule.RiskId + "-" + schedule.RiskMajorVersion + "-" + schedule.RiskCode + "-0",
+                    OriginalTransactionReference: null,
+                    SourceSystem: "PolicyAdmin",
+                    CreatedBy: modifiedBy,
+                    CreatedDate: isoCreated,
+                    ModifiedBy: modifiedBy,
+                    ModifiedDate: isoCreated,
                 };
 
                 createdCollectionDoc = {
                     ...deepClone(baseCollection),
                     CollectionStatus: "Created",
                     IsLatest: false,
-                    Sequence: 1,
-                    PaymentMethod: null,
-                    TransactionReference: null,
-                    OriginalTransactionReference: null,
                     ProviderDetails: null,
                     id: crypto.randomUUID() + "-created",
-                    _etag: null,
-                    CreatedBy: modifiedBy,
-                    CreatedDate: isoCreated,
-                    ModifiedBy: modifiedBy,
-                    ModifiedDate: isoCreated,
-                    _rid: null,
-                    _self: null,
-                    _attachments: "attachments/"
                 };
 
                 refundedCollectionDoc = {
                     ...deepClone(baseCollection),
                     CollectionStatus: "Refunded",
                     IsLatest: true,
-                    Sequence: 2,
-                    PaymentMethod: null,
-                    TransactionReference: null,
-                    OriginalTransactionReference: null,
-                    ProviderDetails: null,
                     id: crypto.randomUUID(),
-                    _etag: null,
-                    CreatedBy: modifiedBy,
-                    CreatedDate: nowIso,
-                    ModifiedBy: modifiedBy,
-                    ModifiedDate: nowIso,
-                    _rid: null,
-                    _self: null,
-                    _attachments: "attachments/"
                 };
             }
 
