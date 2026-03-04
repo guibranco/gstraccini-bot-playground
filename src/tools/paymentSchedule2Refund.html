@@ -282,7 +282,7 @@
                 checkbox.type = "checkbox";
                 checkbox.value = index;
                 label.appendChild(checkbox);
-                label.appendChild(document.createTextNode(` ${item.Id} | AmountDue: ${item.AmountDue}`));
+                label.appendChild(document.createTextNode(` ${item.Id} | Amount Due: ${item.AmountDue} | Due date: ${item.DueDate} | Period Start Date: ${item.PeriodStartDate} | Period End Date: ${item.PeriodEndDate}`));
                 container.appendChild(label);
             });
         }
