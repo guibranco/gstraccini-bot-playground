@@ -1,240 +1,798 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8" />
-    <title>Simulador de Projeção em Renda Fixa</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Simulador de Projeção em Renda Fixa</title>
 
-    <style>
-        body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-            color: #fff;
-            margin: 0;
-            padding: 40px;
-        }
+<style>
+    :root {
+        --page-plane: #0d0d0d;
+        --surface-1: #18181a;
+        --surface-2: #101012;
+        --surface-inset: #0a0a0b;
+        --text-primary: #ffffff;
+        --text-secondary: #c3c2b7;
+        --text-muted: #898781;
+        --border: rgba(255, 255, 255, 0.10);
+        --border-strong: rgba(255, 255, 255, 0.16);
+        --gridline: #2c2c2a;
+        --baseline: #383835;
+        --series-1: #3987e5;
+        --series-2: #199e70;
+        --good: #0ca30c;
+        --focus: #5aa6ef;
+    }
 
-        h1 {
-            text-align: center;
-            margin-bottom: 30px;
-        }
+    * { box-sizing: border-box; }
 
-        .container {
-            max-width: 900px;
-            margin: auto;
-            background: #1e293b;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-        }
+    body {
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+        background:
+            radial-gradient(circle at 15% -10%, rgba(57, 135, 229, 0.16), transparent 45%),
+            radial-gradient(circle at 85% 0%, rgba(25, 158, 112, 0.14), transparent 40%),
+            var(--page-plane);
+        color: var(--text-primary);
+        margin: 0;
+        padding: 48px 20px 80px;
+        min-height: 100vh;
+    }
 
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-        }
+    .page {
+        max-width: 980px;
+        margin: 0 auto;
+    }
 
-        label {
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
+    .hero {
+        text-align: center;
+        margin-bottom: 36px;
+    }
 
-        input {
-            width: 100%;
-            padding: 10px;
-            margin-top: 6px;
-            border-radius: 6px;
-            border: none;
-            font-size: 1rem;
-        }
+    .eyebrow {
+        display: inline-block;
+        font-size: 0.78rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--series-2);
+        background: rgba(25, 158, 112, 0.12);
+        border: 1px solid rgba(25, 158, 112, 0.3);
+        padding: 4px 12px;
+        border-radius: 999px;
+        margin-bottom: 14px;
+    }
 
-        .optional {
-            margin-top: 25px;
-            padding: 20px;
-            border-radius: 8px;
-            background: #0f172a;
-        }
+    h1 {
+        margin: 0 0 10px;
+        font-size: clamp(1.6rem, 3vw, 2.2rem);
+        letter-spacing: -0.01em;
+    }
 
-        button {
-            margin-top: 30px;
-            width: 100%;
-            padding: 14px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            border: none;
-            border-radius: 8px;
-            background: #22c55e;
-            color: #022c22;
-            cursor: pointer;
-        }
+    .subtitle {
+        margin: 0 auto;
+        max-width: 520px;
+        color: var(--text-secondary);
+        font-size: 0.98rem;
+        line-height: 1.5;
+    }
 
-        button:hover {
-            background: #16a34a;
-        }
+    .panel {
+        background: var(--surface-1);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 28px;
+        box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
+    }
 
-        .results {
-            margin-top: 40px;
-        }
+    .form-panel {
+        margin-bottom: 24px;
+    }
 
-        .summary {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
+    .field-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 18px;
+    }
 
-        .card {
-            flex: 1;
-            min-width: 200px;
-            background: #020617;
-            padding: 20px;
-            border-radius: 10px;
-        }
+    .field label {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        margin-bottom: 7px;
+    }
 
-        .card h3 {
-            margin: 0 0 10px;
-            font-size: 0.9rem;
-            opacity: 0.8;
-        }
+    .field small {
+        display: block;
+        margin-top: 6px;
+        font-size: 0.76rem;
+        color: var(--text-muted);
+    }
 
-        .card p {
-            margin: 0;
-            font-size: 1.4rem;
-            font-weight: bold;
-        }
+    .input-wrap {
+        display: flex;
+        align-items: stretch;
+        background: var(--surface-inset);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+    .input-wrap:focus-within {
+        border-color: var(--focus);
+        box-shadow: 0 0 0 3px rgba(90, 166, 239, 0.22);
+    }
 
-        th, td {
-            padding: 12px;
-            border-bottom: 1px solid #334155;
-            text-align: center;
-        }
+    .input-wrap .prefix,
+    .input-wrap .suffix {
+        display: flex;
+        align-items: center;
+        padding: 0 12px;
+        font-size: 0.88rem;
+        color: var(--text-muted);
+        background: rgba(255, 255, 255, 0.03);
+        white-space: nowrap;
+    }
 
-        th {
-            background: #020617;
-        }
-    </style>
+    .input-wrap .prefix { border-right: 1px solid var(--border); }
+    .input-wrap .suffix { border-left: 1px solid var(--border); }
+
+    input[type="number"] {
+        flex: 1;
+        min-width: 0;
+        width: 100%;
+        padding: 11px 12px;
+        border: none;
+        background: transparent;
+        color: var(--text-primary);
+        font-size: 1rem;
+        font-variant-numeric: tabular-nums;
+    }
+
+    input[type="number"]:focus { outline: none; }
+
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+        opacity: 0.5;
+    }
+
+    .toggle-section {
+        margin-top: 24px;
+        padding-top: 22px;
+        border-top: 1px dashed var(--border-strong);
+    }
+
+    .switch-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        cursor: pointer;
+        margin-bottom: 18px;
+    }
+
+    .switch-row input[type="checkbox"] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .switch {
+        position: relative;
+        flex-shrink: 0;
+        width: 42px;
+        height: 24px;
+        background: var(--surface-inset);
+        border: 1px solid var(--border-strong);
+        border-radius: 999px;
+        transition: background 0.2s ease;
+    }
+
+    .switch::after {
+        content: "";
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--text-muted);
+        transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .switch-row input:checked + .switch {
+        background: rgba(25, 158, 112, 0.35);
+        border-color: var(--series-2);
+    }
+
+    .switch-row input:checked + .switch::after {
+        transform: translateX(18px);
+        background: var(--series-2);
+    }
+
+    .switch-row input:focus-visible + .switch {
+        box-shadow: 0 0 0 3px rgba(90, 166, 239, 0.3);
+    }
+
+    .switch-label strong {
+        display: block;
+        font-size: 0.92rem;
+    }
+
+    .switch-label small {
+        color: var(--text-muted);
+        font-size: 0.8rem;
+    }
+
+    .increase-fields {
+        transition: opacity 0.2s ease;
+    }
+
+    .increase-fields.is-disabled {
+        opacity: 0.4;
+        pointer-events: none;
+    }
+
+    .cta {
+        margin-top: 26px;
+        width: 100%;
+        padding: 15px;
+        font-size: 1.02rem;
+        font-weight: 700;
+        border: none;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--series-2), #22c58a);
+        color: #04140e;
+        cursor: pointer;
+        transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.15s ease;
+        box-shadow: 0 10px 24px rgba(25, 158, 112, 0.28);
+    }
+
+    .cta:hover { background: linear-gradient(135deg, #1cb37e, #29d69a); }
+    .cta:active { transform: translateY(1px); }
+    .cta:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+    .results-panel-wrap {
+        opacity: 0;
+        transform: translateY(14px);
+        transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+
+    .results-panel-wrap.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .stat-card {
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 18px 20px;
+    }
+
+    .stat-card.highlight {
+        border-color: rgba(25, 158, 112, 0.4);
+        background: linear-gradient(160deg, rgba(25, 158, 112, 0.12), var(--surface-2) 60%);
+    }
+
+    .stat-label {
+        display: block;
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+    }
+
+    .stat-value {
+        display: block;
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+    }
+
+    .stat-value.good { color: var(--good); }
+
+    .chart-card, .table-card {
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 22px;
+        margin-bottom: 20px;
+    }
+
+    .chart-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 14px;
+    }
+
+    .chart-head h2, .table-card h2 {
+        margin: 0;
+        font-size: 1rem;
+        color: var(--text-primary);
+    }
+
+    .legend {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 0.82rem;
+        color: var(--text-secondary);
+    }
+
+    .legend-item i {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .chart-wrap {
+        position: relative;
+    }
+
+    .chart-wrap svg {
+        width: 100%;
+        height: auto;
+        display: block;
+        overflow: visible;
+    }
+
+    .chart-tooltip {
+        position: absolute;
+        pointer-events: none;
+        background: #05070a;
+        border: 1px solid var(--border-strong);
+        border-radius: 10px;
+        padding: 10px 12px;
+        font-size: 0.78rem;
+        color: var(--text-secondary);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.45);
+        opacity: 0;
+        transition: opacity 0.1s ease;
+        white-space: nowrap;
+        z-index: 5;
+    }
+
+    .chart-tooltip strong {
+        display: block;
+        color: var(--text-primary);
+        font-size: 0.85rem;
+        margin-bottom: 4px;
+    }
+
+    .chart-tooltip .row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 2px;
+    }
+
+    .chart-tooltip .row i {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .table-scroll {
+        max-height: 340px;
+        overflow-y: auto;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+    }
+
+    th, td {
+        padding: 12px 14px;
+        text-align: right;
+        border-bottom: 1px solid var(--border);
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+    }
+
+    th:first-child, td:first-child { text-align: left; font-variant-numeric: normal; }
+
+    th {
+        position: sticky;
+        top: 0;
+        background: #131315;
+        color: var(--text-muted);
+        font-size: 0.76rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        font-weight: 600;
+        z-index: 1;
+    }
+
+    tbody tr:hover { background: rgba(255, 255, 255, 0.03); }
+    tbody tr:last-child td { border-bottom: none; }
+
+    .footnote {
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.78rem;
+        margin-top: 28px;
+    }
+
+    @media (max-width: 560px) {
+        .panel { padding: 20px; border-radius: 16px; }
+        th, td { padding: 10px; font-size: 0.82rem; }
+    }
+</style>
 </head>
 <body>
 
-<h1>📈 Simulador de Projeção em Renda Fixa</h1>
+<div class="page">
+    <header class="hero">
+        <span class="eyebrow">Renda fixa · Juros compostos</span>
+        <h1>Simulador de Projeção Patrimonial</h1>
+        <p class="subtitle">Estime como aportes mensais recorrentes evoluem ao longo dos anos, com reajustes periódicos opcionais no valor investido.</p>
+    </header>
 
-<div class="container">
-    <div class="grid">
-        <div>
-            <label>Valor mensal inicial (R$)</label>
-            <input id="initialValue" type="number" value="100" />
-        </div>
+    <section class="panel form-panel">
+        <form id="simForm">
+            <div class="field-grid">
+                <div class="field">
+                    <label for="initialValue">Aporte mensal inicial</label>
+                    <div class="input-wrap">
+                        <span class="prefix">R$</span>
+                        <input id="initialValue" type="number" min="0" step="0.01" value="100" required />
+                    </div>
+                </div>
 
-        <div>
-            <label>Período (anos)</label>
-            <input id="years" type="number" value="30" />
-        </div>
+                <div class="field">
+                    <label for="years">Período de investimento</label>
+                    <div class="input-wrap">
+                        <input id="years" type="number" min="1" max="80" step="1" value="30" required />
+                        <span class="suffix">anos</span>
+                    </div>
+                </div>
 
-        <div>
-            <label>Taxa anual (%)</label>
-            <input id="rate" type="number" value="15" />
-        </div>
+                <div class="field">
+                    <label for="rate">Taxa de juros anual</label>
+                    <div class="input-wrap">
+                        <input id="rate" type="number" step="0.01" value="15" required />
+                        <span class="suffix">% a.a.</span>
+                    </div>
+                    <small>Ex.: o CDI histórico costuma girar entre 10% e 14% a.a.</small>
+                </div>
+            </div>
+
+            <div class="toggle-section">
+                <label class="switch-row">
+                    <input type="checkbox" id="increaseEnabled" checked />
+                    <span class="switch"></span>
+                    <span class="switch-label">
+                        <strong>Reajuste programado do aporte</strong>
+                        <small>Aumente o valor investido periodicamente ao longo do tempo</small>
+                    </span>
+                </label>
+
+                <div class="field-grid increase-fields" id="increaseFields">
+                    <div class="field">
+                        <label for="increaseYears">Frequência do reajuste</label>
+                        <div class="input-wrap">
+                            <input id="increaseYears" type="number" min="1" step="1" value="5" />
+                            <span class="suffix">anos</span>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="increasePercent">Aumento no aporte</label>
+                        <div class="input-wrap">
+                            <input id="increasePercent" type="number" step="0.01" value="100" />
+                            <span class="suffix">%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="cta">Calcular projeção</button>
+        </form>
+    </section>
+
+    <div class="results-panel-wrap" id="resultsWrap">
+        <section class="panel results-panel" id="results">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-label">Total investido</span>
+                    <span class="stat-value" id="totalInvested">—</span>
+                </div>
+                <div class="stat-card highlight">
+                    <span class="stat-label">Saldo final</span>
+                    <span class="stat-value" id="finalBalance">—</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Juros acumulados</span>
+                    <span class="stat-value" id="totalInterest">—</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Rentabilidade sobre o investido</span>
+                    <span class="stat-value good" id="profitability">—</span>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-head">
+                    <h2>Evolução do patrimônio</h2>
+                    <div class="legend">
+                        <span class="legend-item"><i style="background:var(--series-1)"></i>Total investido</span>
+                        <span class="legend-item"><i style="background:var(--series-2)"></i>Saldo acumulado</span>
+                    </div>
+                </div>
+                <div class="chart-wrap" id="chartWrap"></div>
+            </div>
+
+            <div class="table-card">
+                <h2>Detalhamento por período</h2>
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Período</th>
+                                <th>Aporte mensal</th>
+                                <th>Investido no período</th>
+                                <th>Saldo ao final</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
     </div>
 
-    <div class="optional">
-        <h3>🔁 Regra opcional de aumento</h3>
-
-        <div class="grid">
-            <div>
-                <label>A cada quantos anos</label>
-                <input id="increaseYears" type="number" value="5" />
-            </div>
-
-            <div>
-                <label>Aumento percentual (%)</label>
-                <input id="increasePercent" type="number" value="100" />
-            </div>
-        </div>
-    </div>
-
-    <button onclick="calculate()">Calcular projeção</button>
-
-    <div class="results" id="results" style="display:none;">
-        <div class="summary">
-            <div class="card">
-                <h3>Total investido</h3>
-                <p id="totalInvested"></p>
-            </div>
-
-            <div class="card">
-                <h3>Saldo final</h3>
-                <p id="finalBalance"></p>
-            </div>
-        </div>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Período</th>
-                    <th>Valor mensal (R$)</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-        </table>
-    </div>
+    <p class="footnote">Simulação apenas para fins educativos. Não constitui recomendação de investimento.</p>
 </div>
 
 <script>
+    const currencyFmt = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 2 });
+    const compactCurrencyFmt = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", notation: "compact", maximumFractionDigits: 1 });
+    const percentFmt = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 1 });
+
+    const increaseEnabledEl = document.getElementById("increaseEnabled");
+    const increaseFieldsEl = document.getElementById("increaseFields");
+    const resultsWrap = document.getElementById("resultsWrap");
+    const chartWrap = document.getElementById("chartWrap");
+
+    function syncIncreaseFields() {
+        increaseFieldsEl.classList.toggle("is-disabled", !increaseEnabledEl.checked);
+    }
+    increaseEnabledEl.addEventListener("change", syncIncreaseFields);
+    syncIncreaseFields();
+
+    document.getElementById("simForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        calculate();
+    });
+
     function calculate() {
-        const initialValue = parseFloat(document.getElementById("initialValue").value);
-        const years = parseInt(document.getElementById("years").value);
-        const rateAnnual = parseFloat(document.getElementById("rate").value) / 100;
+        const initialValue = parseFloat(document.getElementById("initialValue").value) || 0;
+        const years = Math.max(1, parseInt(document.getElementById("years").value) || 0);
+        const rateAnnual = (parseFloat(document.getElementById("rate").value) || 0) / 100;
 
-        const increaseYears = parseInt(document.getElementById("increaseYears").value);
-        const increasePercent = parseFloat(document.getElementById("increasePercent").value) / 100;
+        const increaseEnabled = increaseEnabledEl.checked;
+        const increaseYears = increaseEnabled ? (parseInt(document.getElementById("increaseYears").value) || 0) : 0;
+        const increasePercent = (parseFloat(document.getElementById("increasePercent").value) || 0) / 100;
 
-        const months = years * 12;
         const rateMonthly = Math.pow(1 + rateAnnual, 1 / 12) - 1;
 
         let monthlyValue = initialValue;
         let balance = 0;
         let totalInvested = 0;
 
-        const tableBody = document.getElementById("tableBody");
-        tableBody.innerHTML = "";
+        const yearPoints = [{ year: 0, invested: 0, balance: 0 }];
+        const periods = [];
+        let periodStartYear = 0;
+        let periodInvested = 0;
 
         for (let year = 0; year < years; year++) {
             if (year > 0 && increaseYears > 0 && year % increaseYears === 0) {
+                periods.push({
+                    start: periodStartYear,
+                    end: year,
+                    monthlyValue: monthlyValue,
+                    invested: periodInvested,
+                    balanceAtEnd: balance,
+                });
+                periodStartYear = year;
+                periodInvested = 0;
                 monthlyValue *= (1 + increasePercent);
             }
-
-            const periodStart = year;
-            const periodEnd = year + 1;
 
             for (let m = 0; m < 12; m++) {
                 balance = balance * (1 + rateMonthly) + monthlyValue;
                 totalInvested += monthlyValue;
+                periodInvested += monthlyValue;
             }
 
-            if (
-                increaseYears === 0 ||
-                year % increaseYears === 0
-            ) {
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>${periodStart} – ${periodEnd} anos</td>
-                    <td>R$ ${monthlyValue.toFixed(2)}</td>
-                `;
-                tableBody.appendChild(row);
-            }
+            yearPoints.push({ year: year + 1, invested: totalInvested, balance: balance });
         }
 
-        document.getElementById("totalInvested").innerText =
-            "R$ " + totalInvested.toFixed(2);
+        periods.push({
+            start: periodStartYear,
+            end: years,
+            monthlyValue: monthlyValue,
+            invested: periodInvested,
+            balanceAtEnd: balance,
+        });
 
-        document.getElementById("finalBalance").innerText =
-            "R$ " + balance.toFixed(2);
+        renderStats(totalInvested, balance);
+        renderTable(periods);
+        renderChart(yearPoints);
 
-        document.getElementById("results").style.display = "block";
+        resultsWrap.hidden = false;
+        requestAnimationFrame(() => resultsWrap.classList.add("is-visible"));
+        document.getElementById("results").scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    function renderStats(totalInvested, balance) {
+        const interest = balance - totalInvested;
+        const profitability = totalInvested > 0 ? (interest / totalInvested) * 100 : 0;
+
+        document.getElementById("totalInvested").textContent = currencyFmt.format(totalInvested);
+        document.getElementById("finalBalance").textContent = currencyFmt.format(balance);
+        document.getElementById("totalInterest").textContent = currencyFmt.format(interest);
+        document.getElementById("profitability").textContent = "+" + percentFmt.format(profitability) + "%";
+    }
+
+    function renderTable(periods) {
+        const tableBody = document.getElementById("tableBody");
+        tableBody.innerHTML = "";
+
+        periods.forEach((p) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${p.start} – ${p.end} anos</td>
+                <td>${currencyFmt.format(p.monthlyValue)}</td>
+                <td>${currencyFmt.format(p.invested)}</td>
+                <td>${currencyFmt.format(p.balanceAtEnd)}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    function renderChart(points) {
+        const width = 760;
+        const height = 340;
+        const margin = { top: 16, right: 16, bottom: 30, left: 64 };
+        const innerW = width - margin.left - margin.right;
+        const innerH = height - margin.top - margin.bottom;
+
+        const maxYear = points[points.length - 1].year;
+        const maxValue = Math.max(1, points[points.length - 1].balance);
+
+        const xScale = (year) => margin.left + (year / maxYear) * innerW;
+        const yScale = (value) => margin.top + innerH - (value / maxValue) * innerH;
+
+        const gridSteps = 4;
+        let gridLines = "";
+        let gridLabels = "";
+        for (let i = 0; i <= gridSteps; i++) {
+            const value = (maxValue / gridSteps) * i;
+            const y = yScale(value);
+            gridLines += `<line x1="${margin.left}" y1="${y}" x2="${width - margin.right}" y2="${y}" stroke="var(--gridline)" stroke-width="1" />`;
+            gridLabels += `<text x="${margin.left - 10}" y="${y + 4}" text-anchor="end" font-size="11" fill="var(--text-muted)">${compactCurrencyFmt.format(value)}</text>`;
+        }
+
+        const tickCount = Math.min(maxYear, 6);
+        const tickStep = Math.max(1, Math.ceil(maxYear / tickCount));
+        let xLabels = "";
+        for (let year = 0; year <= maxYear; year += tickStep) {
+            xLabels += `<text x="${xScale(year)}" y="${height - margin.bottom + 20}" text-anchor="middle" font-size="11" fill="var(--text-muted)">${year}a</text>`;
+        }
+
+        const investedPath = points.map((p, i) => `${i === 0 ? "M" : "L"}${xScale(p.year)},${yScale(p.invested)}`).join(" ");
+        const balancePath = points.map((p, i) => `${i === 0 ? "M" : "L"}${xScale(p.year)},${yScale(p.balance)}`).join(" ");
+        const balanceAreaPath = `${balancePath} L${xScale(maxYear)},${yScale(0)} L${xScale(0)},${yScale(0)} Z`;
+
+        const last = points[points.length - 1];
+
+        chartWrap.innerHTML = `
+            <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Gráfico de evolução do total investido e do saldo acumulado ao longo do tempo">
+                <defs>
+                    <linearGradient id="balanceGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="var(--series-2)" stop-opacity="0.28" />
+                        <stop offset="100%" stop-color="var(--series-2)" stop-opacity="0.02" />
+                    </linearGradient>
+                </defs>
+                <line x1="${margin.left}" y1="${margin.top + innerH}" x2="${width - margin.right}" y2="${margin.top + innerH}" stroke="var(--baseline)" stroke-width="1" />
+                ${gridLines}
+                ${gridLabels}
+                ${xLabels}
+                <path d="${balanceAreaPath}" fill="url(#balanceGradient)" stroke="none" />
+                <path d="${investedPath}" fill="none" stroke="var(--series-1)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+                <path d="${balancePath}" fill="none" stroke="var(--series-2)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+                <circle cx="${xScale(last.year)}" cy="${yScale(last.invested)}" r="4" fill="var(--series-1)" stroke="var(--surface-2)" stroke-width="2" />
+                <circle cx="${xScale(last.year)}" cy="${yScale(last.balance)}" r="4" fill="var(--series-2)" stroke="var(--surface-2)" stroke-width="2" />
+                <line id="crosshair" x1="0" y1="${margin.top}" x2="0" y2="${margin.top + innerH}" stroke="var(--border-strong)" stroke-width="1" style="display:none" />
+                <circle id="hoverInvested" r="5" fill="var(--series-1)" stroke="var(--surface-2)" stroke-width="2" style="display:none" />
+                <circle id="hoverBalance" r="5" fill="var(--series-2)" stroke="var(--surface-2)" stroke-width="2" style="display:none" />
+                <rect id="hoverCapture" x="${margin.left}" y="${margin.top}" width="${innerW}" height="${innerH}" fill="transparent" />
+            </svg>
+            <div class="chart-tooltip" id="chartTooltip"></div>
+        `;
+
+        const svg = chartWrap.querySelector("svg");
+        const capture = chartWrap.querySelector("#hoverCapture");
+        const crosshair = chartWrap.querySelector("#crosshair");
+        const hoverInvested = chartWrap.querySelector("#hoverInvested");
+        const hoverBalance = chartWrap.querySelector("#hoverBalance");
+        const tooltip = chartWrap.querySelector("#chartTooltip");
+
+        function handleMove(clientX, clientY) {
+            const rect = svg.getBoundingClientRect();
+            const scale = width / rect.width;
+            const svgX = (clientX - rect.left) * scale;
+            const year = Math.round(((svgX - margin.left) / innerW) * maxYear);
+            const clampedYear = Math.max(0, Math.min(maxYear, year));
+            const point = points[clampedYear];
+            if (!point) return;
+
+            const px = xScale(point.year);
+            crosshair.setAttribute("x1", px);
+            crosshair.setAttribute("x2", px);
+            crosshair.style.display = "block";
+
+            hoverInvested.setAttribute("cx", px);
+            hoverInvested.setAttribute("cy", yScale(point.invested));
+            hoverInvested.style.display = "block";
+
+            hoverBalance.setAttribute("cx", px);
+            hoverBalance.setAttribute("cy", yScale(point.balance));
+            hoverBalance.style.display = "block";
+
+            tooltip.innerHTML = `
+                <strong>Ano ${point.year}</strong>
+                <div class="row"><i style="background:var(--series-1)"></i>Investido: ${currencyFmt.format(point.invested)}</div>
+                <div class="row"><i style="background:var(--series-2)"></i>Saldo: ${currencyFmt.format(point.balance)}</div>
+            `;
+
+            const wrapRect = chartWrap.getBoundingClientRect();
+            const displayScale = rect.width / width;
+            let left = (px * displayScale);
+            const tooltipWidth = 190;
+            if (left + tooltipWidth > wrapRect.width) left = wrapRect.width - tooltipWidth;
+            tooltip.style.left = Math.max(0, left) + "px";
+            tooltip.style.top = "0px";
+            tooltip.style.opacity = "1";
+        }
+
+        function hide() {
+            crosshair.style.display = "none";
+            hoverInvested.style.display = "none";
+            hoverBalance.style.display = "none";
+            tooltip.style.opacity = "0";
+        }
+
+        capture.addEventListener("mousemove", (e) => handleMove(e.clientX, e.clientY));
+        capture.addEventListener("mouseleave", hide);
+        capture.addEventListener("touchmove", (e) => {
+            if (e.touches[0]) handleMove(e.touches[0].clientX, e.touches[0].clientY);
+        }, { passive: true });
+        capture.addEventListener("touchend", hide);
     }
 </script>
 
