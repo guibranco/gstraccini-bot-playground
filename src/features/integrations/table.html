@@ -12,23 +12,131 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 
     <style>
-        .input-container {
-            margin: 2rem auto;
-            width: 50%;
+        :root {
+            --primary-blue: #2563eb;
+            --dark-blue: #1e40af;
+            --light-blue: #3b82f6;
+            --accent-blue: #60a5fa;
+            --bg-blue: #eff6ff;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --border-color: #e2e8f0;
+            --success-green: #10b981;
+            --danger-red: #ef4444;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        .main-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .header-section {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.2);
+        }
+
+        .header-section h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+
+        .header-section p {
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        .account-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-color);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .input-group .form-control {
+            border-radius: 0.75rem 0 0 0.75rem;
+        }
+
+        .input-group-text {
+            border: 2px solid var(--border-color);
+            border-left: none;
+            border-radius: 0 0.75rem 0.75rem 0;
+            background: var(--bg-blue);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-blue), var(--light-blue));
+            border: none;
+            border-radius: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+            background: linear-gradient(135deg, var(--dark-blue), var(--primary-blue));
         }
 
         .badge-healthy {
-            background-color: #76ca61;
+            background-color: var(--success-green);
             color: white;
         }
 
         .badge-unhealthy {
-            background-color: #ee3535;
+            background-color: var(--danger-red);
             color: white;
         }
 
         .badge-checking {
-            background-color: #6c757d;
+            background-color: var(--text-light);
             color: white;
         }
 
@@ -42,6 +150,30 @@
             margin-right: 10px;
         }
 
+        .table {
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .table thead th {
+            background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
+            color: white;
+            border: none;
+            font-weight: 600;
+            padding: 1rem;
+        }
+
+        .table tbody td {
+            padding: 1rem;
+            border-color: var(--border-color);
+            vertical-align: middle;
+        }
+
+        .table tbody tr:hover {
+            background-color: var(--bg-blue);
+        }
+
         .integration-table img {
             height: 30px;
             width: auto;
@@ -49,49 +181,64 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Provider Selection -->
-        <div class="input-container">
-            <label for="providerSelect" class="form-label">Select Provider</label>
-            <select id="providerSelect" class="form-select">
-                <option value="" disabled selected>Choose a provider...</option>
-                <option value="provider1" data-logo="https://via.placeholder.com/50?text=P1">Provider 1</option>
-                <option value="provider2" data-logo="https://via.placeholder.com/50?text=P2">Provider 2</option>
-                <option value="provider3" data-logo="https://via.placeholder.com/50?text=P3">Provider 3</option>
-            </select>
+    <div class="main-container">
+        <div class="header-section">
+            <h1>
+                <div class="header-icon">
+                    <i class="fas fa-plug"></i>
+                </div>
+                <div>Provider Integrations</div>
+            </h1>
+            <p>Connect and manage API keys for third-party providers.</p>
         </div>
 
-        <!-- API Key Input -->
-        <div class="input-container">
-            <label for="apiKey" class="form-label">API Key</label>
-            <div class="input-group">
-                <input type="password" id="apiKey" class="form-control" placeholder="Enter API Key" aria-label="API Key">
-                <span class="input-group-text">
-                    <i id="toggleVisibility" class="fas fa-eye icon-btn"></i>
-                </span>
+        <!-- Provider Selection & API Key -->
+        <div class="account-card">
+            <div class="mb-3">
+                <label for="providerSelect" class="form-label">Select Provider</label>
+                <select id="providerSelect" class="form-select">
+                    <option value="" disabled selected>Choose a provider...</option>
+                    <option value="provider1" data-logo="https://via.placeholder.com/50?text=P1">Provider 1</option>
+                    <option value="provider2" data-logo="https://via.placeholder.com/50?text=P2">Provider 2</option>
+                    <option value="provider3" data-logo="https://via.placeholder.com/50?text=P3">Provider 3</option>
+                </select>
             </div>
-            <div class="d-flex justify-content-between mt-2">
-                <span id="badgeStatus" class="badge" style="display:none;"></span>
-                <button class="btn btn-primary" id="saveBtn">Save API Key</button>
+
+            <div class="mb-2">
+                <label for="apiKey" class="form-label">API Key</label>
+                <div class="input-group">
+                    <input type="password" id="apiKey" class="form-control" placeholder="Enter API Key" aria-label="API Key">
+                    <span class="input-group-text">
+                        <i id="toggleVisibility" class="fas fa-eye icon-btn"></i>
+                    </span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <span id="badgeStatus" class="badge" style="display:none;"></span>
+                    <button class="btn btn-primary ms-auto" id="saveBtn">
+                        <i class="fas fa-save me-2"></i>Save API Key
+                    </button>
+                </div>
             </div>
         </div>
 
         <!-- Integrations Table -->
-        <div class="mt-5">
-            <h5>Integrations</h5>
-            <table class="table table-bordered integration-table">
-                <thead>
-                    <tr>
-                        <th>Provider</th>
-                        <th>API Key</th>
-                        <th>Status</th>
-                        <th>Last Usage</th>
-                        <th>Last Error</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="integrationsTableBody"></tbody>
-            </table>
+        <div class="account-card">
+            <h5 class="mb-3"><i class="fas fa-list me-2 text-primary"></i>Integrations</h5>
+            <div class="table-responsive">
+                <table class="table integration-table">
+                    <thead>
+                        <tr>
+                            <th>Provider</th>
+                            <th>API Key</th>
+                            <th>Status</th>
+                            <th>Last Usage</th>
+                            <th>Last Error</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="integrationsTableBody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 

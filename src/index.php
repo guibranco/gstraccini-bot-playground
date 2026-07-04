@@ -50,6 +50,55 @@ function read($dir)
     }
 }
 
+/**
+ * Same as read(), but renders entries under functional sub-headings.
+ * Files not listed in $groups fall back into an "Other" group so nothing gets lost.
+ *
+ * @param array<string, string[]> $groups Sub-heading label => file names in that group
+ */
+function readGrouped($dir, $groups)
+{
+    $ignorePaths = array(".", "..");
+    $ignoredExtensions = array("css", "js", "json", "log", "md", "sql", "template", "txt", "xml");
+
+    $labels = [];
+    $handle = opendir($dir);
+    while ($file = readdir($handle)) {
+        if (in_array($file, $ignorePaths)) {
+            continue;
+        }
+
+        $filePath = $dir . "/" . $file;
+
+        if (is_dir($filePath)) {
+            $labels[$file] = preg_replace('/(?<!^)([A-Z])/', ' \\1', $file);
+        } elseif (is_file($filePath)) {
+            $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+            if (in_array($ext, $ignoredExtensions)) {
+                continue;
+            }
+            $labels[$file] = $file;
+        }
+    }
+    closedir($handle);
+
+    $groups['Other'] = array_diff(array_keys($labels), ...array_values($groups));
+
+    foreach ($groups as $groupLabel => $fileNames) {
+        $fileNames = array_values(array_intersect($fileNames, array_keys($labels)));
+        if ($fileNames === []) {
+            continue;
+        }
+        sort($fileNames, SORT_STRING | SORT_FLAG_CASE);
+
+        echo "<li class='list-group-item group-heading'>" . htmlspecialchars($groupLabel) . "</li>\r\n";
+        foreach ($fileNames as $file) {
+            echo "<li class='list-group-item'><a href='" . htmlspecialchars($dir . "/" . $file) . "'>" .
+                htmlspecialchars($labels[$file]) . "</a></li>\r\n";
+        }
+    }
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -158,6 +207,19 @@ function read($dir)
 
         .list-group-item:last-child {
             border-bottom: none;
+        }
+
+        .group-heading {
+            padding: 0.75rem 2rem 0.25rem !important;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #adb5bd;
+        }
+
+        .group-heading:first-child {
+            padding-top: 1.25rem !important;
         }
 
         .list-group-item a {
@@ -314,7 +376,13 @@ function read($dir)
                         Pages
                     </div>
                     <ul class="list-group list-group-flush">
-                        <?php read($pagesDir) ?>
+                        <?php
+                        readGrouped($pagesDir, [
+                            'Account & Security' => ['login.html', 'my-account.html', 'my-account-password-validation.html', 'security-settings.html'],
+                            'Notifications' => ['notifications.html', 'notifications-new.html'],
+                            'Repositories & Pull Requests' => ['commit.html', 'pull-request.html', 'repositories.html', 'repositories-new.html'],
+                        ]);
+                        ?>
                     </ul>
                 </div>
             </div>
