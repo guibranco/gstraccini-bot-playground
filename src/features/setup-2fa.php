@@ -1,37 +1,60 @@
 <?php
-require 'vendor/autoload.php';
+
+declare(strict_types=1);
+
+require __DIR__ . '/../../vendor/autoload.php';
 
 use Sonata\GoogleAuthenticator\GoogleAuthenticator;
 use Sonata\GoogleAuthenticator\GoogleQrUrl;
 
 session_start();
 
-// Initialize Google Authenticator
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 $gAuth = new GoogleAuthenticator();
 
 if (!isset($_SESSION['2fa_secret'])) {
     $_SESSION['2fa_secret'] = $gAuth->generateSecret();
 }
 
-// Handle form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $userCode = $_POST['2fa_code'] ?? null;
+$message = null;
+$messageType = 'info';
 
-    if ($gAuth->checkCode($_SESSION['2fa_secret'], $userCode)) {
-        $_SESSION['2fa_enabled'] = true;
-        $message = '2FA enabled successfully!';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $token = $_POST['csrf_token'] ?? '';
+
+    if (!hash_equals($_SESSION['csrf_token'], $token)) {
+        $message = 'Sessão expirada. Recarregue a página e tente novamente.';
+        $messageType = 'danger';
     } else {
-        $message = 'Invalid code. Please try again.';
+        $userCode = trim((string) ($_POST['2fa_code'] ?? ''));
+
+        if ($userCode === '' || !ctype_digit($userCode)) {
+            $message = 'Informe o código de 6 dígitos gerado pelo aplicativo autenticador.';
+            $messageType = 'warning';
+        } elseif ($gAuth->checkCode($_SESSION['2fa_secret'], $userCode)) {
+            $_SESSION['2fa_enabled'] = true;
+            $message = 'Autenticação de dois fatores ativada com sucesso!';
+            $messageType = 'success';
+        } else {
+            $message = 'Código inválido. Tente novamente.';
+            $messageType = 'danger';
+        }
     }
 }
+
+$issuer = 'GStraccini-bot Playground';
+$accountName = 'sessao-' . substr(session_id(), 0, 8);
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2FA Setup</title>
+    <title>Configuração de 2FA</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- FontAwesome -->
@@ -39,37 +62,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
 <div class="container mt-5">
-    <h2>Two-Factor Authentication Setup</h2>
+    <h2>Configuração de Autenticação de Dois Fatores</h2>
 
-    <?php if (isset($message)): ?>
-        <div class="alert alert-info">
-            <?php echo $message; ?>
+    <?php if ($message !== null): ?>
+        <div class="alert alert-<?php echo htmlspecialchars($messageType, ENT_QUOTES); ?>">
+            <?php echo htmlspecialchars($message, ENT_QUOTES); ?>
         </div>
     <?php endif; ?>
 
     <div class="row">
         <div class="col-md-6">
-            <?php if (!isset($_SESSION['2fa_enabled']) || !$_SESSION['2fa_enabled']): ?>
-                <h4>Scan the QR code below with Google Authenticator</h4>
-                <p>Secret: <strong><?php echo $_SESSION['2fa_secret']; ?></strong></p>
-                <img src="<?php echo GoogleQrUrl::generate('YourAppName', $_SESSION['2fa_secret'], 'YourAppDomain'); ?>" alt="QR Code" class="img-fluid mb-4">
+            <?php if (empty($_SESSION['2fa_enabled'])): ?>
+                <h4>Escaneie o QR code abaixo com o Google Authenticator</h4>
+                <p>Chave secreta: <strong><?php echo htmlspecialchars($_SESSION['2fa_secret'], ENT_QUOTES); ?></strong></p>
+                <img src="<?php echo htmlspecialchars(GoogleQrUrl::generate($accountName, $_SESSION['2fa_secret'], $issuer), ENT_QUOTES); ?>" alt="QR Code" class="img-fluid mb-4">
 
                 <form method="POST">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES); ?>">
                     <div class="mb-3">
-                        <label for="2fa_code" class="form-label">Enter the code from your app:</label>
-                        <input type="text" id="2fa_code" name="2fa_code" class="form-control" placeholder="123456" required>
+                        <label for="2fa_code" class="form-label">Digite o código do aplicativo:</label>
+                        <input type="text" id="2fa_code" name="2fa_code" class="form-control" placeholder="123456" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required>
                     </div>
                     <button type="submit" class="btn btn-primary">
-                        <i class="fa fa-shield-alt"></i> Enable 2FA
+                        <i class="fa fa-shield-alt"></i> Ativar 2FA
                     </button>
                 </form>
             <?php else: ?>
                 <div class="alert alert-success">
-                    2FA is already enabled.
+                    O 2FA já está ativado.
                 </div>
-                <form method="POST" action="disable_2fa.php">
+                <form method="POST" action="disable-2fa.php">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES); ?>">
                     <button type="submit" class="btn btn-danger">
-                        <i class="fa fa-times-circle"></i> Disable 2FA
+                        <i class="fa fa-times-circle"></i> Desativar 2FA
                     </button>
                 </form>
             <?php endif; ?>
