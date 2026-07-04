@@ -1,48 +1,46 @@
 <?php
-require 'vendor/autoload.php';
 
+declare(strict_types=1);
+
+require __DIR__ . '/bootstrap.php';
+
+use Webauthn\AuthenticatorSelectionCriteria;
 use Webauthn\PublicKeyCredentialCreationOptions;
+use Webauthn\PublicKeyCredentialParameters;
 use Webauthn\PublicKeyCredentialRpEntity;
 use Webauthn\PublicKeyCredentialUserEntity;
-use Webauthn\AuthenticatorSelectionCriteria;
-use Webauthn\PublicKeyCredentialParameters;
-use Webauthn\PublicKeyCredentialDescriptor;
-use Webauthn\PublicKeyCredentialSource;
-use Webauthn\AuthenticatorAssertionResponse;
-use Webauthn\PublicKeyCredentialRequestOptions;
 
-session_start();
+$username = trim($_GET['username'] ?? '');
+if ($username === '') {
+    fido_json_error(400, 'Informe um nome de usuário.');
+}
 
-// FIDO2 Registration Setup
-$rpEntity = new PublicKeyCredentialRpEntity(
-    'Your Application Name', // Display Name
-    'your-app-domain.com'    // ID (domain)
+$rpEntity = PublicKeyCredentialRpEntity::create(FIDO_RP_NAME, FIDO_RP_ID);
+$userEntity = PublicKeyCredentialUserEntity::create($username, fido_user_handle($username), $username);
+
+$excludeCredentials = array_map(
+    static fn($record) => $record->getPublicKeyCredentialDescriptor(),
+    $credentialStore->findAllForUsername($username)
 );
 
-$userEntity = new PublicKeyCredentialUserEntity(
-    'user@example.com',      // User Email or unique username
-    '123456',                // Unique User ID (binary form)
-    'User Display Name'      // Display Name
-);
-
-$pubKeyCredParams = [
-    new PublicKeyCredentialParameters('public-key', -7),  // Alg -7 is for ES256 (Elliptic Curve)
-];
-
-// Set registration options
-$authenticatorSelectionCriteria = new AuthenticatorSelectionCriteria();
-$authenticatorSelectionCriteria->setUserVerification(AuthenticatorSelectionCriteria::USER_VERIFICATION_REQUIREMENT_PREFERRED);
-
-$creationOptions = new PublicKeyCredentialCreationOptions(
+$creationOptions = PublicKeyCredentialCreationOptions::create(
     $rpEntity,
     $userEntity,
-    random_bytes(16),        // Challenge
-    $pubKeyCredParams
+    random_bytes(32),
+    [
+        PublicKeyCredentialParameters::createPk(-7),   // ES256
+        PublicKeyCredentialParameters::createPk(-257),  // RS256
+    ],
+    AuthenticatorSelectionCriteria::create(
+        userVerification: AuthenticatorSelectionCriteria::USER_VERIFICATION_REQUIREMENT_PREFERRED
+    ),
+    PublicKeyCredentialCreationOptions::ATTESTATION_CONVEYANCE_PREFERENCE_NONE,
+    $excludeCredentials
 );
 
-$_SESSION['challenge'] = $creationOptions->getChallenge();  // Save challenge in session
+$_SESSION['fido_ceremony'] = 'register';
+$_SESSION['fido_username'] = $username;
+$_SESSION['fido_options'] = $webauthnSerializer->serialize($creationOptions, 'json');
 
-// JSON encode options and return to frontend
 header('Content-Type: application/json');
-echo json_encode($creationOptions);
-?>
+echo $_SESSION['fido_options'];

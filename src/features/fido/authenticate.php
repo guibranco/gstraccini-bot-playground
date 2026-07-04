@@ -1,44 +1,36 @@
 <?php
-require 'vendor/autoload.php';
+
+declare(strict_types=1);
+
+require __DIR__ . '/bootstrap.php';
 
 use Webauthn\PublicKeyCredentialRequestOptions;
-use Webauthn\PublicKeyCredentialSourceRepository;
-use Webauthn\PublicKeyCredentialDescriptor;
 
-session_start();
-
-// Dummy user credential source repository (replace with your DB logic)
-class SimpleCredentialSourceRepository implements PublicKeyCredentialSourceRepository {
-    public function findAllForUserEntity($userEntity) {
-        // You need to fetch all credentials for the user from your DB/storage
-        // Example:
-        return [new PublicKeyCredentialDescriptor('public-key', base64_decode('credential_id'))];
-    }
+$username = trim($_GET['username'] ?? '');
+if ($username === '') {
+    fido_json_error(400, 'Informe um nome de usuário.');
 }
 
-// Fetch stored credentials for the user (replace '123456' with your user's unique ID)
-$credentialRepository = new SimpleCredentialSourceRepository();
-$userEntity = '123456';  // Replace with the current user's unique ID
-
-$storedCredentials = $credentialRepository->findAllForUserEntity($userEntity);
-
-if (!$storedCredentials) {
-    echo json_encode(['error' => 'No credentials registered for this user']);
-    exit();
+$credentials = $credentialStore->findAllForUsername($username);
+if ($credentials === []) {
+    fido_json_error(404, 'Nenhum dispositivo FIDO registrado para este usuário.');
 }
 
-// Create request options for FIDO authentication
-$challenge = random_bytes(32);
-$requestOptions = new PublicKeyCredentialRequestOptions(
-    $challenge,         // Challenge to be verified with the authenticator
-    60000,              // Timeout in milliseconds
-    'your-app-domain.com',  // The relying party ID (usually your domain)
-    $storedCredentials  // List of credential descriptors (user's registered credentials)
+$allowCredentials = array_map(
+    static fn($record) => $record->getPublicKeyCredentialDescriptor(),
+    $credentials
 );
 
-$_SESSION['challenge'] = $requestOptions->getChallenge();  // Save challenge in session
+$requestOptions = PublicKeyCredentialRequestOptions::create(
+    random_bytes(32),
+    FIDO_RP_ID,
+    $allowCredentials,
+    PublicKeyCredentialRequestOptions::USER_VERIFICATION_REQUIREMENT_PREFERRED
+);
 
-// Return request options to frontend
+$_SESSION['fido_ceremony'] = 'login';
+$_SESSION['fido_username'] = $username;
+$_SESSION['fido_options'] = $webauthnSerializer->serialize($requestOptions, 'json');
+
 header('Content-Type: application/json');
-echo json_encode($requestOptions);
-?>
+echo $_SESSION['fido_options'];

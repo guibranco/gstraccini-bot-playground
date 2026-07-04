@@ -1,0 +1,10 @@
+{
+    "name": "guibranco/gstraccini-bot-playground",
+    "description": "Playground repository for experimenting with GStraccini-bot features.",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.2",
+        "web-auth/webauthn-lib": "^5.3"
+    }
+}
