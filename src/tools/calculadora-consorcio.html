@@ -365,6 +365,15 @@
         margin-top: 18px;
     }
 
+    #financiamentoFields {
+        transition: opacity 0.2s ease;
+    }
+
+    #financiamentoFields.is-disabled {
+        opacity: 0.4;
+        pointer-events: none;
+    }
+
     .cta {
         margin-top: 8px;
         width: 100%;
@@ -1172,7 +1181,6 @@ var CALC = (function () {
 
     var resultsWrap = document.getElementById("resultsWrap");
     var chartWrap = document.getElementById("chartWrap");
-    var financiamentoDetails = document.getElementById("financiamentoDetails");
     var financiamentoFields = document.getElementById("financiamentoFields");
 
     var aporteSincronizado = true;
@@ -1654,9 +1662,7 @@ var CALC = (function () {
     // Interações de toggle
     // ------------------------------------------------------------------
     function syncFinanciamentoFields() {
-        var ativo = els.financiamentoAtivo.checked;
-        financiamentoFields.classList.toggle("is-disabled", !ativo);
-        if (!ativo) financiamentoDetails.open = financiamentoDetails.open; // não força abrir/fechar
+        financiamentoFields.classList.toggle("is-disabled", !els.financiamentoAtivo.checked);
     }
     els.financiamentoAtivo.addEventListener("change", function () {
         syncFinanciamentoFields();
