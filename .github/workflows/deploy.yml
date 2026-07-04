@@ -31,27 +31,28 @@ jobs:
         id: gitversion
         uses: gittools/actions/gitversion/execute@v4.0.0
 
-      # - name: 💾 Cache Composer Dependencies
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: /tmp/composer-cache
-      #     key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+      - name: 💾 Cache Composer Dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
 
-      # - name: 📚 Install PHP Dependencies
-      #   uses: "php-actions/composer@v6"
-      #   with:
-      #     php_extensions: sockets
-      #     dev: no
-      #     progress: yes
-      #     working_dir: "./src/"
+      - name: 📚 Install PHP Dependencies
+        uses: "php-actions/composer@v6"
+        with:
+          dev: no
+          progress: yes
 
       - name: 📝 Create Version File for API
         run: |
-          cd src       
+          cd src
           echo ${{ env.fullSemVer }} > version.txt
 
       - name: 📦 Package Files for Deployment
         run: |
+          cp -r vendor src/vendor
           cd src
           zip -r deploy.zip . -x install.php
           cd ..

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/../../../vendor/autoload.php';
+require __DIR__ . '/../../vendor/autoload.php';
 require __DIR__ . '/CredentialStore.php';
 require __DIR__ . '/LenientCounterChecker.php';
 
