@@ -1,71 +1,52 @@
 <?php
-// Database connection details
-$host = 'localhost';
-$dbname = 'your_database_name';
-$user = 'your_database_user';
-$password = 'your_database_password';
 
-// Create a MySQL connection
-$mysqli = new mysqli($host, $user, $password, $dbname);
+declare(strict_types=1);
 
-// Check connection
-if ($mysqli->connect_error) {
-    die("Connection failed: " . $mysqli->connect_error);
-}
+require __DIR__ . '/db.php';
+
+$pdo = notifications_db();
 
 // Prepare SQL query to fetch unread notifications first, followed by read notifications
 $sql = "
     SELECT Sender, SenderAvatar, Title, Type
     FROM Notifications
-    WHERE UserId = ?
+    WHERE UserId = :userId
     ORDER BY DateRead IS NULL DESC, DateSent DESC
 ";
 
 // Replace this with the actual GitHub user ID of the logged-in user
 $userId = 123456;
 
-// Prepare and bind the statement
-if ($stmt = $mysqli->prepare($sql)) {
-    $stmt->bind_param("i", $userId); // 'i' stands for integer
-    $stmt->execute();
-    
-    // Bind the results to variables
-    $stmt->bind_result($sender, $senderAvatar, $title, $type);
-    
-    // Fetch and display the notifications in a Bootstrap dropdown
-    echo "<ul class='dropdown-menu dropdown-menu-end' aria-labelledby='notificationsDropdown'>";
+$stmt = $pdo->prepare($sql);
+$stmt->execute([':userId' => $userId]);
 
-    while ($stmt->fetch()) {
-        // Determine FontAwesome icon based on the notification type
-        $iconClass = getIconClass($type);
+// Fetch and display the notifications in a Bootstrap dropdown
+echo "<ul class='dropdown-menu dropdown-menu-end' aria-labelledby='notificationsDropdown'>";
 
-        // Generate URL based on type
-        $linkUrl = generateNotificationLink($type);
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    ['Sender' => $sender, 'SenderAvatar' => $senderAvatar, 'Title' => $title, 'Type' => $type] = $row;
 
-        echo "<li>";
-        echo "<a class='dropdown-item' href='" . htmlspecialchars($linkUrl) . "'>";
-        echo "<div class='d-flex align-items-center'>";
-        echo "<img src='" . htmlspecialchars($senderAvatar) . "' alt='" . htmlspecialchars($sender) . "' class='rounded-circle me-2' width='40' height='40'>";
-        echo "<div>";
-        echo "<h6 class='mb-0'>" . htmlspecialchars($title) . "</h6>";
-        echo "<small class='text-muted'><i class='fa-solid $iconClass me-1'></i>" . ucfirst($type) . "</small>";
-        echo "</div>";
-        echo "</div>";
-        echo "</a>";
-        echo "</li>";
-        echo "<li><hr class='dropdown-divider'></li>";
-    }
+    // Determine FontAwesome icon based on the notification type
+    $iconClass = getIconClass($type);
 
-    echo "</ul>";
-    
-    // Close the statement
-    $stmt->close();
-} else {
-    echo "Error: " . $mysqli->error;
+    // Generate URL based on type
+    $linkUrl = generateNotificationLink($type);
+
+    echo "<li>";
+    echo "<a class='dropdown-item' href='" . htmlspecialchars($linkUrl) . "'>";
+    echo "<div class='d-flex align-items-center'>";
+    echo "<img src='" . htmlspecialchars($senderAvatar) . "' alt='" . htmlspecialchars($sender) . "' class='rounded-circle me-2' width='40' height='40'>";
+    echo "<div>";
+    echo "<h6 class='mb-0'>" . htmlspecialchars($title) . "</h6>";
+    echo "<small class='text-muted'><i class='fa-solid $iconClass me-1'></i>" . ucfirst($type) . "</small>";
+    echo "</div>";
+    echo "</div>";
+    echo "</a>";
+    echo "</li>";
+    echo "<li><hr class='dropdown-divider'></li>";
 }
 
-// Close the database connection
-$mysqli->close();
+echo "</ul>";
 
 /**
  * Get FontAwesome icon class based on notification type
@@ -104,4 +85,3 @@ function generateNotificationLink($type) {
             return '/notifications'; // Default or general notifications URL
     }
 }
-?>

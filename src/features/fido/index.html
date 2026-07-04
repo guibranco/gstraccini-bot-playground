@@ -8,37 +8,223 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #2563eb;
+            --dark-blue: #1e40af;
+            --light-blue: #3b82f6;
+            --accent-blue: #60a5fa;
+            --bg-blue: #eff6ff;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --border-color: #e2e8f0;
+            --success-green: #10b981;
+            --danger-red: #ef4444;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        .main-container {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .header-section {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.2);
+        }
+
+        .header-section h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+
+        .header-section p {
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        .account-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-color);
+        }
+
+        .notice-banner {
+            background: var(--bg-blue);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 1rem 1.25rem;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .notice-banner code {
+            color: var(--dark-blue);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            border: 2px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .action-card {
+            background: var(--bg-blue);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            height: 100%;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .action-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 0.75rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: white;
+        }
+
+        .action-icon.register {
+            background: linear-gradient(135deg, var(--primary-blue), var(--light-blue));
+        }
+
+        .action-icon.authenticate {
+            background: linear-gradient(135deg, var(--success-green), #059669);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-blue), var(--light-blue));
+            border: none;
+            border-radius: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+            background: linear-gradient(135deg, var(--dark-blue), var(--primary-blue));
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-green), #059669);
+            border: none;
+            border-radius: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .alert {
+            border-radius: 0.75rem;
+            border: none;
+            font-weight: 500;
+        }
+    </style>
 </head>
 <body>
-<div class="container mt-5" style="max-width: 640px;">
-    <h2>Configuração de Autenticação FIDO2</h2>
-    <p class="text-muted">
-        Esta página precisa ser servida via HTTP(S) (ex.: <code>php -S localhost:8000</code> a partir da raiz do
-        repositório) — WebAuthn não funciona em páginas abertas como arquivo local.
-    </p>
-
-    <div class="mb-4">
-        <label for="username" class="form-label">Usuário</label>
-        <input type="text" id="username" class="form-control" placeholder="seu-usuario@exemplo.com" autocomplete="username">
+<div class="main-container">
+    <div class="header-section">
+        <h1>
+            <div class="header-icon">
+                <i class="fa fa-fingerprint"></i>
+            </div>
+            <div>Autenticação FIDO2</div>
+        </h1>
+        <p>Registre e utilize chaves de segurança para proteger sua conta.</p>
     </div>
 
-    <div id="status" class="alert d-none" role="alert"></div>
+    <div class="notice-banner">
+        <i class="fa fa-circle-info me-2"></i>Esta página precisa ser servida via HTTP(S) (ex.: <code>php -S localhost:8000</code> a partir da raiz do
+        repositório) — WebAuthn não funciona em páginas abertas como arquivo local.
+    </div>
 
-    <div class="row">
-        <div class="col-md-6">
-            <!-- Registration -->
-            <h4>Registrar um novo dispositivo</h4>
-            <button class="btn btn-primary mb-4" id="register-btn">
-                <i class="fa fa-key"></i> Registrar dispositivo FIDO
-            </button>
+    <div class="account-card">
+        <div class="mb-2">
+            <label for="username" class="form-label">Usuário</label>
+            <input type="text" id="username" class="form-control" placeholder="seu-usuario@exemplo.com" autocomplete="username">
         </div>
 
-        <div class="col-md-6">
-            <!-- Authentication -->
-            <h4>Autenticar com FIDO</h4>
-            <button class="btn btn-success" id="authenticate-btn">
-                <i class="fa fa-lock"></i> Autenticar com dispositivo FIDO
-            </button>
+        <div id="status" class="alert d-none mt-3" role="alert"></div>
+
+        <div class="row mt-3 g-3">
+            <div class="col-md-6">
+                <!-- Registration -->
+                <div class="action-card">
+                    <div class="action-icon register"><i class="fa fa-key"></i></div>
+                    <h5>Registrar um novo dispositivo</h5>
+                    <button class="btn btn-primary mt-2" id="register-btn">
+                        <i class="fa fa-key me-2"></i>Registrar dispositivo FIDO
+                    </button>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <!-- Authentication -->
+                <div class="action-card">
+                    <div class="action-icon authenticate"><i class="fa fa-lock"></i></div>
+                    <h5>Autenticar com FIDO</h5>
+                    <button class="btn btn-success mt-2" id="authenticate-btn">
+                        <i class="fa fa-lock me-2"></i>Autenticar com dispositivo FIDO
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 </div>

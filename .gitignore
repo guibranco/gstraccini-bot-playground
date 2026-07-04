@@ -1,3 +1,4 @@
 ﻿src/secrets/**.php
 **/vendor/**
 src/features/fido/storage/**
+src/features/notifications/storage/**
