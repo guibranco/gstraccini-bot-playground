@@ -1662,7 +1662,9 @@ var CALC = (function () {
     // Interações de toggle
     // ------------------------------------------------------------------
     function syncFinanciamentoFields() {
-        financiamentoFields.classList.toggle("is-disabled", !els.financiamentoAtivo.checked);
+        var ativo = els.financiamentoAtivo.checked;
+        financiamentoFields.classList.toggle("is-disabled", !ativo);
+        if (!ativo) financiamentoDetails.open = financiamentoDetails.open; // não força abrir/fechar
     }
     els.financiamentoAtivo.addEventListener("change", function () {
         syncFinanciamentoFields();
