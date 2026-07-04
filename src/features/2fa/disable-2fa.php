@@ -12,5 +12,5 @@ if (
     unset($_SESSION['2fa_enabled'], $_SESSION['2fa_secret']);
 }
 
-header('Location: setup-2fa.php');
+header('Location: index.php');
 exit;
