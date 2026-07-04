@@ -1,0 +1,1701 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Calculadora de Consórcio vs Renda Fixa</title>
+
+<style>
+    :root {
+        --page-plane: #0d0d0d;
+        --surface-1: #18181a;
+        --surface-2: #101012;
+        --surface-inset: #0a0a0b;
+        --text-primary: #ffffff;
+        --text-secondary: #c3c2b7;
+        --text-muted: #898781;
+        --border: rgba(255, 255, 255, 0.10);
+        --border-strong: rgba(255, 255, 255, 0.16);
+        --gridline: #2c2c2a;
+        --baseline: #383835;
+        --series-1: #3987e5;
+        --series-2: #199e70;
+        --series-3: #e0a53c;
+        --good: #0ca30c;
+        --bad: #e0574a;
+        --focus: #5aa6ef;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+        background:
+            radial-gradient(circle at 15% -10%, rgba(57, 135, 229, 0.16), transparent 45%),
+            radial-gradient(circle at 85% 0%, rgba(25, 158, 112, 0.14), transparent 40%),
+            var(--page-plane);
+        color: var(--text-primary);
+        margin: 0;
+        padding: 48px 20px 80px;
+        min-height: 100vh;
+    }
+
+    .page {
+        max-width: 1080px;
+        margin: 0 auto;
+    }
+
+    .hero {
+        text-align: center;
+        margin-bottom: 36px;
+    }
+
+    .eyebrow {
+        display: inline-block;
+        font-size: 0.78rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--series-2);
+        background: rgba(25, 158, 112, 0.12);
+        border: 1px solid rgba(25, 158, 112, 0.3);
+        padding: 4px 12px;
+        border-radius: 999px;
+        margin-bottom: 14px;
+    }
+
+    h1 {
+        margin: 0 0 10px;
+        font-size: clamp(1.6rem, 3vw, 2.2rem);
+        letter-spacing: -0.01em;
+    }
+
+    .subtitle {
+        margin: 0 auto;
+        max-width: 620px;
+        color: var(--text-secondary);
+        font-size: 0.98rem;
+        line-height: 1.5;
+    }
+
+    .panel {
+        background: var(--surface-1);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 28px;
+        box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
+    }
+
+    .form-panel {
+        margin-bottom: 24px;
+    }
+
+    fieldset {
+        border: none;
+        margin: 0 0 24px;
+        padding: 0;
+    }
+
+    fieldset legend {
+        padding: 0;
+        font-size: 0.82rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--series-2);
+        margin-bottom: 14px;
+    }
+
+    .field-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 18px;
+    }
+
+    .field label {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        margin-bottom: 7px;
+    }
+
+    .field small {
+        display: block;
+        margin-top: 6px;
+        font-size: 0.76rem;
+        color: var(--text-muted);
+    }
+
+    .field .field-error {
+        display: none;
+        margin-top: 6px;
+        font-size: 0.76rem;
+        color: var(--bad);
+    }
+
+    .field.is-invalid .field-error { display: block; }
+    .field.is-invalid .input-wrap { border-color: var(--bad); }
+
+    .input-wrap {
+        display: flex;
+        align-items: stretch;
+        background: var(--surface-inset);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .input-wrap:focus-within {
+        border-color: var(--focus);
+        box-shadow: 0 0 0 3px rgba(90, 166, 239, 0.22);
+    }
+
+    .input-wrap .prefix,
+    .input-wrap .suffix {
+        display: flex;
+        align-items: center;
+        padding: 0 12px;
+        font-size: 0.88rem;
+        color: var(--text-muted);
+        background: rgba(255, 255, 255, 0.03);
+        white-space: nowrap;
+    }
+
+    .input-wrap .prefix { border-right: 1px solid var(--border); }
+    .input-wrap .suffix { border-left: 1px solid var(--border); }
+
+    .input-wrap button.inline-btn {
+        border: none;
+        border-left: 1px solid var(--border);
+        background: rgba(25, 158, 112, 0.14);
+        color: var(--series-2);
+        font-size: 0.76rem;
+        font-weight: 700;
+        padding: 0 10px;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    .input-wrap button.inline-btn:hover { background: rgba(25, 158, 112, 0.24); }
+
+    input[type="number"] {
+        flex: 1;
+        min-width: 0;
+        width: 100%;
+        padding: 11px 12px;
+        border: none;
+        background: transparent;
+        color: var(--text-primary);
+        font-size: 1rem;
+        font-variant-numeric: tabular-nums;
+    }
+
+    input[type="number"]:focus { outline: none; }
+
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+        opacity: 0.5;
+    }
+
+    .switch-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        cursor: pointer;
+        margin-bottom: 18px;
+    }
+
+    .switch-row input[type="checkbox"] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .switch {
+        position: relative;
+        flex-shrink: 0;
+        width: 42px;
+        height: 24px;
+        background: var(--surface-inset);
+        border: 1px solid var(--border-strong);
+        border-radius: 999px;
+        transition: background 0.2s ease;
+    }
+
+    .switch::after {
+        content: "";
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--text-muted);
+        transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .switch-row input:checked + .switch {
+        background: rgba(25, 158, 112, 0.35);
+        border-color: var(--series-2);
+    }
+
+    .switch-row input:checked + .switch::after {
+        transform: translateX(18px);
+        background: var(--series-2);
+    }
+
+    .switch-row input:focus-visible + .switch {
+        box-shadow: 0 0 0 3px rgba(90, 166, 239, 0.3);
+    }
+
+    .switch-label strong {
+        display: block;
+        font-size: 0.92rem;
+    }
+
+    .switch-label small {
+        color: var(--text-muted);
+        font-size: 0.8rem;
+    }
+
+    .slider-block {
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 18px 20px;
+        margin-bottom: 24px;
+    }
+
+    .slider-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+
+    .slider-head label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+    }
+
+    .slider-value {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--focus);
+        font-variant-numeric: tabular-nums;
+    }
+
+    input[type="range"] {
+        width: 100%;
+        appearance: none;
+        -webkit-appearance: none;
+        height: 6px;
+        border-radius: 999px;
+        background: var(--surface-inset);
+        border: 1px solid var(--border);
+        outline: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: var(--focus);
+        border: 2px solid #04121f;
+        cursor: pointer;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--focus);
+        border: 2px solid #04121f;
+        cursor: pointer;
+    }
+
+    input[type="range"]:focus-visible {
+        box-shadow: 0 0 0 3px rgba(90, 166, 239, 0.3);
+    }
+
+    .slider-note {
+        margin-top: 8px;
+        font-size: 0.76rem;
+        color: var(--text-muted);
+    }
+
+    details.collapsible {
+        border-top: 1px dashed var(--border-strong);
+        padding-top: 18px;
+        margin-top: 4px;
+    }
+
+    details.collapsible summary {
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--text-secondary);
+        list-style: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    details.collapsible summary::-webkit-details-marker { display: none; }
+
+    details.collapsible summary::before {
+        content: "▸";
+        color: var(--series-2);
+        transition: transform 0.15s ease;
+    }
+
+    details.collapsible[open] summary::before {
+        transform: rotate(90deg);
+    }
+
+    details.collapsible .details-body {
+        margin-top: 18px;
+    }
+
+    .cta {
+        margin-top: 8px;
+        width: 100%;
+        padding: 15px;
+        font-size: 1.02rem;
+        font-weight: 700;
+        border: none;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--series-2), #22c58a);
+        color: #04140e;
+        cursor: pointer;
+        transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.15s ease;
+        box-shadow: 0 10px 24px rgba(25, 158, 112, 0.28);
+    }
+
+    .cta:hover { background: linear-gradient(135deg, #1cb37e, #29d69a); }
+    .cta:active { transform: translateY(1px); }
+    .cta:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+    .results-panel-wrap {
+        opacity: 0;
+        transform: translateY(14px);
+        transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+
+    .results-panel-wrap.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .stat-card {
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 18px 20px;
+    }
+
+    .stat-card.highlight {
+        border-color: rgba(25, 158, 112, 0.4);
+        background: linear-gradient(160deg, rgba(25, 158, 112, 0.12), var(--surface-2) 60%);
+    }
+
+    .stat-card.verdict {
+        grid-column: 1 / -1;
+    }
+
+    .stat-card.verdict.is-bad {
+        border-color: rgba(224, 87, 74, 0.4);
+        background: linear-gradient(160deg, rgba(224, 87, 74, 0.12), var(--surface-2) 60%);
+    }
+
+    .stat-label {
+        display: block;
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+    }
+
+    .stat-value {
+        display: block;
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+    }
+
+    .stat-value.good { color: var(--good); }
+    .stat-value.bad { color: var(--bad); }
+
+    .verdict-text {
+        font-size: 1.05rem;
+        font-weight: 600;
+        line-height: 1.5;
+    }
+
+    .verdict-text strong { color: var(--good); }
+    .stat-card.verdict.is-bad .verdict-text strong { color: var(--bad); }
+
+    .chart-card, .table-card, .financing-card {
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 22px;
+        margin-bottom: 20px;
+    }
+
+    .chart-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 14px;
+    }
+
+    .chart-head h2, .table-card h2, .financing-card h2 {
+        margin: 0;
+        font-size: 1rem;
+        color: var(--text-primary);
+    }
+
+    .legend {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 0.82rem;
+        color: var(--text-secondary);
+    }
+
+    .legend-item i {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .chart-wrap {
+        position: relative;
+    }
+
+    .chart-wrap svg {
+        width: 100%;
+        height: auto;
+        display: block;
+        overflow: visible;
+    }
+
+    .chart-tooltip {
+        position: absolute;
+        pointer-events: none;
+        background: #05070a;
+        border: 1px solid var(--border-strong);
+        border-radius: 10px;
+        padding: 10px 12px;
+        font-size: 0.78rem;
+        color: var(--text-secondary);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.45);
+        opacity: 0;
+        transition: opacity 0.1s ease;
+        white-space: nowrap;
+        z-index: 5;
+    }
+
+    .chart-tooltip strong {
+        display: block;
+        color: var(--text-primary);
+        font-size: 0.85rem;
+        margin-bottom: 4px;
+    }
+
+    .chart-tooltip .row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 2px;
+    }
+
+    .chart-tooltip .row i {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .financing-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 16px;
+    }
+
+    .table-scroll {
+        max-height: 340px;
+        overflow-y: auto;
+        overflow-x: auto;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+    }
+
+    th, td {
+        padding: 12px 14px;
+        text-align: right;
+        border-bottom: 1px solid var(--border);
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+    }
+
+    th:first-child, td:first-child { text-align: left; font-variant-numeric: normal; }
+
+    th {
+        position: sticky;
+        top: 0;
+        background: #131315;
+        color: var(--text-muted);
+        font-size: 0.76rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        font-weight: 600;
+        z-index: 1;
+    }
+
+    tbody tr:hover { background: rgba(255, 255, 255, 0.03); }
+    tbody tr:last-child td { border-bottom: none; }
+
+    .footnote {
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.78rem;
+        margin-top: 28px;
+        line-height: 1.6;
+    }
+
+    .footnote strong { color: var(--text-secondary); }
+
+    @media (max-width: 560px) {
+        .panel { padding: 20px; border-radius: 16px; }
+        th, td { padding: 10px; font-size: 0.82rem; }
+    }
+</style>
+</head>
+<body>
+
+<div class="page">
+    <header class="hero">
+        <span class="eyebrow">Consórcio · Renda fixa · Financiamento</span>
+        <h1>Calculadora de Consórcio vs Renda Fixa</h1>
+        <p class="subtitle">Compare o custo efetivo total (CET) de um consórcio contemplado em diferentes momentos com o rendimento líquido de uma aplicação em renda fixa atrelada ao CDI — e, opcionalmente, com um financiamento.</p>
+    </header>
+
+    <section class="panel form-panel">
+        <form id="calcForm">
+            <fieldset>
+                <legend>Consórcio</legend>
+                <div class="field-grid">
+                    <div class="field">
+                        <label for="carta">Valor da carta de crédito</label>
+                        <div class="input-wrap">
+                            <span class="prefix">R$</span>
+                            <input id="carta" type="number" min="1000" step="100" value="100000" required />
+                        </div>
+                        <div class="field-error"></div>
+                    </div>
+
+                    <div class="field">
+                        <label for="prazo">Prazo do grupo</label>
+                        <div class="input-wrap">
+                            <input id="prazo" type="number" min="1" max="240" step="1" value="180" required />
+                            <span class="suffix">meses</span>
+                        </div>
+                        <div class="field-error"></div>
+                    </div>
+
+                    <div class="field">
+                        <label for="taxaAdm">Taxa de administração total</label>
+                        <div class="input-wrap">
+                            <input id="taxaAdm" type="number" min="0" max="100" step="0.01" value="20" required />
+                            <span class="suffix">%</span>
+                        </div>
+                        <div class="field-error"></div>
+                    </div>
+
+                    <div class="field">
+                        <label for="fundoReserva">Fundo de reserva total</label>
+                        <div class="input-wrap">
+                            <input id="fundoReserva" type="number" min="0" max="50" step="0.01" value="2" required />
+                            <span class="suffix">%</span>
+                        </div>
+                        <div class="field-error"></div>
+                    </div>
+
+                    <div class="field">
+                        <label for="seguro">Seguro mensal</label>
+                        <div class="input-wrap">
+                            <span class="prefix">R$</span>
+                            <input id="seguro" type="number" min="0" step="0.01" value="0" />
+                        </div>
+                        <div class="field-error"></div>
+                    </div>
+
+                    <div class="field">
+                        <label for="correcao">Correção anual da carta (INCC/IPCA)</label>
+                        <div class="input-wrap">
+                            <input id="correcao" type="number" min="-50" max="100" step="0.01" value="6" required />
+                            <span class="suffix">% a.a.</span>
+                        </div>
+                        <div class="field-error"></div>
+                    </div>
+
+                    <div class="field">
+                        <label for="lance">Lance</label>
+                        <div class="input-wrap">
+                            <input id="lance" type="number" min="0" max="100" step="0.01" value="0" />
+                            <span class="suffix">% da carta</span>
+                        </div>
+                        <div class="field-error"></div>
+                    </div>
+                </div>
+
+                <label class="switch-row" style="margin-top: 18px;">
+                    <input type="checkbox" id="lanceEmbutido" />
+                    <span class="switch"></span>
+                    <span class="switch-label">
+                        <strong>Lance embutido</strong>
+                        <small>Se marcado, o lance é descontado do valor líquido da carta recebida em vez de sair do bolso</small>
+                    </span>
+                </label>
+            </fieldset>
+
+            <div class="slider-block">
+                <div class="slider-head">
+                    <label for="mesContemplacao">Mês de contemplação</label>
+                    <span class="slider-value"><span id="mesContemplacaoValor">90</span> de <span id="prazoLabelSlider">180</span></span>
+                </div>
+                <input type="range" id="mesContemplacao" min="1" max="180" step="1" value="90"
+                       aria-describedby="mesContemplacaoNota" />
+                <p class="slider-note" id="mesContemplacaoNota">Arraste para simular a contemplação em qualquer mês do prazo. Todos os resultados abaixo são atualizados em tempo real.</p>
+            </div>
+
+            <fieldset>
+                <legend>Renda fixa</legend>
+                <div class="field-grid">
+                    <div class="field">
+                        <label for="percentCDI">Rendimento</label>
+                        <div class="input-wrap">
+                            <input id="percentCDI" type="number" min="0" max="300" step="1" value="100" required />
+                            <span class="suffix">% do CDI</span>
+                        </div>
+                        <div class="field-error"></div>
+                    </div>
+
+                    <div class="field">
+                        <label for="cdiAnual">CDI atual</label>
+                        <div class="input-wrap">
+                            <input id="cdiAnual" type="number" min="0" max="100" step="0.01" value="15" required />
+                            <span class="suffix">% a.a.</span>
+                        </div>
+                        <small>Verifique o CDI vigente antes de decidir com base nesta simulação.</small>
+                        <div class="field-error"></div>
+                    </div>
+
+                    <div class="field">
+                        <label for="aporte">Aporte mensal</label>
+                        <div class="input-wrap">
+                            <span class="prefix">R$</span>
+                            <input id="aporte" type="number" min="0" step="0.01" value="681.08" />
+                            <button type="button" class="inline-btn" id="igualarParcela">Igualar à parcela</button>
+                        </div>
+                        <div class="field-error"></div>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Bem</legend>
+                <div class="field-grid">
+                    <div class="field">
+                        <label for="inflacaoBem">Inflação anual do bem</label>
+                        <div class="input-wrap">
+                            <input id="inflacaoBem" type="number" min="-50" max="100" step="0.01" value="6" required />
+                            <span class="suffix">% a.a.</span>
+                        </div>
+                        <div class="field-error"></div>
+                    </div>
+                </div>
+            </fieldset>
+
+            <details class="collapsible" id="financiamentoDetails">
+                <summary>Comparar também com financiamento (opcional)</summary>
+                <div class="details-body">
+                    <label class="switch-row">
+                        <input type="checkbox" id="financiamentoAtivo" />
+                        <span class="switch"></span>
+                        <span class="switch-label">
+                            <strong>Incluir financiamento na comparação</strong>
+                            <small>Sistema Price, com prestações fixas</small>
+                        </span>
+                    </label>
+
+                    <div class="field-grid" id="financiamentoFields">
+                        <div class="field">
+                            <label for="finTaxa">Taxa de juros</label>
+                            <div class="input-wrap">
+                                <input id="finTaxa" type="number" min="0" max="100" step="0.01" value="12" />
+                                <span class="suffix">% a.a.</span>
+                            </div>
+                            <div class="field-error"></div>
+                        </div>
+
+                        <div class="field">
+                            <label for="finEntrada">Entrada</label>
+                            <div class="input-wrap">
+                                <input id="finEntrada" type="number" min="0" max="100" step="0.01" value="20" />
+                                <span class="suffix">%</span>
+                            </div>
+                            <div class="field-error"></div>
+                        </div>
+
+                        <div class="field">
+                            <label for="finPrazo">Prazo</label>
+                            <div class="input-wrap">
+                                <input id="finPrazo" type="number" min="1" max="600" step="1" value="180" />
+                                <span class="suffix">meses</span>
+                            </div>
+                            <div class="field-error"></div>
+                        </div>
+                    </div>
+                </div>
+            </details>
+
+            <button type="submit" class="cta">Calcular</button>
+        </form>
+    </section>
+
+    <div class="results-panel-wrap" id="resultsWrap">
+        <section class="panel results-panel" id="results" aria-live="polite">
+            <div class="stats-grid">
+                <div class="stat-card highlight">
+                    <span class="stat-label">CET implícito do consórcio (% a.a.)</span>
+                    <span class="stat-value" id="statCet">—</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Rendimento líquido da renda fixa (% a.a.)</span>
+                    <span class="stat-value" id="statRendimentoRF">—</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Total pago no consórcio</span>
+                    <span class="stat-value" id="statTotalPago">—</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Patrimônio final líquido na renda fixa</span>
+                    <span class="stat-value" id="statPatrimonioRF">—</span>
+                </div>
+                <div class="stat-card verdict" id="statVeredito">
+                    <span class="stat-label">Veredito</span>
+                    <span class="verdict-text" id="veredictoTexto">—</span>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-head">
+                    <h2>Evolução mensal</h2>
+                    <div class="legend">
+                        <span class="legend-item"><i style="background:var(--series-1)"></i>Acumulado pago (consórcio)</span>
+                        <span class="legend-item"><i style="background:var(--series-2)"></i>Saldo líquido (renda fixa)</span>
+                        <span class="legend-item"><i style="background:var(--series-3)"></i>Preço do bem</span>
+                    </div>
+                </div>
+                <div class="chart-wrap" id="chartWrap"></div>
+            </div>
+
+            <div class="financing-card" id="financingCard" hidden>
+                <h2>Financiamento (Sistema Price)</h2>
+                <div class="financing-grid">
+                    <div class="stat-card">
+                        <span class="stat-label">Parcela fixa</span>
+                        <span class="stat-value" id="finParcela">—</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Custo total (entrada + parcelas)</span>
+                        <span class="stat-value" id="finCustoTotal">—</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">CET simples sobre o valor do bem</span>
+                        <span class="stat-value" id="finCet">—</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-card">
+                <details>
+                    <summary style="cursor:pointer; font-weight:700; color:var(--text-secondary); font-size:0.9rem;">Ver tabela mês a mês</summary>
+                    <div class="table-scroll" style="margin-top:14px;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Mês</th>
+                                    <th>Carta corrigida</th>
+                                    <th>Parcela</th>
+                                    <th>Acumulado pago</th>
+                                    <th>Saldo líquido RF</th>
+                                    <th>Preço do bem</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody"></tbody>
+                        </table>
+                    </div>
+                </details>
+            </div>
+        </section>
+    </div>
+
+    <p class="footnote">
+        <strong>Aviso:</strong> o resultado é extremamente sensível ao mês de contemplação, que é incerto e definido por sorteio ou lance dentro do grupo de consórcio.
+        Esta ferramenta é apenas educacional e não constitui recomendação de investimento ou de compra.
+    </p>
+</div>
+
+<script>
+"use strict";
+
+// =====================================================================================
+// CALC — funções puras de cálculo financeiro (sem acesso a DOM). Podem ser testadas
+// isoladamente no console do navegador via window.CALC.
+// =====================================================================================
+var CALC = (function () {
+    "use strict";
+
+    // Taxa mensal equivalente a uma taxa anual (juros compostos)
+    function taxaMensalEquivalente(taxaAnual) {
+        return Math.pow(1 + taxaAnual, 1 / 12) - 1;
+    }
+
+    // Valor da carta de crédito corrigido no mês t pela correção anual (INCC/IPCA)
+    function cartaCorrigida(carta, correcaoAnual, t) {
+        return carta * Math.pow(1 + correcaoAnual, t / 12);
+    }
+
+    // Parcela mensal do consórcio no mês t: rateio da carta corrigida + adm + fundo de reserva, mais seguro fixo
+    function parcelaConsorcio(params, t) {
+        var base = cartaCorrigida(params.carta, params.correcaoAnual, t);
+        return (base * (1 + params.taxaAdm + params.fundoReserva)) / params.prazo + params.seguro;
+    }
+
+    // Fluxo de caixa mensal do consorciado: negativo = saída (parcela/lance), positivo = entrada (carta recebida)
+    function fluxoCaixaConsorcio(params) {
+        var prazo = params.prazo;
+        var fluxo = new Array(prazo + 1).fill(0); // índice 0 não utilizado; meses vão de 1 a prazo
+        var t;
+
+        for (t = 1; t <= prazo; t++) {
+            fluxo[t] -= parcelaConsorcio(params, t);
+        }
+
+        var cartaNoMes = cartaCorrigida(params.carta, params.correcaoAnual, params.mesContemplacao);
+        var lanceValor = cartaNoMes * params.lancePercent;
+        var entrada = cartaNoMes;
+
+        if (params.lanceEmbutido) {
+            entrada -= lanceValor; // lance embutido é descontado do valor líquido da carta recebida
+        } else {
+            fluxo[params.mesContemplacao] -= lanceValor; // lance livre é pago do bolso, além da parcela do mês
+        }
+
+        fluxo[params.mesContemplacao] += entrada;
+        return fluxo;
+    }
+
+    // Valor presente líquido do fluxo a uma taxa mensal
+    function npv(fluxo, taxa) {
+        var soma = 0;
+        var t;
+        for (t = 0; t < fluxo.length; t++) {
+            if (fluxo[t] === 0) continue;
+            soma += fluxo[t] / Math.pow(1 + taxa, t);
+        }
+        return soma;
+    }
+
+    // Derivada do NPV em relação à taxa (para Newton-Raphson)
+    function dNpv(fluxo, taxa) {
+        var soma = 0;
+        var t;
+        for (t = 1; t < fluxo.length; t++) {
+            if (fluxo[t] === 0) continue;
+            soma += (-t * fluxo[t]) / Math.pow(1 + taxa, t + 1);
+        }
+        return soma;
+    }
+
+    // TIR mensal do fluxo de caixa via Newton-Raphson, com fallback para bisseção; retorna null se não houver raiz
+    function irrMensal(fluxo, tolerancia, maxIter) {
+        tolerancia = tolerancia || 1e-7;
+        maxIter = maxIter || 200;
+
+        var taxa = 0.01;
+        var convergiu = false;
+        var i, f, df, proxima;
+
+        for (i = 0; i < maxIter; i++) {
+            f = npv(fluxo, taxa);
+            if (Math.abs(f) < tolerancia) {
+                convergiu = true;
+                break;
+            }
+            df = dNpv(fluxo, taxa);
+            if (Math.abs(df) < 1e-12) break;
+            proxima = taxa - f / df;
+            if (!Number.isFinite(proxima) || proxima <= -0.999999) break;
+            taxa = proxima;
+        }
+
+        if (convergiu) return taxa;
+
+        // Fallback: bisseção num intervalo amplo de taxas mensais plausíveis
+        var low = -0.9;
+        var high = 50;
+        var fLow = npv(fluxo, low);
+        var fHigh = npv(fluxo, high);
+
+        if (!Number.isFinite(fLow) || !Number.isFinite(fHigh) || fLow * fHigh > 0) {
+            return null; // sem mudança de sinal no intervalo: TIR não encontrada
+        }
+
+        for (i = 0; i < maxIter; i++) {
+            var mid = (low + high) / 2;
+            var fMid = npv(fluxo, mid);
+            if (Math.abs(fMid) < tolerancia || (high - low) < tolerancia) return mid;
+            if (fLow * fMid < 0) {
+                high = mid;
+            } else {
+                low = mid;
+                fLow = fMid;
+            }
+        }
+        return (low + high) / 2;
+    }
+
+    // CET anualizado do consórcio a partir da TIR mensal do fluxo de caixa
+    function cetAnualConsorcio(params) {
+        var fluxo = fluxoCaixaConsorcio(params);
+        var mensal = irrMensal(fluxo);
+        if (mensal === null) return null;
+        return Math.pow(1 + mensal, 12) - 1;
+    }
+
+    // Alíquota de IR regressivo sobre rendimentos, conforme prazo da aplicação em dias
+    function aliquotaIR(dias) {
+        if (dias <= 180) return 0.225;
+        if (dias <= 360) return 0.2;
+        if (dias <= 720) return 0.175;
+        return 0.15;
+    }
+
+    // Simula a renda fixa com aportes mensais e IR regressivo por lote (cada aporte é seu próprio "lote" tributável)
+    function simulaRendaFixa(params) {
+        var taxaAnualEfetiva = params.cdiAnual * params.percentCDI;
+        var taxaMensal = taxaMensalEquivalente(taxaAnualEfetiva);
+        var lotes = [];
+        var pontos = [];
+        var aporteAcumulado = 0;
+        var mes, lote, saldoBrutoTotal, saldoLiquidoTotal, diasAplicado, rendimentoLote, irLote;
+
+        for (mes = 1; mes <= params.meses; mes++) {
+            for (var li = 0; li < lotes.length; li++) {
+                lotes[li].saldo *= 1 + taxaMensal;
+            }
+            lotes.push({ mesAporte: mes, principal: params.aporteMensal, saldo: params.aporteMensal });
+            aporteAcumulado += params.aporteMensal;
+
+            saldoBrutoTotal = 0;
+            saldoLiquidoTotal = 0;
+            for (var lj = 0; lj < lotes.length; lj++) {
+                lote = lotes[lj];
+                saldoBrutoTotal += lote.saldo;
+                diasAplicado = (mes - lote.mesAporte) * 30;
+                rendimentoLote = lote.saldo - lote.principal;
+                irLote = rendimentoLote > 0 ? rendimentoLote * aliquotaIR(diasAplicado) : 0;
+                saldoLiquidoTotal += lote.saldo - irLote;
+            }
+
+            pontos.push({ mes: mes, saldoBruto: saldoBrutoTotal, saldoLiquido: saldoLiquidoTotal, aporteAcumulado: aporteAcumulado });
+        }
+
+        return pontos;
+    }
+
+    // Rendimento líquido anualizado da renda fixa, via TIR do fluxo de aportes mensais + resgate líquido final
+    // (mesma metodologia do CET do consórcio, para permitir comparação justa entre as duas pontas)
+    function rendimentoLiquidoAnualizado(pontos, aporteMensal) {
+        if (pontos.length === 0) return null;
+        var meses = pontos[pontos.length - 1].mes;
+        var fluxo = new Array(meses + 1).fill(0);
+        var t;
+        for (t = 1; t <= meses; t++) {
+            fluxo[t] -= aporteMensal;
+        }
+        fluxo[meses] += pontos[pontos.length - 1].saldoLiquido;
+        var mensal = irrMensal(fluxo);
+        if (mensal === null) return null;
+        return Math.pow(1 + mensal, 12) - 1;
+    }
+
+    // Preço do bem no mês t, corrigido pela inflação anual do bem
+    function precoBem(carta, inflacaoAnual, t) {
+        return carta * Math.pow(1 + inflacaoAnual, t / 12);
+    }
+
+    // Prestação fixa (Sistema Price) de um financiamento
+    function prestacaoPrice(valorFinanciado, taxaAnual, prazo) {
+        var i = taxaMensalEquivalente(taxaAnual);
+        if (i === 0) return valorFinanciado / prazo;
+        var fator = Math.pow(1 + i, prazo);
+        return (valorFinanciado * i * fator) / (fator - 1);
+    }
+
+    function simulaFinanciamento(params) {
+        var valorEntrada = params.carta * params.entradaPercent;
+        var valorFinanciado = params.carta - valorEntrada;
+        var parcela = prestacaoPrice(valorFinanciado, params.taxaAnual, params.prazo);
+        var custoTotal = valorEntrada + parcela * params.prazo;
+        var cetSimples = custoTotal / params.carta - 1; // custo total sobre o valor do bem, não anualizado
+        return { valorEntrada: valorEntrada, valorFinanciado: valorFinanciado, parcela: parcela, custoTotal: custoTotal, cetSimples: cetSimples };
+    }
+
+    // Varre todos os meses de contemplação possíveis e devolve o CET de cada um, mais os intervalos
+    // contínuos de meses em que o consórcio vence a renda fixa (CET >= rendimento líquido da RF).
+    //
+    // O CET não é necessariamente monótono no mês de contemplação: como todas as parcelas do prazo
+    // inteiro são pagas independentemente de quando a contemplação ocorre (só o valor da carta recebida
+    // muda, corrigido pela indexação), pode haver uma janela "no meio do prazo" mais vantajosa do que
+    // contemplar logo no início — e o CET pode ficar indefinido (sem raiz real) em outros trechos.
+    // Por isso o resultado é expresso como intervalo(s) vencedores, e não como um único "mês de corte".
+    function analisaBreakEven(paramsBase, rendimentoRFAnual) {
+        var prazo = paramsBase.prazo;
+        var cetPorMes = new Array(prazo + 1).fill(null);
+        var segmentos = [];
+        var inicioAtual = null;
+        var mes, cet, vence, params;
+
+        for (mes = 1; mes <= prazo; mes++) {
+            params = Object.assign({}, paramsBase, { mesContemplacao: mes });
+            cet = cetAnualConsorcio(params);
+            cetPorMes[mes] = cet;
+            vence = cet !== null && cet >= rendimentoRFAnual;
+
+            if (vence && inicioAtual === null) {
+                inicioAtual = mes;
+            } else if (!vence && inicioAtual !== null) {
+                segmentos.push([inicioAtual, mes - 1]);
+                inicioAtual = null;
+            }
+        }
+        if (inicioAtual !== null) {
+            segmentos.push([inicioAtual, prazo]);
+        }
+
+        return { cetPorMes: cetPorMes, segmentos: segmentos };
+    }
+
+    // Monta a descrição do veredito exibido ao usuário a partir dos intervalos vencedores encontrados
+    function veredictoBreakEven(segmentos, prazo) {
+        if (segmentos.length === 0) {
+            return { tipo: "rf_sempre", segmentos: segmentos };
+        }
+        if (segmentos.length === 1 && segmentos[0][0] === 1 && segmentos[0][1] === prazo) {
+            return { tipo: "consorcio_sempre", segmentos: segmentos };
+        }
+        if (segmentos.length === 1 && segmentos[0][0] === 1) {
+            return { tipo: "corte_simples", mesCorte: segmentos[0][1], segmentos: segmentos };
+        }
+        return { tipo: "janela", segmentos: segmentos };
+    }
+
+    return {
+        taxaMensalEquivalente: taxaMensalEquivalente,
+        cartaCorrigida: cartaCorrigida,
+        parcelaConsorcio: parcelaConsorcio,
+        fluxoCaixaConsorcio: fluxoCaixaConsorcio,
+        irrMensal: irrMensal,
+        cetAnualConsorcio: cetAnualConsorcio,
+        aliquotaIR: aliquotaIR,
+        simulaRendaFixa: simulaRendaFixa,
+        rendimentoLiquidoAnualizado: rendimentoLiquidoAnualizado,
+        precoBem: precoBem,
+        prestacaoPrice: prestacaoPrice,
+        simulaFinanciamento: simulaFinanciamento,
+        analisaBreakEven: analisaBreakEven,
+        veredictoBreakEven: veredictoBreakEven
+    };
+})();
+
+// =====================================================================================
+// APP — controlador de DOM: leitura de inputs, validação, persistência na URL, renderização
+// =====================================================================================
+(function () {
+    "use strict";
+
+    var currencyFmt = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 2 });
+    var compactCurrencyFmt = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", notation: "compact", maximumFractionDigits: 1 });
+    var percentFmt = new Intl.NumberFormat("pt-BR", { style: "percent", minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    var els = {};
+    ["carta", "prazo", "taxaAdm", "fundoReserva", "seguro", "correcao", "lance", "lanceEmbutido",
+     "mesContemplacao", "percentCDI", "cdiAnual", "aporte", "inflacaoBem",
+     "financiamentoAtivo", "finTaxa", "finEntrada", "finPrazo"].forEach(function (id) {
+        els[id] = document.getElementById(id);
+    });
+
+    var resultsWrap = document.getElementById("resultsWrap");
+    var chartWrap = document.getElementById("chartWrap");
+    var financiamentoDetails = document.getElementById("financiamentoDetails");
+    var financiamentoFields = document.getElementById("financiamentoFields");
+
+    var aporteSincronizado = true;
+    var finPrazoSincronizado = true;
+    var mesTocadoPeloUsuario = false;
+
+    var cacheCompleto = null; // resultado caro (RF, break-even) que não depende do mês de contemplação
+
+    // ------------------------------------------------------------------
+    // Validação
+    // ------------------------------------------------------------------
+    var regrasValidacao = {
+        carta: { min: 1000, max: 1e8, label: "o valor da carta de crédito" },
+        prazo: { min: 1, max: 240, integer: true, label: "o prazo do grupo" },
+        taxaAdm: { min: 0, max: 100, label: "a taxa de administração" },
+        fundoReserva: { min: 0, max: 50, label: "o fundo de reserva" },
+        seguro: { min: 0, max: 1e6, label: "o seguro mensal" },
+        correcao: { min: -50, max: 100, label: "a correção anual da carta" },
+        lance: { min: 0, max: 100, label: "o lance" },
+        percentCDI: { min: 0, max: 300, label: "o rendimento sobre o CDI" },
+        cdiAnual: { min: 0, max: 100, label: "o CDI atual" },
+        aporte: { min: 0, max: 1e7, label: "o aporte mensal" },
+        inflacaoBem: { min: -50, max: 100, label: "a inflação do bem" },
+        finTaxa: { min: 0, max: 100, label: "a taxa de juros do financiamento" },
+        finEntrada: { min: 0, max: 100, label: "a entrada do financiamento" },
+        finPrazo: { min: 1, max: 600, integer: true, label: "o prazo do financiamento" }
+    };
+
+    function validarCampo(id) {
+        var regra = regrasValidacao[id];
+        if (!regra) return true;
+        var input = els[id];
+        var fieldEl = input.closest(".field");
+        var errorEl = fieldEl ? fieldEl.querySelector(".field-error") : null;
+        var valor = parseFloat(input.value);
+        var mensagem = "";
+
+        if (input.value.trim() === "" || Number.isNaN(valor)) {
+            mensagem = "Informe um valor para " + regra.label + ".";
+        } else if (valor < regra.min || valor > regra.max) {
+            mensagem = "Use um valor entre " + regra.min + " e " + regra.max + " para " + regra.label + ".";
+        } else if (regra.integer && !Number.isInteger(valor)) {
+            mensagem = "Use um número inteiro de meses para " + regra.label + ".";
+        }
+
+        var valido = mensagem === "";
+        if (fieldEl) fieldEl.classList.toggle("is-invalid", !valido);
+        if (errorEl) errorEl.textContent = mensagem;
+        input.setAttribute("aria-invalid", valido ? "false" : "true");
+        return valido;
+    }
+
+    function validarTudo() {
+        var ok = true;
+        Object.keys(regrasValidacao).forEach(function (id) {
+            if (id.indexOf("fin") === 0 && !els.financiamentoAtivo.checked) return;
+            if (!validarCampo(id)) ok = false;
+        });
+        return ok;
+    }
+
+    // ------------------------------------------------------------------
+    // Leitura de inputs
+    // ------------------------------------------------------------------
+    function lerParametrosConsorcio() {
+        return {
+            carta: parseFloat(els.carta.value) || 0,
+            prazo: Math.max(1, parseInt(els.prazo.value, 10) || 1),
+            taxaAdm: (parseFloat(els.taxaAdm.value) || 0) / 100,
+            fundoReserva: (parseFloat(els.fundoReserva.value) || 0) / 100,
+            seguro: parseFloat(els.seguro.value) || 0,
+            correcaoAnual: (parseFloat(els.correcao.value) || 0) / 100,
+            lancePercent: (parseFloat(els.lance.value) || 0) / 100,
+            lanceEmbutido: els.lanceEmbutido.checked
+        };
+    }
+
+    function formatarDuracao(meses) {
+        var anos = Math.floor(meses / 12);
+        var restoMeses = meses % 12;
+        var partes = [];
+        if (anos > 0) partes.push(anos + (anos === 1 ? " ano" : " anos"));
+        if (restoMeses > 0 || anos === 0) partes.push(restoMeses + (restoMeses === 1 ? " mês" : " meses"));
+        return partes.join(" e ");
+    }
+
+    // ------------------------------------------------------------------
+    // Sincronização de campos dependentes (aporte <-> parcela, prazo financiamento <-> prazo consórcio)
+    // ------------------------------------------------------------------
+    function sincronizarAporte(paramsConsorcio) {
+        if (!aporteSincronizado) return;
+        var parcela1 = CALC.parcelaConsorcio(paramsConsorcio, 1);
+        els.aporte.value = parcela1.toFixed(2);
+    }
+
+    function sincronizarFinPrazo(prazoConsorcio) {
+        if (!finPrazoSincronizado) return;
+        els.finPrazo.value = prazoConsorcio;
+    }
+
+    els.aporte.addEventListener("input", function () {
+        aporteSincronizado = false;
+    });
+
+    document.getElementById("igualarParcela").addEventListener("click", function () {
+        aporteSincronizado = true;
+        recalcularCompleto();
+    });
+
+    els.finPrazo.addEventListener("input", function () {
+        finPrazoSincronizado = false;
+    });
+
+    els.mesContemplacao.addEventListener("input", function () {
+        mesTocadoPeloUsuario = true;
+    });
+
+    // ------------------------------------------------------------------
+    // Persistência na URL (query string)
+    // ------------------------------------------------------------------
+    var mapaQuery = {
+        carta: "carta", prazo: "prazo", taxaAdm: "adm", fundoReserva: "fr", seguro: "seg",
+        correcao: "corr", lance: "lance", lanceEmbutido: "lanceEmb", mesContemplacao: "mes",
+        percentCDI: "cdiPct", cdiAnual: "cdi", aporte: "aporte", inflacaoBem: "inflBem",
+        financiamentoAtivo: "finAtivo", finTaxa: "finTaxa", finEntrada: "finEntrada", finPrazo: "finPrazo"
+    };
+
+    function atualizarURL() {
+        var params = new URLSearchParams();
+        Object.keys(mapaQuery).forEach(function (id) {
+            var el = els[id];
+            var chave = mapaQuery[id];
+            if (el.type === "checkbox") {
+                params.set(chave, el.checked ? "1" : "0");
+            } else {
+                params.set(chave, el.value);
+            }
+        });
+        if (!aporteSincronizado) params.set("aporteManual", "1");
+        if (!finPrazoSincronizado) params.set("finPrazoManual", "1");
+        var novaURL = window.location.pathname + "?" + params.toString();
+        window.history.replaceState(null, "", novaURL);
+    }
+
+    function carregarDaURL() {
+        var params = new URLSearchParams(window.location.search);
+        if (Array.from(params.keys()).length === 0) return;
+
+        Object.keys(mapaQuery).forEach(function (id) {
+            var chave = mapaQuery[id];
+            if (!params.has(chave)) return;
+            var el = els[id];
+            var valor = params.get(chave);
+            if (el.type === "checkbox") {
+                el.checked = valor === "1";
+            } else {
+                el.value = valor;
+            }
+        });
+
+        if (params.get("aporteManual") === "1") aporteSincronizado = false;
+        if (params.get("finPrazoManual") === "1") finPrazoSincronizado = false;
+        if (params.has("mes")) mesTocadoPeloUsuario = true;
+    }
+
+    // ------------------------------------------------------------------
+    // Cálculo completo (caro): tudo o que NÃO depende do mês de contemplação
+    // ------------------------------------------------------------------
+    function debounce(fn, delay) {
+        var timer = null;
+        return function () {
+            var args = arguments;
+            clearTimeout(timer);
+            timer = setTimeout(function () { fn.apply(null, args); }, delay);
+        };
+    }
+
+    function recalcularCompleto() {
+        if (!validarTudo()) {
+            resultsWrap.classList.remove("is-visible");
+            return;
+        }
+
+        var paramsConsorcio = lerParametrosConsorcio();
+        sincronizarAporte(paramsConsorcio);
+        sincronizarFinPrazo(paramsConsorcio.prazo);
+
+        els.mesContemplacao.max = paramsConsorcio.prazo;
+        document.getElementById("prazoLabelSlider").textContent = paramsConsorcio.prazo;
+        if (!mesTocadoPeloUsuario) {
+            els.mesContemplacao.value = Math.round(paramsConsorcio.prazo / 2);
+        } else if (parseInt(els.mesContemplacao.value, 10) > paramsConsorcio.prazo) {
+            els.mesContemplacao.value = paramsConsorcio.prazo;
+        }
+
+        var aporteMensal = parseFloat(els.aporte.value) || 0;
+        var cdiAnual = (parseFloat(els.cdiAnual.value) || 0) / 100;
+        var percentCDI = (parseFloat(els.percentCDI.value) || 0) / 100;
+        var inflacaoBem = (parseFloat(els.inflacaoBem.value) || 0) / 100;
+
+        var pontosRF = CALC.simulaRendaFixa({ aporteMensal: aporteMensal, meses: paramsConsorcio.prazo, cdiAnual: cdiAnual, percentCDI: percentCDI });
+        var rendimentoRFAnual = CALC.rendimentoLiquidoAnualizado(pontosRF, aporteMensal);
+
+        var analiseBreakEven = CALC.analisaBreakEven(paramsConsorcio, rendimentoRFAnual);
+        var veredicto = CALC.veredictoBreakEven(analiseBreakEven.segmentos, paramsConsorcio.prazo);
+
+        var precosBem = [null];
+        var t;
+        for (t = 1; t <= paramsConsorcio.prazo; t++) {
+            precosBem.push(CALC.precoBem(paramsConsorcio.carta, inflacaoBem, t));
+        }
+
+        var acumuladoPago = [null];
+        var acumulado = 0;
+        for (t = 1; t <= paramsConsorcio.prazo; t++) {
+            acumulado += CALC.parcelaConsorcio(paramsConsorcio, t);
+            acumuladoPago.push(acumulado);
+        }
+
+        var financiamento = null;
+        if (els.financiamentoAtivo.checked) {
+            financiamento = CALC.simulaFinanciamento({
+                carta: paramsConsorcio.carta,
+                taxaAnual: (parseFloat(els.finTaxa.value) || 0) / 100,
+                entradaPercent: (parseFloat(els.finEntrada.value) || 0) / 100,
+                prazo: Math.max(1, parseInt(els.finPrazo.value, 10) || 1)
+            });
+        }
+
+        cacheCompleto = {
+            paramsConsorcio: paramsConsorcio,
+            pontosRF: pontosRF,
+            rendimentoRFAnual: rendimentoRFAnual,
+            veredicto: veredicto,
+            precosBem: precosBem,
+            acumuladoPago: acumuladoPago,
+            financiamento: financiamento
+        };
+
+        atualizarURL();
+        renderizarTudo();
+    }
+
+    // ------------------------------------------------------------------
+    // Recálculo leve: só o que depende do mês de contemplação (chamado a cada movimento do slider)
+    // ------------------------------------------------------------------
+    function renderizarTudo() {
+        if (!cacheCompleto) return;
+        var mesContemplacao = Math.min(parseInt(els.mesContemplacao.value, 10) || 1, cacheCompleto.paramsConsorcio.prazo);
+        document.getElementById("mesContemplacaoValor").textContent = mesContemplacao;
+
+        var paramsComMes = Object.assign({}, cacheCompleto.paramsConsorcio, { mesContemplacao: mesContemplacao });
+        var cetAnual = CALC.cetAnualConsorcio(paramsComMes);
+
+        var totalPago = cacheCompleto.acumuladoPago[cacheCompleto.acumuladoPago.length - 1];
+        var rfFinal = cacheCompleto.pontosRF[cacheCompleto.pontosRF.length - 1];
+
+        document.getElementById("statCet").textContent = cetAnual === null ? "—" : percentFmt.format(cetAnual);
+        document.getElementById("statCet").title = cetAnual === null
+            ? "Não há uma taxa de desconto real que zere o valor presente deste fluxo de caixa (a contemplação neste mês não gera uma TIR bem definida)."
+            : "";
+        document.getElementById("statRendimentoRF").textContent = cacheCompleto.rendimentoRFAnual === null ? "—" : percentFmt.format(cacheCompleto.rendimentoRFAnual);
+        document.getElementById("statTotalPago").textContent = currencyFmt.format(totalPago);
+        document.getElementById("statPatrimonioRF").textContent = currencyFmt.format(rfFinal.saldoLiquido);
+
+        renderizarVeredicto(cacheCompleto.veredicto, mesContemplacao, cetAnual);
+        renderizarFinanciamento(cacheCompleto.financiamento);
+        renderizarTabela(cacheCompleto, mesContemplacao);
+        renderizarGrafico(cacheCompleto, mesContemplacao);
+
+        resultsWrap.hidden = false;
+        requestAnimationFrame(function () { resultsWrap.classList.add("is-visible"); });
+    }
+
+    function renderizarVeredicto(veredicto, mesContemplacao, cetAnualAtual) {
+        var el = document.getElementById("statVeredito");
+        var texto = document.getElementById("veredictoTexto");
+        var vencendoAgora = cetAnualAtual !== null && cacheCompleto.rendimentoRFAnual !== null && cetAnualAtual >= cacheCompleto.rendimentoRFAnual;
+        el.classList.toggle("is-bad", !vencendoAgora);
+
+        if (veredicto.tipo === "rf_sempre") {
+            texto.innerHTML = "Neste cenário, a <strong>renda fixa vence</strong> em qualquer mês de contemplação simulado.";
+        } else if (veredicto.tipo === "consorcio_sempre") {
+            texto.innerHTML = "Neste cenário, o <strong>consórcio vence</strong> em qualquer mês de contemplação simulado.";
+        } else if (veredicto.tipo === "corte_simples") {
+            texto.innerHTML = "Se você for contemplado até o mês <strong>" + veredicto.mesCorte + "</strong>, o consórcio vence; a partir do mês " + (veredicto.mesCorte + 1) + ", a renda fixa vence.";
+        } else {
+            var faixas = veredicto.segmentos.map(function (s) { return s[0] + "–" + s[1]; }).join(", ");
+            texto.innerHTML = "O CET do consórcio não cai (nem sobe) de forma constante ao longo do prazo. Neste cenário, o consórcio só supera a renda fixa se a contemplação cair " +
+                "dentro do(s) mês(es) <strong>" + faixas + "</strong>; fora dessa janela, a renda fixa vence.";
+        }
+    }
+
+    function renderizarFinanciamento(financiamento) {
+        var card = document.getElementById("financingCard");
+        if (!financiamento) {
+            card.hidden = true;
+            return;
+        }
+        card.hidden = false;
+        document.getElementById("finParcela").textContent = currencyFmt.format(financiamento.parcela);
+        document.getElementById("finCustoTotal").textContent = currencyFmt.format(financiamento.custoTotal);
+        document.getElementById("finCet").textContent = percentFmt.format(financiamento.cetSimples);
+    }
+
+    function renderizarTabela(cache, mesContemplacao) {
+        var tbody = document.getElementById("tableBody");
+        tbody.innerHTML = "";
+        var frag = document.createDocumentFragment();
+        var prazo = cache.paramsConsorcio.prazo;
+        var t;
+        for (t = 1; t <= prazo; t++) {
+            var row = document.createElement("tr");
+            var cartaCorrigidaMes = CALC.cartaCorrigida(cache.paramsConsorcio.carta, cache.paramsConsorcio.correcaoAnual, t);
+            var parcela = CALC.parcelaConsorcio(cache.paramsConsorcio, t);
+            var rowHtml =
+                "<td>" + t + (t === mesContemplacao ? " (contemplação)" : "") + "</td>" +
+                "<td>" + currencyFmt.format(cartaCorrigidaMes) + "</td>" +
+                "<td>" + currencyFmt.format(parcela) + "</td>" +
+                "<td>" + currencyFmt.format(cache.acumuladoPago[t]) + "</td>" +
+                "<td>" + currencyFmt.format(cache.pontosRF[t - 1].saldoLiquido) + "</td>" +
+                "<td>" + currencyFmt.format(cache.precosBem[t]) + "</td>";
+            row.innerHTML = rowHtml;
+            frag.appendChild(row);
+        }
+        tbody.appendChild(frag);
+    }
+
+    // ------------------------------------------------------------------
+    // Gráfico (SVG desenhado em JS puro, sem dependências externas)
+    // ------------------------------------------------------------------
+    function renderizarGrafico(cache, mesContemplacao) {
+        var width = 900;
+        var height = 380;
+        var margin = { top: 16, right: 16, bottom: 30, left: 70 };
+        var innerW = width - margin.left - margin.right;
+        var innerH = height - margin.top - margin.bottom;
+        var prazo = cache.paramsConsorcio.prazo;
+
+        var maxValue = 1;
+        var t;
+        for (t = 1; t <= prazo; t++) {
+            maxValue = Math.max(maxValue, cache.acumuladoPago[t], cache.pontosRF[t - 1].saldoLiquido, cache.precosBem[t]);
+        }
+
+        var xScale = function (mes) { return margin.left + (mes / prazo) * innerW; };
+        var yScale = function (value) { return margin.top + innerH - (value / maxValue) * innerH; };
+
+        var gridSteps = 4;
+        var gridLines = "";
+        var gridLabels = "";
+        var i;
+        for (i = 0; i <= gridSteps; i++) {
+            var value = (maxValue / gridSteps) * i;
+            var y = yScale(value);
+            gridLines += '<line x1="' + margin.left + '" y1="' + y + '" x2="' + (width - margin.right) + '" y2="' + y + '" stroke="var(--gridline)" stroke-width="1" />';
+            gridLabels += '<text x="' + (margin.left - 10) + '" y="' + (y + 4) + '" text-anchor="end" font-size="11" fill="var(--text-muted)">' + compactCurrencyFmt.format(value) + '</text>';
+        }
+
+        var tickCount = Math.min(prazo, 6);
+        var tickStep = Math.max(1, Math.ceil(prazo / tickCount));
+        var xLabels = "";
+        var mes;
+        for (mes = 0; mes <= prazo; mes += tickStep) {
+            var mesRef = Math.max(1, mes);
+            xLabels += '<text x="' + xScale(mesRef) + '" y="' + (height - margin.bottom + 20) + '" text-anchor="middle" font-size="11" fill="var(--text-muted)">' + mesRef + 'm</text>';
+        }
+
+        function buildPath(getValue) {
+            var d = "";
+            for (t = 1; t <= prazo; t++) {
+                d += (t === 1 ? "M" : "L") + xScale(t) + "," + yScale(getValue(t));
+            }
+            return d;
+        }
+
+        var pathAcumulado = buildPath(function (m) { return cache.acumuladoPago[m]; });
+        var pathRF = buildPath(function (m) { return cache.pontosRF[m - 1].saldoLiquido; });
+        var pathBem = buildPath(function (m) { return cache.precosBem[m]; });
+
+        // Encontra o primeiro mês em que o saldo líquido da RF ultrapassa o preço do bem ("compra à vista")
+        var mesCompraAvista = null;
+        for (t = 1; t <= prazo; t++) {
+            if (cache.pontosRF[t - 1].saldoLiquido >= cache.precosBem[t]) {
+                mesCompraAvista = t;
+                break;
+            }
+        }
+
+        var xContemplacao = xScale(mesContemplacao);
+        var marcadorContemplacao =
+            '<line x1="' + xContemplacao + '" y1="' + margin.top + '" x2="' + xContemplacao + '" y2="' + (margin.top + innerH) + '" stroke="var(--focus)" stroke-width="1.5" stroke-dasharray="4 4" />' +
+            '<text x="' + xContemplacao + '" y="' + (margin.top - 4) + '" text-anchor="middle" font-size="10" fill="var(--focus)">Contemplação</text>';
+
+        var marcadorCompra = "";
+        if (mesCompraAvista !== null) {
+            var xCompra = xScale(mesCompraAvista);
+            var yCompra = yScale(cache.precosBem[mesCompraAvista]);
+            marcadorCompra =
+                '<circle cx="' + xCompra + '" cy="' + yCompra + '" r="5" fill="var(--good)" stroke="var(--surface-2)" stroke-width="2" />' +
+                '<text x="' + xCompra + '" y="' + (yCompra - 10) + '" text-anchor="middle" font-size="10" fill="var(--good)">Compra à vista</text>';
+        }
+
+        chartWrap.innerHTML =
+            '<svg viewBox="0 0 ' + width + ' ' + height + '" role="img" aria-label="Gráfico comparando o acumulado pago no consórcio, o saldo líquido da renda fixa e o preço do bem ao longo do prazo">' +
+                '<line x1="' + margin.left + '" y1="' + (margin.top + innerH) + '" x2="' + (width - margin.right) + '" y2="' + (margin.top + innerH) + '" stroke="var(--baseline)" stroke-width="1" />' +
+                gridLines + gridLabels + xLabels +
+                '<path d="' + pathBem + '" fill="none" stroke="var(--series-3)" stroke-width="2" stroke-dasharray="6 4" stroke-linejoin="round" stroke-linecap="round" />' +
+                '<path d="' + pathAcumulado + '" fill="none" stroke="var(--series-1)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />' +
+                '<path d="' + pathRF + '" fill="none" stroke="var(--series-2)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />' +
+                marcadorContemplacao + marcadorCompra +
+                '<line id="crosshair" x1="0" y1="' + margin.top + '" x2="0" y2="' + (margin.top + innerH) + '" stroke="var(--border-strong)" stroke-width="1" style="display:none" />' +
+                '<circle id="hoverAcumulado" r="5" fill="var(--series-1)" stroke="var(--surface-2)" stroke-width="2" style="display:none" />' +
+                '<circle id="hoverRF" r="5" fill="var(--series-2)" stroke="var(--surface-2)" stroke-width="2" style="display:none" />' +
+                '<circle id="hoverBem" r="5" fill="var(--series-3)" stroke="var(--surface-2)" stroke-width="2" style="display:none" />' +
+                '<rect id="hoverCapture" x="' + margin.left + '" y="' + margin.top + '" width="' + innerW + '" height="' + innerH + '" fill="transparent" />' +
+            '</svg>' +
+            '<div class="chart-tooltip" id="chartTooltip"></div>';
+
+        var svg = chartWrap.querySelector("svg");
+        var capture = chartWrap.querySelector("#hoverCapture");
+        var crosshair = chartWrap.querySelector("#crosshair");
+        var hoverAcumulado = chartWrap.querySelector("#hoverAcumulado");
+        var hoverRF = chartWrap.querySelector("#hoverRF");
+        var hoverBem = chartWrap.querySelector("#hoverBem");
+        var tooltip = chartWrap.querySelector("#chartTooltip");
+
+        function handleMove(clientX) {
+            var rect = svg.getBoundingClientRect();
+            var scale = width / rect.width;
+            var svgX = (clientX - rect.left) * scale;
+            var mesAlvo = Math.round(((svgX - margin.left) / innerW) * prazo);
+            var clampedMes = Math.max(1, Math.min(prazo, mesAlvo));
+
+            var px = xScale(clampedMes);
+            crosshair.setAttribute("x1", px);
+            crosshair.setAttribute("x2", px);
+            crosshair.style.display = "block";
+
+            var yAcumulado = yScale(cache.acumuladoPago[clampedMes]);
+            var yRF = yScale(cache.pontosRF[clampedMes - 1].saldoLiquido);
+            var yBem = yScale(cache.precosBem[clampedMes]);
+
+            hoverAcumulado.setAttribute("cx", px); hoverAcumulado.setAttribute("cy", yAcumulado); hoverAcumulado.style.display = "block";
+            hoverRF.setAttribute("cx", px); hoverRF.setAttribute("cy", yRF); hoverRF.style.display = "block";
+            hoverBem.setAttribute("cx", px); hoverBem.setAttribute("cy", yBem); hoverBem.style.display = "block";
+
+            tooltip.innerHTML =
+                "<strong>Mês " + clampedMes + "</strong>" +
+                '<div class="row"><i style="background:var(--series-1)"></i>Pago: ' + currencyFmt.format(cache.acumuladoPago[clampedMes]) + "</div>" +
+                '<div class="row"><i style="background:var(--series-2)"></i>RF líquido: ' + currencyFmt.format(cache.pontosRF[clampedMes - 1].saldoLiquido) + "</div>" +
+                '<div class="row"><i style="background:var(--series-3)"></i>Bem: ' + currencyFmt.format(cache.precosBem[clampedMes]) + "</div>";
+
+            var wrapRect = chartWrap.getBoundingClientRect();
+            var displayScale = rect.width / width;
+            var left = px * displayScale;
+            var tooltipWidth = 190;
+            if (left + tooltipWidth > wrapRect.width) left = wrapRect.width - tooltipWidth;
+            tooltip.style.left = Math.max(0, left) + "px";
+            tooltip.style.top = "0px";
+            tooltip.style.opacity = "1";
+        }
+
+        function hide() {
+            crosshair.style.display = "none";
+            hoverAcumulado.style.display = "none";
+            hoverRF.style.display = "none";
+            hoverBem.style.display = "none";
+            tooltip.style.opacity = "0";
+        }
+
+        capture.addEventListener("mousemove", function (e) { handleMove(e.clientX); });
+        capture.addEventListener("mouseleave", hide);
+        capture.addEventListener("touchmove", function (e) { if (e.touches[0]) handleMove(e.touches[0].clientX); }, { passive: true });
+        capture.addEventListener("touchend", hide);
+    }
+
+    // ------------------------------------------------------------------
+    // Interações de toggle
+    // ------------------------------------------------------------------
+    function syncFinanciamentoFields() {
+        var ativo = els.financiamentoAtivo.checked;
+        financiamentoFields.classList.toggle("is-disabled", !ativo);
+        if (!ativo) financiamentoDetails.open = financiamentoDetails.open; // não força abrir/fechar
+    }
+    els.financiamentoAtivo.addEventListener("change", function () {
+        syncFinanciamentoFields();
+        recalcularCompleto();
+    });
+    syncFinanciamentoFields();
+
+    // ------------------------------------------------------------------
+    // Listeners
+    // ------------------------------------------------------------------
+    var recalcularCompletoDebounced = debounce(recalcularCompleto, 200);
+
+    document.getElementById("calcForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        recalcularCompleto();
+    });
+
+    Object.keys(regrasValidacao).forEach(function (id) {
+        els[id].addEventListener("input", function () {
+            validarCampo(id);
+            recalcularCompletoDebounced();
+        });
+    });
+    els.lanceEmbutido.addEventListener("change", recalcularCompletoDebounced);
+
+    // O slider só precisa do recálculo leve (render), não do recálculo completo — muito mais rápido
+    els.mesContemplacao.addEventListener("input", function () {
+        document.getElementById("mesContemplacaoValor").textContent = els.mesContemplacao.value;
+        renderizarTudo();
+        atualizarURL();
+    });
+
+    // ------------------------------------------------------------------
+    // Inicialização
+    // ------------------------------------------------------------------
+    carregarDaURL();
+    recalcularCompleto();
+})();
+</script>
+
+</body>
+</html>
